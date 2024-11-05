@@ -1,0 +1,58 @@
+/* Global settings */
+body,
+.navbar-container {
+  font-family: "Roboto", sans-serif;
+  /* Applies Roboto font to body and navbar */
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #fff;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.navbar-links li {
+  padding: 10px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  display: inline-block;
+}
+
+.navbar-links li:hover {
+  transform: scale(1.1);
+  /* Scales the link horizontally */
+}
+
+.profile-pic-container {
+  display: flex;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  object-fit: cover;
+  border: 1px solid #ffffff;
+}
+
+.profile-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 80%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+@media (max-width: 768px) {
+
+  .navbar-container,
+  .navbar-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
