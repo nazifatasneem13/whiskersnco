@@ -1,87 +1,237 @@
 import React, { useState } from "react";
+import {
+  Grid,
+  Box,
+  TextField,
+  Typography,
+  Button,
+  CircularProgress,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import upload from "../../utils/upload";
-import "./Register.scss";
 import newRequest from "../../utils/newRequest";
 import { useNavigate } from "react-router-dom";
+import { auth, provider, signInWithPopup } from "../../firebase";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#6a5acd", // Soft purple
+    },
+    background: {
+      default: "#f4f4f4",
+      paper: "#ffffff",
+    },
+  },
+  typography: {
+    fontFamily: "Arial, sans-serif",
+    h1: {
+      fontSize: "1.8rem",
+      fontWeight: 700,
+      color: "#333333",
+    },
+    body1: {
+      color: "#666666",
+    },
+  },
+});
 
 const Register = () => {
   const [file, setFile] = useState(null);
-  const [user, setUser] = useState({
-    username: "",
-    email: "",
-    password: "",
-    img: "",
-    country: "",
-    isSeller: false,
-    desc: "",
-  });
+  const [user, setUser] = useState({ username: "", email: "", password: "" });
   const [emailError, setEmailError] = useState("");
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setUser((prev) => {
-      return { ...prev, [e.target.name]: e.target.value };
-    });
+    setUser((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleGoogleSignUp = async () => {
+    try {
+      setLoading(true);
+      const result = await signInWithPopup(auth, provider);
+      const googleUser = result.user;
 
+      const res = await newRequest.post(
+        "http://localhost:4000/auth/google-login",
+        {
+          uid: googleUser.uid,
+          username: googleUser.displayName,
+          email: googleUser.email,
+          img: googleUser.photoURL,
+        }
+      );
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!user.email.includes("@")) {
-    setEmailError("Please enter a valid email address.");
-    return;
-  }
-  setEmailError(""); // Clear any previous error message
-  const url = await upload(file);
-  try {
-    await newRequest.post("http://localhost:4000/auth/register", {
-      ...user,
-      img: url,
-    });
-    setSignupSuccess(true);
-    setTimeout(() => {
-      setSignupSuccess(false);
-    }, 3000);
-    navigate("/preferences"); // Navigate to preferences page
-  } catch (err) {
-    console.log(err);
-  }
-};
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("currentUser", JSON.stringify(res.data.user));
+      navigate(res.data.user.petTypes ? "/" : "/preferences");
+    } catch (error) {
+      console.error("Google Sign-in Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user.email.includes("@")) {
+      setEmailError("Please enter a valid email.");
+      return;
+    }
+    setEmailError("");
+    setLoading(true);
+    const imgUrl = file ? await upload(file) : "";
+
+    try {
+      await newRequest.post("http://localhost:4000/auth/register", {
+        ...user,
+        img: imgUrl,
+      });
+      setSignupSuccess(true);
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (err) {
+      console.error("Error during registration:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="register">
-      <form onSubmit={handleSubmit}>
-        <div className="left">
-          <h1>Create a new account</h1>
-          <label>Username</label>
-          <input
-            name="username"
-            type="text"
-            placeholder="Your username"
-            onChange={handleChange}
+    <ThemeProvider theme={theme}>
+      <Grid container style={{ minHeight: "70vh" }}>
+        {/* Left Panel */}
+        <Grid
+          item
+          xs={12}
+          md={6}
+          style={{
+            backgroundColor: theme.palette.background.paper,
+            padding: "2rem",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <Typography variant="h1" align="center" gutterBottom>
+            Sign Up
+          </Typography>
+          <Typography variant="body1" align="center" gutterBottom>
+            Fill the form below to create your account
+          </Typography>
+          <form
+            onSubmit={handleSubmit}
+            style={{ maxWidth: 400, margin: "0 auto" }}
+          >
+            <TextField
+              fullWidth
+              label="Full Name"
+              name="username"
+              margin="normal"
+              variant="outlined"
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              margin="normal"
+              variant="outlined"
+              onChange={handleChange}
+              error={!!emailError}
+              helperText={emailError}
+            />
+            <TextField
+              fullWidth
+              label="Password"
+              name="password"
+              type="password"
+              margin="normal"
+              variant="outlined"
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              type="file"
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+            <FormControlLabel
+              control={<Checkbox />}
+              label="I accept the Terms of Use & Privacy Policy"
+            />
+            {signupSuccess && (
+              <Typography variant="body1" align="center" color="success.main">
+                Signup successful!
+              </Typography>
+            )}
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              type="submit"
+              disabled={loading}
+              style={{ marginTop: "1rem" }}
+              sx={{
+                mt: 3,
+                mb: 2,
+                backgroundColor: "#121858", // Midnight Blue
+                color: "white", // Ensure text color contrasts well
+                "&:hover": {
+                  backgroundColor: "#0f144d", // Slightly darker shade for hover effect
+                },
+              }}
+            >
+              {loading ? <CircularProgress size={24} /> : "Sign Up"}
+            </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={handleGoogleSignUp}
+              disabled={loading}
+              style={{ marginTop: "1rem" }}
+            >
+              {loading ? <CircularProgress size={24} /> : "Sign up with Google"}
+            </Button>
+          </form>
+          <Typography
+            variant="body2"
+            align="center"
+            style={{ marginTop: "1rem" }}
+          >
+            Already have an account? <a href="/login">Sign in</a>
+          </Typography>
+        </Grid>
+        {/* Right Panel */}
+        <Grid
+          item
+          xs={12}
+          md={6}
+          style={{
+            backgroundColor: "#121858",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "relative",
+          }}
+        >
+          <Box
+            style={{
+              width: 300,
+              height: 300,
+              backgroundColor: "#ffffff",
+              borderRadius: "50%",
+              filter: "blur(50px)",
+            }}
           />
-          <label>Email</label>
-          <input
-            name="email"
-            type="email"
-            placeholder="youremail@example.com"
-            onChange={handleChange}
-          />
-          {emailError && <p className="error">{emailError}</p>}
-          {signupSuccess && <p className="success">Signup successful!</p>}
-          <label>Password</label>
-          <input name="password" type="password" onChange={handleChange} />
-          <label>Profile Picture</label>
-          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-      
-          <button type="submit">Register</button>
-        </div>
-   
-      </form>
-    </div>
+        </Grid>
+      </Grid>
+    </ThemeProvider>
   );
 };
 
