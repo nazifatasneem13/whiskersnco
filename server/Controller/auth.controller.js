@@ -2,57 +2,94 @@ const User = require("../Model/user.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const createError = require("../utils/createError");
- const register = async (req, res, next) => {
-    try{
-        const hash = bcryptjs.hashSync(req.body.password, 5);
 
-        const newUser = new User({
-            ...req.body,
-            password: hash,
-        })
+const register = async (req, res, next) => {
+  try {
+    const hash = bcryptjs.hashSync(req.body.password, 5);
 
-        await newUser.save();
-        res.status(201).send("User has been created.");
+    const newUser = new User({
+      ...req.body,
+      password: hash,
+    });
 
-    } catch(err) {
-        next(err)
+    await newUser.save();
+    res.status(201).send("User has been created.");
+  } catch (err) {
+    next(err);
+  }
+};
+
+const login = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ username: req.body.username });
+    if (!user) return next(createError(404, "User not found."));
+
+    const isCorrect = bcryptjs.compareSync(req.body.password, user.password);
+    if (!isCorrect)
+      return next(createError(400, "Wrong password or username."));
+
+    // Generate token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_KEY, {
+      expiresIn: "1h",
+    });
+
+    // Send token and user data back to the client
+    res.status(200).json({ token, user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const logout = async (req, res) => {
+  res
+    .clearCookie("accessToken", {
+      sameSite: "none",
+      secure: "true",
+    })
+    .status(200)
+    .send("User has been logged out.");
+};
+
+const googleLogin = async (req, res, next) => {
+  try {
+    const { uid, username, email, img } = req.body;
+
+    // Find user by 'uid' (for Google users)
+    let user = await User.findOne({ uid });
+
+    if (!user) {
+      // If not found by 'uid', check by 'email' (in case user registered before)
+      user = await User.findOne({ email });
     }
-};
 
- const login = async (req, res, next) => {
-    try{
-        const user = await User.findOne({ username: req.body.username});
-
-        if(!user) return next(createError(404, "User not found."));
-
-        const isCorrect = bcryptjs.compareSync(req.body.password, user.password);
-        if(!isCorrect) 
-            return next(createError(400, "Wrong password or username."));
-
-        const token = jwt.sign({
-            id: user._id,
-            isSeller: user.isSeller,
-        }, process.env.JWT_KEY)
-
-        const {password, ...info} = user._doc;
-        res.cookie("accessToken", token, {httpOnly: true}).status(200).send(info)
-
-    } catch(error) {
-        next(err);
+    if (!user) {
+      // Create a new user if not found
+      user = new User({
+        uid, // Set 'uid' for Google users
+        username,
+        email,
+        img,
+        petTypes: [],
+        vaccinationStatuses: [],
+        preferredPetTypes: [],
+      });
+      await user.save();
     }
+
+    // Generate token using MongoDB '_id'
+    const token = jwt.sign({ id: user._id }, process.env.JWT_KEY, {
+      expiresIn: "1h",
+    });
+
+    res.status(200).json({ token, user });
+  } catch (err) {
+    next(err);
+  }
 };
-
- const logout = async (req,res) => {
-    res.clearCookie("accessToken", {
-        sameSite:"none",
-        secure:"true",
-    }).status(200).send("User has been logged out.");
-};
-
-
 
 module.exports = {
-    register,
-    login,
-    logout,
+  register,
+  login,
+  logout,
+  googleLogin,
 };
