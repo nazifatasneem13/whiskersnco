@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+  Box,
+} from "@mui/material";
+import { formatDistanceToNow } from "date-fns";
 
 const AdoptedCards = (props) => {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [showApproved, setShowApproved] = useState(false);
-  const [showDeletedSuccess, setshowDeletedSuccess] = useState(false);
+  const [showDeletedSuccess, setShowDeletedSuccess] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const formatTimeAgo = (updatedAt) => {
@@ -12,91 +20,123 @@ const AdoptedCards = (props) => {
     return formatDistanceToNow(date, { addSuffix: true });
   };
 
- const handleReject = async () => {
-    setIsDeleting(true)
+  const handleReject = async () => {
+    setIsDeleting(true);
     try {
-      const response = await fetch(`http://localhost:4000/delete/${props.pet._id}`, {
-        method: 'DELETE'
-      })
+      const response = await fetch(
+        `http://localhost:4000/delete/${props.pet._id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         setShowErrorPopup(true);
-        throw new Error('Failed to delete pet');
+        throw new Error("Failed to delete pet");
       } else {
-        setshowDeletedSuccess(true);
+        setShowDeletedSuccess(true);
       }
     } catch (err) {
       setShowErrorPopup(true);
-      console.error('Error deleting pet:', err);
+      console.error("Error deleting pet:", err);
     } finally {
       setIsDeleting(false);
     }
-  }
+  };
 
   return (
-    <div className='req-containter'>
-      <div className='pet-view-card'>
-        <div className='pet-card-pic'>
-          <img src={`http://localhost:4000/images/${props.pet.filename}`} alt={props.pet.name} />
-        </div>
-        <div className='pet-card-details'>
-          <h2>{props.pet.name}</h2>
-          <p><b>Type:</b> {props.pet.type}</p>
-          <p><b>New Owner Email:</b> {props.pet.email}</p>
-          <p><b>New Owner Phone:</b> {props.pet.phone}</p>
-          <p><b>Adopted: </b>{formatTimeAgo(props.pet.updatedAt)}</p>
-        </div>
-        <div className='app-rej-btn'>
-          <button onClick={handleReject} disabled={isDeleting}>{isDeleting ? (<p>Deleting</p>) : (props.deleteBtnText)}</button>
+    <Card
+      sx={{
+        backgroundColor: "#ffffff",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        borderRadius: 2,
+        padding: 2,
+      }}
+    >
+      <CardMedia
+        component="img"
+        height="200"
+        image={props.pet.filename}
+        alt={props.pet.name}
+      />
 
-        </div>
-        {showErrorPopup && (
-          <div className='popup'>
-            <div className='popup-content'>
-              <p>Oops!... Connection Error</p>
-            </div>
-            <button onClick={() => setShowErrorPopup(!showErrorPopup)} className='close-btn'>
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
-        {showApproved && (
-          <div className='popup'>
-            <div className='popup-content'>
-              <p>Approval Successful...</p>
-              <p>
-                Please contact the customer at{' '}
-                <a href={`mailto:${props.pet.email}`}>{props.pet.email}</a>{' '}
-                or{' '}
-                <a href={`tel:${props.pet.phone}`}>{props.pet.phone}</a>{' '}
-                to arrange the transfer of the pet from the owner's home to our adoption center.
-              </p>
-            </div>
-            <button onClick={() => {
-              setShowApproved(!showApproved)
-              props.updateCards()
-            }} className='close-btn'>
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
+      <CardContent>
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{ fontWeight: "bold", color: "#1e3c72" }} // Dark blue text
+        >
+          {props.pet.name}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Type:</b> {props.pet.type}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>New Owner Email:</b> {props.pet.email}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>New Owner Phone:</b> {props.pet.phone}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Adopted:</b> {formatTimeAgo(props.pet.updatedAt)}
+        </Typography>
+        <Button
+          variant="contained"
+          color="error"
+          fullWidth
+          onClick={handleReject}
+          disabled={isDeleting}
+          sx={{
+            marginTop: 2,
+            backgroundColor: "#d32f2f",
+            "&:hover": { backgroundColor: "#b71c1c" },
+          }}
+        >
+          {isDeleting ? "Deleting..." : props.deleteBtnText}
+        </Button>
+      </CardContent>
 
-        {showDeletedSuccess && (
-          <div className='popup'>
-            <div className='popup-content'>
-              <p>Deleted Successfully from Database...</p>
-            </div>
-            <button onClick={() => {
-              setshowDeletedSuccess(!showDeletedSuccess)
-              props.updateCards()
-            }} className='close-btn'>
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
+      {showErrorPopup && (
+        <Box sx={{ padding: 2, backgroundColor: "#f8d7da", borderRadius: 1 }}>
+          <Typography color="error">Oops!... Connection Error</Typography>
+          <Button onClick={() => setShowErrorPopup(false)}>Close</Button>
+        </Box>
+      )}
 
-      </div>
-    </div>
+      {showApproved && (
+        <Box sx={{ padding: 2, backgroundColor: "#d1e7dd", borderRadius: 1 }}>
+          <Typography>Approval Successful...</Typography>
+          <Typography>
+            Please contact the customer at{" "}
+            <a href={`mailto:${props.pet.email}`}>{props.pet.email}</a> or{" "}
+            <a href={`tel:${props.pet.phone}`}>{props.pet.phone}</a> to arrange
+            the transfer of the pet.
+          </Typography>
+          <Button
+            onClick={() => {
+              setShowApproved(false);
+              props.updateCards();
+            }}
+          >
+            Close
+          </Button>
+        </Box>
+      )}
+
+      {showDeletedSuccess && (
+        <Box sx={{ padding: 2, backgroundColor: "#d1e7dd", borderRadius: 1 }}>
+          <Typography>Deleted Successfully from Database...</Typography>
+          <Button
+            onClick={() => {
+              setShowDeletedSuccess(false);
+              props.updateCards();
+            }}
+          >
+            Close
+          </Button>
+        </Box>
+      )}
+    </Card>
   );
 };
 

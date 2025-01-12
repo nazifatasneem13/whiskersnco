@@ -1,7 +1,7 @@
 import React from "react";
 import HomeDarkCardLeftPic from "./images/HomeDarkCardLeftPic.jpeg";
 import HomeDarkCardRightPic from "./images/HomeDarkCardRightPic.jpeg";
-
+import "./cardbelowhome.css";
 const CardBelowHome = () => {
   return (
     <div className="dark-grey-container">

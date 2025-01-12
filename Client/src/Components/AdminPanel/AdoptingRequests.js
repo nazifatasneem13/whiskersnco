@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import FormCard from './FormCard';
+import React, { useState, useEffect } from "react";
+import FormCard from "./FormCard";
 
 const AdoptingRequests = () => {
   const [forms, setForms] = useState([]);
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [petDetailsPopup, setPetDetailsPopup] = useState(false); 
-  const [selectedPet, setSelectedPet] = useState(null); 
-  const [selectedPetId, setSelectedPetId] = useState(''); 
+  const [petDetailsPopup, setPetDetailsPopup] = useState(false);
+  const [selectedPet, setSelectedPet] = useState(null);
+  const [selectedPetId, setSelectedPetId] = useState("");
 
   const fetchForms = async () => {
     try {
-      const response = await fetch('http://localhost:4000/form/getForms');
+      const response = await fetch("http://localhost:4000/form/getForms");
       if (!response.ok) {
-        throw new Error('An error occurred');
+        throw new Error("An error occurred");
       }
       const data = await response.json();
       setForms(data);
@@ -26,9 +26,9 @@ const AdoptingRequests = () => {
 
   const fetchPets = async () => {
     try {
-      const response = await fetch('http://localhost:4000/approvedPets');
+      const response = await fetch("http://localhost:4000/approvedPets");
       if (!response.ok) {
-        throw new Error('An error occurred');
+        throw new Error("An error occurred");
       }
       const data = await response.json();
       setPets(data);
@@ -53,7 +53,7 @@ const AdoptingRequests = () => {
 
   const closePetDetailsPopup = () => {
     setPetDetailsPopup(false);
-    setSelectedPet(null); 
+    setSelectedPet(null);
   };
 
   const handlePetChange = (event) => {
@@ -61,13 +61,20 @@ const AdoptingRequests = () => {
   };
 
   const filteredPets = selectedPetId
-    ? petsWithRequests.filter(pet => pet._id === selectedPetId)
+    ? petsWithRequests.filter((pet) => pet._id === selectedPetId)
     : petsWithRequests;
 
   return (
     <div>
-      <div className="dropdown-container" style={{ textAlign: 'right', marginBottom: '20px' }}>
-        <select className='req-filter-selection' onChange={handlePetChange} value={selectedPetId}>
+      <div
+        className="dropdown-container"
+        style={{ textAlign: "right", marginBottom: "20px" }}
+      >
+        <select
+          className="req-filter-selection"
+          onChange={handlePetChange}
+          value={selectedPetId}
+        >
           <option value="">All Requets</option>
           {petsWithRequests.map((pet) => (
             <option key={pet._id} value={pet._id}>
@@ -82,20 +89,23 @@ const AdoptingRequests = () => {
         filteredPets.map((pet) => {
           const petForms = forms.filter((form) => form.petId === pet._id);
           return (
-            <div key={pet._id} className='form-container'>
+            <div key={pet._id} className="form-container">
               <div>
-                <h2 className='clickable-pet-name' onClick={() => displayPetDetails(pet)}>
+                <h2
+                  className="clickable-pet-name"
+                  onClick={() => displayPetDetails(pet)}
+                >
                   {pet.name}
                 </h2>
               </div>
-              <div className='form-child-container'>
+              <div className="form-child-container">
                 {petForms.map((form) => (
                   <FormCard
                     key={form._id}
                     form={form}
                     pet={pet}
                     updateCards={fetchForms}
-                    deleteBtnText={'Reject'}
+                    deleteBtnText={"Reject"}
                     approveBtn={true}
                   />
                 ))}
@@ -108,23 +118,41 @@ const AdoptingRequests = () => {
       )}
 
       {petDetailsPopup && selectedPet && (
-        <div className='popup'>
-          <div className='popup-content'>
-            <div className='pet-view-card'>
-              <div className='pet-card-pic'>
-                <img src={`http://localhost:4000/images/${selectedPet.filename}`} alt={selectedPet.name} />
+        <div className="popup">
+          <div className="popup-content">
+            <div className="pet-view-card">
+              <div className="pet-card-pic">
+                <img
+                  src={`http://localhost:4000/images/${selectedPet.filename}`}
+                  alt={selectedPet.name}
+                />
               </div>
-              <div className='pet-card-details'>
+              <div className="pet-card-details">
                 <h2>{selectedPet.name}</h2>
-                <p><b>Type:</b> {selectedPet.type}</p>
-                <p><b>Age:</b> {selectedPet.age}</p>
-                <p><b>Location:</b> {selectedPet.area}</p>
-                <p><b>Owner Email:</b> {selectedPet.email}</p>
-                <p><b>Owner Phone:</b> {selectedPet.phone}</p>
-                <p><b>Justification:</b> {selectedPet.justification}</p>
+                <p>
+                  <b>Type:</b> {selectedPet.type}
+                </p>
+                <p>
+                  <b>Age:</b> {selectedPet.age}
+                </p>
+                <p>
+                  <b>Location:</b> {selectedPet.area}
+                </p>
+                <p>
+                  <b>Divison:</b> {selectedPet.division}
+                </p>
+                <p>
+                  <b>Owner Email:</b> {selectedPet.email}
+                </p>
+                <p>
+                  <b>Owner Phone:</b> {selectedPet.phone}
+                </p>
+                <p>
+                  <b>Justification:</b> {selectedPet.justification}
+                </p>
               </div>
             </div>
-            <button onClick={closePetDetailsPopup} className='close-btn'>
+            <button onClick={closePetDetailsPopup} className="close-btn">
               Close <i className="fa fa-times"></i>
             </button>
           </div>

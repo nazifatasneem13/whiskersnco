@@ -1,27 +1,33 @@
 import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 import { formatDistanceToNow } from "date-fns";
 
 const PetCards = (props) => {
   const [showJustificationPopup, setShowJustificationPopup] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [showApproved, setShowApproved] = useState(false);
-  const [showDeletedSuccess, setshowDeletedSuccess] = useState(false);
+  const [showDeletedSuccess, setShowDeletedSuccess] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
 
-  const truncateText = (text, maxLength) => {
-    if (text.length <= maxLength) {
-      return text;
-    }
-    return text.substring(0, maxLength) + "...";
-  };
+  const truncateText = (text, maxLength) =>
+    text.length <= maxLength ? text : `${text.substring(0, maxLength)}...`;
 
   const maxLength = 40;
 
-  const formatTimeAgo = (updatedAt) => {
-    const date = new Date(updatedAt);
-    return formatDistanceToNow(date, { addSuffix: true });
-  };
+  const formatTimeAgo = (updatedAt) =>
+    formatDistanceToNow(new Date(updatedAt), { addSuffix: true });
 
   const handleApprove = async () => {
     setIsApproving(true);
@@ -30,12 +36,8 @@ const PetCards = (props) => {
         `http://localhost:4000/approving/${props.pet._id}`,
         {
           method: "PUT",
-          body: JSON.stringify({
-            status: "Approved",
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          body: JSON.stringify({ status: "Approved" }),
+          headers: { "Content-Type": "application/json" },
         }
       );
 
@@ -44,7 +46,7 @@ const PetCards = (props) => {
       } else {
         setShowApproved(true);
       }
-    } catch (err) {
+    } catch {
       setShowErrorPopup(true);
     } finally {
       setIsApproving(false);
@@ -56,14 +58,12 @@ const PetCards = (props) => {
     try {
       const deleteResponses = await fetch(
         `http://localhost:4000/form/delete/many/${props.pet._id}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
       if (!deleteResponses.ok) {
         throw new Error("Failed to delete forms");
       }
-    } catch (err) {
+    } catch {
     } finally {
       handleReject();
     }
@@ -73,156 +73,163 @@ const PetCards = (props) => {
     try {
       const response = await fetch(
         `http://localhost:4000/delete/${props.pet._id}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
 
       if (!response.ok) {
         setShowErrorPopup(true);
         throw new Error("Failed to delete pet");
       } else {
-        setshowDeletedSuccess(true);
+        setShowDeletedSuccess(true);
       }
-    } catch (err) {
+    } catch {
       setShowErrorPopup(true);
-      console.error("Error deleting pet:", err);
     } finally {
       setIsDeleting(false);
     }
   };
 
   return (
-    <div className="req-containter">
-      <div className="pet-view-card">
-        <div className="pet-card-pic">
-          <img
-            src={`http://localhost:4000/images/${props.pet.filename}`}
-            alt={props.pet.name}
-          />
-        </div>
-        <div className="pet-card-details">
-          <h2>{props.pet.name}</h2>
-          <p>
-            <b>Type:</b> {props.pet.type}
-          </p>
-          <p>
-            <b>Age:</b> {props.pet.age}
-          </p>
-          <p>
-            <b>Location:</b> {props.pet.area}
-          </p>
-          <p>
-            <b>Owner Email:</b> {props.pet.email}
-          </p>
-          <p>
-            <b>Owner Phone:</b> {props.pet.phone}
-          </p>
-          <p>
-            <b>Justification:</b>
-            <span>
-              {truncateText(props.pet.justification, maxLength)}
-              {props.pet.justification.length > maxLength && (
-                <span
-                  onClick={() =>
-                    setShowJustificationPopup(!showJustificationPopup)
-                  }
-                  className="read-more-btn"
-                >
-                  Read More
-                </span>
-              )}
-            </span>
-          </p>
-          <p>{formatTimeAgo(props.pet.updatedAt)}</p>
-        </div>
-        <div className="app-rej-btn">
-          <button
+    <Card
+      sx={{
+        backgroundColor: "#ffffff",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        borderRadius: 2,
+        padding: 2,
+        marginBottom: 2,
+      }}
+    >
+      <CardMedia
+        component="img"
+        height="200"
+        image={props.pet.filename}
+        alt={props.pet.name}
+        sx={{ borderRadius: 1 }}
+      />
+      <CardContent>
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{ fontWeight: "bold", color: "#1e3c72" }}
+        >
+          {props.pet.name}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Type:</b> {props.pet.type}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Age:</b> {props.pet.age}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Location:</b> {props.pet.area}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Division:</b> {props.pet.division}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Owner Email:</b> {props.pet.email}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Owner Phone:</b> {props.pet.phone}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Justification:</b>{" "}
+          <span>
+            {truncateText(props.pet.justification, maxLength)}
+            {props.pet.justification.length > maxLength && (
+              <Button
+                variant="text"
+                size="small"
+                onClick={() => setShowJustificationPopup(true)}
+              >
+                Read More
+              </Button>
+            )}
+          </span>
+        </Typography>
+        <Typography variant="caption" display="block" gutterBottom>
+          {formatTimeAgo(props.pet.updatedAt)}
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1, marginTop: 2 }}>
+          <Button
+            variant="contained"
+            color="error"
+            fullWidth
             onClick={deleteFormsAdoptedPet}
             disabled={isDeleting || isApproving}
           >
-            {isDeleting ? <p>Deleting</p> : props.deleteBtnText}
-          </button>
-          {props.approveBtn ? (
-            <button
-              disabled={isDeleting || isApproving}
+            {isDeleting ? "Deleting..." : props.deleteBtnText}
+          </Button>
+          {props.approveBtn && (
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
               onClick={handleApprove}
+              disabled={isDeleting || isApproving}
             >
-              {isApproving ? <p>Approving</p> : "Approve"}
-            </button>
-          ) : (
-            ""
+              {isApproving ? "Approving..." : "Approve"}
+            </Button>
           )}
-        </div>
-        {showJustificationPopup && (
-          <div className="popup">
-            <div className="popup-content">
-              <h4>Justification:</h4>
-              <p>{props.pet.justification}</p>
-            </div>
-            <button
-              onClick={() => setShowJustificationPopup(!showJustificationPopup)}
-              className="close-btn"
-            >
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
-        {showErrorPopup && (
-          <div className="popup">
-            <div className="popup-content">
-              <p>Oops!... Connection Error</p>
-            </div>
-            <button
-              onClick={() => setShowErrorPopup(!showErrorPopup)}
-              className="close-btn"
-            >
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
-        {showApproved && (
-          <div className="popup">
-            <div className="popup-content">
-              <p>Approval Successful...</p>
-              <p>
-                Please contact the customer at{" "}
-                <a href={`mailto:${props.pet.email}`}>{props.pet.email}</a> or{" "}
-                <a href={`tel:${props.pet.phone}`}>{props.pet.phone}</a> to
-                arrange the transfer of the pet from the owner's home to our
-                adoption center.
-              </p>
-            </div>
-            <button
-              onClick={() => {
-                setShowApproved(!showApproved);
-                props.updateCards();
-              }}
-              className="close-btn"
-            >
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
+        </Box>
+      </CardContent>
 
-        {showDeletedSuccess && (
-          <div className="popup">
-            <div className="popup-content">
-              <p>Deleted Successfully from Database...</p>
-            </div>
-            <button
-              onClick={() => {
-                setshowDeletedSuccess(!showDeletedSuccess);
-                props.updateCards();
-              }}
-              className="close-btn"
-            >
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+      {/* Popups */}
+      <Dialog
+        open={showJustificationPopup}
+        onClose={() => setShowJustificationPopup(false)}
+      >
+        <DialogTitle>Justification</DialogTitle>
+        <DialogContent>
+          <Typography>{props.pet.justification}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowJustificationPopup(false)}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={showErrorPopup} onClose={() => setShowErrorPopup(false)}>
+        <DialogTitle>Error</DialogTitle>
+        <DialogContent>
+          <Typography color="error">Oops!... Connection Error</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowErrorPopup(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={showApproved}
+        onClose={() => {
+          setShowApproved(false);
+          props.updateCards();
+        }}
+      >
+        <DialogTitle>Approval Successful</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Please contact the customer at{" "}
+            <a href={`mailto:${props.pet.email}`}>{props.pet.email}</a> or{" "}
+            <a href={`tel:${props.pet.phone}`}>{props.pet.phone}</a>.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowApproved(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={showDeletedSuccess}
+        onClose={() => {
+          setShowDeletedSuccess(false);
+          props.updateCards();
+        }}
+      >
+        <DialogTitle>Deletion Successful</DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setShowDeletedSuccess(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </Card>
   );
 };
 
