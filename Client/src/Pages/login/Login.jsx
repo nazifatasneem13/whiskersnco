@@ -42,7 +42,7 @@ const Login = () => {
   return (
     <div className="login">
       <form onSubmit={handleSubmit}>
-        <h1>Welcome to Whiskers-n-Co</h1>
+        <h1>Welcome to Shelf</h1>
         <label htmlFor="username">Username</label>
         <input
           id="username"
