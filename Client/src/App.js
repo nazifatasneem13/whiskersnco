@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/NavBar/Navbar";
-import Profile from "./Components/Profile.js";
+import Profile from "./Components/Profile.jsx";
 import Home from "./Components/Home/Home";
 import Login from "./Pages/login/Login.jsx";
 import Register from "./Pages/register/Register.jsx";
@@ -12,6 +12,11 @@ import Contact from "./Components/Contact/Contact";
 import Footer from "./Components/Footer/Footer";
 import Pets from "./Components/Pets/Pets";
 import AdoptForm from "./Components/AdoptForm/AdoptForm";
+import NearbyVets from "./Components/NearbyVets/NearbyVets";
+import TrainYourPet from "./Components/Train/TrainYourPet.js";
+import PostPetSection from "./Components/Services/PostPetSection";
+import AdoptSection from "./Components/Services/AdoptSection";
+import CommunicationPage from "./Components/Communication";
 import "./App.css";
 
 const Layout = ({ children }) => (
@@ -30,7 +35,23 @@ const App = () => {
           path="/"
           element={
             <Layout>
-              <Home description="Ensure you are fully prepared to provide proper care and attention to your pet before welcoming them into your home." />
+              <Home />
+            </Layout>
+          }
+        />
+        <Route
+          path="/post-pet"
+          element={
+            <Layout>
+              <PostPetSection />
+            </Layout>
+          }
+        />
+        <Route
+          path="/adopt-pet"
+          element={
+            <Layout>
+              <AdoptSection />
             </Layout>
           }
         />
@@ -51,10 +72,26 @@ const App = () => {
           }
         />
         <Route
+          path="/trainpets"
+          element={
+            <Layout>
+              <TrainYourPet />
+            </Layout>
+          }
+        />
+        <Route
           path="/adopt-form"
           element={
             <Layout>
               <AdoptForm />
+            </Layout>
+          }
+        />
+        <Route
+          path="/nearby-vets"
+          element={
+            <Layout>
+              <NearbyVets />
             </Layout>
           }
         />
@@ -91,11 +128,20 @@ const App = () => {
           }
         />
         <Route path="/admin-111424" element={<AdminLogin />} />
+
         <Route
           path="/profile"
           element={
             <Layout>
               <Profile />
+            </Layout>
+          }
+        />
+        <Route
+          path="/communication"
+          element={
+            <Layout>
+              <CommunicationPage />
             </Layout>
           }
         />
