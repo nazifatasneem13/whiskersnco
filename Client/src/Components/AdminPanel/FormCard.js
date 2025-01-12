@@ -1,5 +1,16 @@
-import React, { useState } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Box,
+} from "@mui/material";
+import { formatDistanceToNow } from "date-fns";
 
 const FormCard = (props) => {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
@@ -17,17 +28,20 @@ const FormCard = (props) => {
   const handleApprove = async () => {
     setIsApproving(true);
     try {
-      const response = await fetch(`http://localhost:4000/approving/${props.form.petId}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          email: props.form.email,
-          phone: props.form.phoneNo,
-          status: "Adopted"
-        }),
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        `http://localhost:4000/approvingadopt/${props.form.petId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            email: props.form.email,
+            phone: props.form.phoneNo,
+            status: "Adopted",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
       if (!response.ok) {
         setShowErrorPopup(true);
@@ -36,130 +50,172 @@ const FormCard = (props) => {
       }
     } catch (err) {
       setShowErrorPopup(true);
-    } finally {
-      deleteFormAdoptedPet();
     }
   };
-  
-  const deleteFormAdoptedPet = async () => {
-    try {
-      const deleteResponse = await fetch(`http://localhost:4000/form/delete/many/${props.form.petId}`, {
-        method: 'DELETE'
-      });
-      if (!deleteResponse.ok) {
-        throw new Error('Failed to delete forms');
-      }
-    } catch (err) {
-    }finally{
-      setIsApproving(false);
-    }
-  }
-
 
   const handleReject = async () => {
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
-      const response = await fetch(`http://localhost:4000/form/reject/${props.form._id}`, {
-        method: 'DELETE'
-      })
+      const response = await fetch(
+        `http://localhost:4000/form/reject/${props.form._id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         setShowErrorPopup(true);
-        throw new Error('Failed to delete form');
+        throw new Error("Failed to delete form");
       } else {
         setShowDeletedSuccess(true);
       }
     } catch (err) {
       setShowErrorPopup(true);
-      console.error('Error deleting form:', err);
     } finally {
       setIsDeleting(false);
     }
-  }
+  };
 
   return (
-    <div className='req-containter'>
-      <div className='pet-view-card'>
-        <div className='form-card-details'>
-          <p><b>Email: </b> {props.form.email}</p>
-          <p><b>Phone Number: </b> {props.form.phoneNo}</p>
-          <p><b>Living Situation: </b> {props.form.livingSituation}</p>
-          <p><b>Previous Pet Experience: </b> {props.form.previousExperience}</p>
-          <p><b>Having Other Pets? </b> {props.form.familyComposition}</p>
-          <p>{formatTimeAgo(props.form.updatedAt)}</p>
-        </div>
-        <div className='app-rej-btn'>
-          <button onClick={handleReject} disabled={isDeleting || isApproving}>{isDeleting ? (<p>Deleting</p>) : (props.deleteBtnText)}</button>
-          <button onClick={() => setShowDetailsPopup(true)}>View Full</button>
-          {props.approveBtn ?
-            <button onClick={handleApprove} disabled={isDeleting || isApproving} >{isApproving ? (<p>Approving</p>) : 'Approve'}</button>
-            : ''
-          }
-        </div>
-        {showErrorPopup && (
-          <div className='popup'>
-            <div className='popup-content'>
-              <p>Oops!... Connection Error</p>
-            </div>
-            <button onClick={() => setShowErrorPopup(!showErrorPopup)} className='close-btn'>
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
-        {showApproved && (
-          <div className='popup'>
-            <div className='popup-content'>
-              <p>Pet is Adopted Successfully...</p>
-              <p>
-                Please contact the Adopter at{' '}
-                <a href={`mailto:${props.form.email}`}>{props.form.email}</a>{' '}
-                or{' '}
-                <a href={`tel:${props.form.phoneNo}`}>{props.form.phoneNo}</a>{' '}
-                to arrange the transfer of the pet from our adoption center to their house.
-              </p>
-            </div>
-            <button onClick={() => {
-              props.updateCards()
-              setShowApproved(!showApproved)
-            }} className='close-btn'>
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
+    <Card
+      sx={{
+        backgroundColor: "#ffffff",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        borderRadius: 2,
+        padding: 2,
+        marginBottom: 2,
+      }}
+    >
+      <CardContent>
+        <Typography
+          variant="body1"
+          sx={{ fontWeight: "bold", color: "#1e3c72" }}
+        >
+          Email: {props.form.email}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Phone Number: {props.form.phoneNo}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Living Situation: {props.form.livingSituation}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Previous Pet Experience: {props.form.previousExperience}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Having Other Pets? {props.form.familyComposition}
+        </Typography>
+        <Typography variant="caption" display="block" gutterBottom>
+          {formatTimeAgo(props.form.updatedAt)}
+        </Typography>
 
-        {showDeletedSuccess && (
-          <div className='popup'>
-            <div className='popup-content'>
-              <p>Request Rejected Successfully...</p>
-            </div>
-            <button onClick={() => {
-              setShowDeletedSuccess(!showDeletedSuccess)
-              props.updateCards()
-            }} className='close-btn'>
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
+        <Box sx={{ display: "flex", gap: 2, marginTop: 2 }}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleReject}
+            disabled={isDeleting || isApproving}
+          >
+            {isDeleting ? "Deleting..." : props.deleteBtnText}
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setShowDetailsPopup(true)}
+          >
+            View Full
+          </Button>
+          {props.approveBtn && (
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleApprove}
+              disabled={isDeleting || isApproving}
+            >
+              {isApproving ? "Approving..." : "Approve"}
+            </Button>
+          )}
+        </Box>
+      </CardContent>
 
-        {showDetailsPopup && (
-          <div className='popup'>
-            <div className='popup-content'>
-              <h2>{props.pet.name}</h2>
-              <p><b>Email: </b> {props.form.email}</p>
-              <p><b>Phone Number: </b> {props.form.phoneNo}</p>
-              <p><b>Living Situation: </b> {props.form.livingSituation}</p>
-              <p><b>Previous Pet Experience: </b> {props.form.previousExperience}</p>
-              <p><b>Having Other Pets? </b> {props.form.familyComposition}</p>
-              <p>{formatTimeAgo(props.form.updatedAt)}</p>
-            </div>
-            <button onClick={() => setShowDetailsPopup(false)} className='close-btn'>
-              Close <i className="fa fa-times"></i>
-            </button>
-          </div>
-        )}
+      {/* Dialogs for Popups */}
+      <Dialog
+        open={showDetailsPopup}
+        onClose={() => setShowDetailsPopup(false)}
+      >
+        <DialogTitle>Form Details</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2">Email: {props.form.email}</Typography>
+          <Typography variant="body2">
+            Phone Number: {props.form.phoneNo}
+          </Typography>
+          <Typography variant="body2">
+            Living Situation: {props.form.livingSituation}
+          </Typography>
+          <Typography variant="body2">
+            Previous Pet Experience: {props.form.previousExperience}
+          </Typography>
+          <Typography variant="body2">
+            Having Other Pets? {props.form.familyComposition}
+          </Typography>
+          <Typography variant="caption" display="block">
+            {formatTimeAgo(props.form.updatedAt)}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDetailsPopup(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
 
-      </div>
-    </div>
+      <Dialog open={showErrorPopup} onClose={() => setShowErrorPopup(false)}>
+        <DialogTitle>Error</DialogTitle>
+        <DialogContent>
+          <Typography color="error">Oops!... Connection Error</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowErrorPopup(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={showApproved} onClose={() => setShowApproved(false)}>
+        <DialogTitle>Approval Successful</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Please contact the adopter at{" "}
+            <a href={`mailto:${props.form.email}`}>{props.form.email}</a> or{" "}
+            <a href={`tel:${props.form.phoneNo}`}>{props.form.phoneNo}</a> to
+            arrange the transfer of the pet.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              props.updateCards();
+              setShowApproved(false);
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={showDeletedSuccess}
+        onClose={() => setShowDeletedSuccess(false)}
+      >
+        <DialogTitle>Request Rejected Successfully</DialogTitle>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setShowDeletedSuccess(false);
+              props.updateCards();
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Card>
   );
 };
 
