@@ -1,65 +1,6 @@
 const User = require("../Model/user.model"); // Ensure this path is correct
 const createError = require("../utils/createError");
-const multer = require("multer");
-const path = require("path");
 
-// Configure multer to store images on the server
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/users"); // Ensure this directory exists
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${req.userId}${ext}`); // e.g., userId.jpg
-  },
-});
-
-const upload = multer({ storage: storage });
-
-// Update User
-const updateUser = async (req, res, next) => {
-  try {
-    const userId = req.userId; // Retrieved from verifyToken middleware
-    const updateData = { ...req.body };
-
-    if (req.file) {
-      // Assuming 'img' is the field name
-      updateData.img = `/uploads/users/${req.file.filename}`;
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!updatedUser) {
-      return next(createError(404, "User not found."));
-    }
-
-    res.status(200).json(updatedUser);
-  } catch (err) {
-    next(err);
-  }
-};
-
-// Middleware to handle image upload and update
-const updateUserWithImage = [upload.single("img"), updateUser];
-
-// Get Current User
-const getCurrentUser = async (req, res, next) => {
-  try {
-    const userId = req.userId;
-    const user = await User.findById(userId).select("-password"); // Exclude password
-    if (!user) {
-      return next(createError(404, "User not found."));
-    }
-    res.status(200).json(user);
-  } catch (err) {
-    next(err);
-  }
-};
-
-// Existing Controller Functions
 const deleteUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
@@ -74,28 +15,84 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-const getUser = async (req, res, next) => {
+const savePreferences = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).select("-password"); // Exclude password
-    res.status(200).send(user);
+    const userId = req.userId;
+    const uid = req.uid;
+
+    if (!userId && !uid) {
+      return res.status(403).send("User ID not found. Please log in again.");
+    }
+
+    const { petTypes, areas } = req.body;
+
+    const user = uid
+      ? await User.findOneAndUpdate({ uid }, { petTypes, areas }, { new: true })
+      : await User.findByIdAndUpdate(
+          userId,
+          { petTypes, areas },
+          { new: true }
+        );
+
+    if (!user) return res.status(404).send("User not found.");
+    res.status(200).send("Preferences saved successfully.");
   } catch (err) {
-    next(err); // Make sure to handle errors
+    console.error("Error saving preferences:", err);
+    res.status(500).send("Something went wrong!");
   }
 };
 
-const savePreferences = async (req, res, next) => {
+const getUser = async (req, res, next) => {
   try {
-    const userId = req.userId; // Retrieve the user ID from the session or auth token
-    const { petTypes, vaccinationStatuses, preferredPetTypes } = req.body;
+    let user;
 
-    // Update the user with multiple preference selections
-    await User.findByIdAndUpdate(userId, {
-      petTypes,
-      vaccinationStatuses,
-      preferredPetTypes,
-    });
+    if (req.uid) {
+      user = await User.findOne({ uid: req.uid });
+    } else {
+      user = await User.findById(req.userId);
+    }
 
-    res.status(200).send("Preferences saved successfully.");
+    if (!user) return res.status(404).send("User not found.");
+    res.status(200).send(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Update user information by either `uid` for Google users or `_id` for other users
+const updateUser = async (req, res, next) => {
+  try {
+    const { username, email, img, newPassword } = req.body;
+    const updatedData = { username, email, img };
+
+    if (newPassword) updatedData.password = newPassword;
+
+    // Use `uid` if available; otherwise, use `userId`
+    const user = req.uid
+      ? await User.findOneAndUpdate({ uid: req.uid }, updatedData, {
+          new: true,
+        })
+      : await User.findByIdAndUpdate(req.userId, updatedData, { new: true });
+
+    if (!user) return res.status(404).send("User not found.");
+    res.status(200).send(user);
+  } catch (err) {
+    next(err);
+  }
+};
+const addToWishlist = async (req, res, next) => {
+  try {
+    const { petId } = req.body;
+    const user = await User.findById(req.userId);
+
+    if (!user) return res.status(404).send("User not found.");
+    if (user.wishlist.includes(petId)) {
+      return res.status(400).send("Pet already in wishlist.");
+    }
+
+    user.wishlist.push(petId);
+    await user.save();
+    res.status(200).send("Pet added to wishlist.");
   } catch (err) {
     next(err);
   }
@@ -106,6 +103,6 @@ module.exports = {
   deleteUser,
   getUser,
   savePreferences,
-  updateUser: updateUserWithImage, // Export the updateUser middleware
-  getCurrentUser,
+  updateUser,
+  addToWishlist,
 };
