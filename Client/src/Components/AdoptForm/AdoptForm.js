@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -8,7 +8,6 @@ import {
   Snackbar,
   Alert,
   Avatar,
-  Divider,
   IconButton,
 } from "@mui/material";
 import {
@@ -34,6 +33,18 @@ function AdoptForm({ pet, closeForm }) {
     severity: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // To store the timeout ID so that it can be cleared if needed
+  const [timeoutId, setTimeoutId] = useState(null);
+
+  useEffect(() => {
+    // Cleanup the timeout when the component unmounts
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,7 +93,12 @@ function AdoptForm({ pet, closeForm }) {
       setLivingSituation("");
       setPreviousExperience("");
       setFamilyComposition("");
-      closeForm();
+
+      // Set a timeout to close the form after the Snackbar is visible
+      const id = setTimeout(() => {
+        closeForm();
+      }, 3000); // 3 seconds delay
+      setTimeoutId(id);
     } catch (error) {
       setSnackbar({ open: true, message: error.message, severity: "error" });
     } finally {
@@ -95,12 +111,13 @@ function AdoptForm({ pet, closeForm }) {
       elevation={6}
       sx={{
         maxWidth: "1100px", // Increased width to 1100px
-        width: "100%", // Responsive width
+        width: "100%",
         margin: "0.7rem auto",
         borderRadius: "12px",
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         overflow: "hidden",
         position: "relative", // Added for proper positioning of the close button
+        fontFamily: "'Roboto', sans-serif", // Changed font
       }}
     >
       {/* Close Button */}
@@ -109,15 +126,14 @@ function AdoptForm({ pet, closeForm }) {
         onClick={closeForm}
         sx={{
           position: "absolute",
-          top: "10px", // Positioned at the top
-          right: "10px", // Positioned at the right
+          top: "10px",
+          right: "10px",
           color: "#757575",
-          zIndex: 1, // Ensures it stays on top of other elements
         }}
       >
         <Close />
       </IconButton>
-      {/* Content */}
+
       <Box
         sx={{
           display: "flex",
@@ -133,7 +149,8 @@ function AdoptForm({ pet, closeForm }) {
             justifyContent: "center",
             backgroundColor: "#f9f9f9",
             padding: "1rem",
-            minWidth: "300px", // Ensures minimum width for the image
+            minWidth: "auto",
+            maxWidth: "auto", // Ensures minimum width for the image
           }}
         >
           <Avatar
@@ -152,6 +169,8 @@ function AdoptForm({ pet, closeForm }) {
           sx={{
             flex: 1,
             padding: "2rem",
+            minWidth: "auto",
+            maxWidth: "auto",
           }}
         >
           {/* Header */}
@@ -159,7 +178,7 @@ function AdoptForm({ pet, closeForm }) {
             variant="h5"
             sx={{
               fontWeight: "bold",
-              color: "#1976d2",
+              color: "#1a237e", // Updated color
               marginBottom: "1rem",
             }}
           >
@@ -168,16 +187,28 @@ function AdoptForm({ pet, closeForm }) {
 
           {/* Pet Info */}
           <Box sx={{ marginBottom: "1.5rem" }}>
-            <Typography variant="body1" sx={{ color: "#424242" }}>
+            <Typography
+              variant="body1"
+              sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
+            >
               <b>Type:</b> {pet.type}
             </Typography>
-            <Typography variant="body1" sx={{ color: "#424242" }}>
+            <Typography
+              variant="body1"
+              sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
+            >
               <b>Age:</b> {pet.age} months
             </Typography>
-            <Typography variant="body1" sx={{ color: "#424242" }}>
+            <Typography
+              variant="body1"
+              sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
+            >
               <b>Location:</b> {pet.area}
             </Typography>
-            <Typography variant="body1" sx={{ color: "#424242" }}>
+            <Typography
+              variant="body1"
+              sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
+            >
               <b>Division:</b> {pet.division}
             </Typography>
           </Box>
@@ -280,15 +311,19 @@ function AdoptForm({ pet, closeForm }) {
               fullWidth
               type="submit"
               variant="contained"
-              color="primary"
-              disabled={isSubmitting}
               sx={{
                 textTransform: "none",
                 fontWeight: "bold",
                 padding: "10px 0",
-                fontSize: "15px",
+                fontSize: "20px",
                 borderRadius: "8px",
+                backgroundColor: "#1a237e", // Updated color
+                color: "#ffffff", // Ensure button text color contrasts well
+                "&:hover": {
+                  backgroundColor: "#3949ab", // Slightly lighter shade for hover effect
+                },
               }}
+              disabled={isSubmitting}
             >
               {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
