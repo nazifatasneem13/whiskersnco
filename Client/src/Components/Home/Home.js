@@ -7,27 +7,6 @@ import PreferredPetsCarousel from "./PreferredPetsCarousel";
 import PetTraining from "./PetTraining";
 
 const Home = (props) => {
-  useEffect(() => {
-    // Configuring the chat bubble
-    window.embeddedChatbotConfig = {
-      chatbotId: "f003Qmsfvl9wpxdNr8CZD",
-      domain: "www.chatbase.co",
-    };
-
-    // Creating the script element for chat bubble
-    const script = document.createElement("script");
-    script.src = "https://www.chatbase.co/embed.min.js";
-    script.async = true;
-    script.setAttribute("chatbotId", "f003Qmsfvl9wpxdNr8CZD");
-    script.setAttribute("domain", "www.chatbase.co");
-    document.body.appendChild(script);
-
-    // Clean up the script when component unmounts
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
   return (
     <Box
       sx={{
