@@ -21,6 +21,12 @@ const Communication = () => {
 
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
+  // Define color constants
+  const senderColor = "#DCF8C6"; // Light green for sent messages
+  const receiverColor = "#FFFFFF"; // White for received messages
+  const adopterColor = "#3f51b5"; // Blue for Adopter
+  const adopteeColor = "#f50057"; // Pink for Adoptee
+
   // Fetch adopter and adoptee chat lists
   useEffect(() => {
     const fetchChats = async () => {
@@ -48,7 +54,7 @@ const Communication = () => {
     };
 
     fetchChats();
-  }, []);
+  }, [currentUser._id]);
 
   // Fetch messages for the selected chat
   useEffect(() => {
@@ -116,19 +122,21 @@ const Communication = () => {
           }),
         }
       );
+      window.location.reload();
     } catch (error) {
       console.error("Update Status Error:", error);
     }
   };
 
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box sx={{ display: "flex", maxHeight: "auto" }}>
       {/* Sidebar for Chat List */}
       <Box sx={{ width: "25%", borderRight: "1px solid #ddd", padding: 2 }}>
         <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
           Chats
         </Typography>
-        <Typography variant="subtitle1">Adopter Chats</Typography>
+        <Typography variant="subtitle1">Chat with Donator</Typography>
+        {/*current user is adopter here */}
         <List>
           {adopterChats.map((chat) => (
             <ListItem
@@ -136,11 +144,25 @@ const Communication = () => {
               button
               onClick={() => handleChatSelect(chat)}
             >
-              <Avatar sx={{ marginRight: 2 }}>
-                {chat.name ? chat.name[0] : "?"}
+              <Avatar sx={{ marginRight: 2, bgcolor: adopterColor }}>
+                {chat.name ? chat.name[0] : "A"}
               </Avatar>
               <ListItemText
-                primary={chat.name || "Unknown"}
+                primary={
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    {chat.email || "Unknown"}
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        bgcolor: adopterColor,
+                        borderRadius: "50%",
+                        marginLeft: 1,
+                      }}
+                      title="Adopter"
+                    />
+                  </Box>
+                }
                 secondary={chat.email}
               />
             </ListItem>
@@ -148,8 +170,9 @@ const Communication = () => {
         </List>
         <Divider />
         <Typography variant="subtitle1" sx={{ marginTop: 2 }}>
-          Adoptee Chats
+          Chat with Adopters
         </Typography>
+        {/*current user is adoptee here */}
         <List>
           {adopteeChats.map((chat) => (
             <ListItem
@@ -157,11 +180,25 @@ const Communication = () => {
               button
               onClick={() => handleChatSelect(chat)}
             >
-              <Avatar sx={{ marginRight: 2 }}>
-                {chat.name ? chat.name[0] : "?"}
+              <Avatar sx={{ marginRight: 2, bgcolor: adopteeColor }}>
+                {chat.name ? chat.name[0] : "D"}
               </Avatar>
               <ListItemText
-                primary={chat.name || "Unknown"}
+                primary={
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    {chat.name || "Unknown"}
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        bgcolor: adopteeColor,
+                        borderRadius: "50%",
+                        marginLeft: 1,
+                      }}
+                      title="Adoptee"
+                    />
+                  </Box>
+                }
                 secondary={chat.email}
               />
             </ListItem>
@@ -170,59 +207,61 @@ const Communication = () => {
       </Box>
 
       {/* Chat Area */}
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <Box
+        sx={{
+          flex: 1,
+          display: "auto",
+
+          maxHeight: "auto",
+          flexDirection: "column",
+        }}
+      >
         {selectedChat ? (
           <>
             <Typography variant="h6" sx={{ padding: 2 }}>
-              Chat with {selectedChat.name}
+              Chat with {selectedChat.email}{" "}
+              <Box
+                component="span"
+                sx={{
+                  display: "inline-block",
+                  width: 10,
+                  height: 10,
+                  bgcolor: adopterChats.some(
+                    (chat) => chat.chatId === selectedChat.chatId
+                  )
+                    ? adopterColor
+                    : adopteeColor,
+                  borderRadius: "50%",
+                  marginLeft: 1,
+                }}
+                title={
+                  adopterChats.some(
+                    (chat) => chat.chatId === selectedChat.chatId
+                  )
+                    ? "Adopter"
+                    : "Adoptee"
+                }
+              />
             </Typography>
+
             <Box
               sx={{
-                flex: 1,
-                overflowY: "auto",
                 padding: 2,
-                backgroundColor: "#f5f5f5",
+                display: "flex",
+                gap: 2,
+                backgroundColor: "#f8bbd0",
+                justifyContent: "flex-end",
               }}
             >
-              {messages.map((message) => (
-                <Box
-                  key={message._id}
-                  sx={{
-                    display: "flex",
-                    justifyContent:
-                      message.senderId === currentUser._id
-                        ? "flex-end"
-                        : "flex-start",
-                  }}
-                >
-                  <Paper
-                    sx={{
-                      padding: 1,
-                      marginBottom: 1,
-                      maxWidth: "60%",
-                    }}
-                  >
-                    {message.content}
-                  </Paper>
-                </Box>
-              ))}
-            </Box>
-            <Box sx={{ padding: 2, borderTop: "1px solid #ddd" }}>
-              <TextField
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-                fullWidth
-                placeholder="Type your message..."
-              />
-              <Button onClick={handleSendMessage}>Send</Button>
-            </Box>
-            <Box sx={{ padding: 2, display: "flex", gap: 2 }}>
+              <Typography variant="h6" sx={{ padding: 2 }}>
+                Status Update
+              </Typography>
               {/* Buttons for adoptee */}
               {adopteeChats.some(
                 (chat) =>
                   chat.chatId === selectedChat.chatId &&
                   chat.status === "active" &&
-                  selectedChat.status !== "sent" // Explicitly ensure it's not "sent"
+                  selectedChat.status !== "sent"
               ) && (
                 <Button
                   variant="contained"
@@ -253,6 +292,88 @@ const Communication = () => {
                 onClick={() => handleStatusUpdate("passive")}
               >
                 Cancel
+              </Button>
+            </Box>
+
+            <Box
+              sx={{
+                flex: 1,
+                overflowY: "auto",
+                padding: 2,
+                backgroundColor: "#f5f5f5",
+                minHeight: "50vh",
+              }}
+            >
+              {messages.map((message) => (
+                <Box
+                  key={message._id}
+                  sx={{
+                    display: "flex",
+                    justifyContent:
+                      message.senderId === currentUser._id
+                        ? "flex-end"
+                        : "flex-start",
+                    marginBottom: 1,
+                  }}
+                >
+                  <Paper
+                    sx={{
+                      padding: 1,
+                      maxWidth: "60%",
+                      backgroundColor:
+                        message.senderId === currentUser._id
+                          ? senderColor
+                          : receiverColor,
+                      borderRadius: 2,
+                      position: "relative",
+                    }}
+                  >
+                    <Typography variant="body2">{message.content}</Typography>
+                    {message.timestamp && (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          position: "absolute",
+                          bottom: 2,
+                          right: 8,
+                          color: "gray",
+                        }}
+                      >
+                        {new Date(message.timestamp).toLocaleTimeString()}
+                      </Typography>
+                    )}
+                  </Paper>
+                </Box>
+              ))}
+            </Box>
+
+            <Box
+              sx={{
+                borderTop: "1px solid #ddd",
+                padding: 2,
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                maxHeight: "auto",
+                backgroundColor: "#f5f5f5",
+              }}
+            >
+              <TextField
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                fullWidth
+                placeholder="Type your message..."
+                variant="outlined"
+                multiline
+                maxRows={4}
+              />
+              <Button
+                onClick={handleSendMessage}
+                variant="contained"
+                color="primary"
+                sx={{ height: "fit-content" }}
+              >
+                Send
               </Button>
             </Box>
           </>

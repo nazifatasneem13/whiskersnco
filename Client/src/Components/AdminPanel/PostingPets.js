@@ -33,7 +33,7 @@ const PostingPets = () => {
         borderRadius: 2,
         /* Fix the component's height so it remains the same even if empty */
         height: "70vh",
-        overflowY: "auto",
+        overflowY: "scroll",
       }}
     >
       {loading ? (

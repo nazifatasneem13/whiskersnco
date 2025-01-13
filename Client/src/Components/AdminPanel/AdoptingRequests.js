@@ -91,9 +91,8 @@ const AdoptingRequests = () => {
         backgroundColor: "#f5f8fc",
         p: 3,
         borderRadius: 2,
-
         height: "70vh",
-        overflowY: "auto",
+        overflowY: "scroll",
       }}
     >
       <Box

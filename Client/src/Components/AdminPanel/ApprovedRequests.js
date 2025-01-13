@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Typography,
-  CircularProgress,
-  Grid,
-  Box,
-} from "@mui/material";
+import { Typography, CircularProgress, Grid, Box } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PetsIcon from "@mui/icons-material/Pets";
 import PetCards from "./PetCards";
@@ -38,9 +32,8 @@ const ApprovedRequests = () => {
       sx={{
         backgroundColor: "#f5f8fc",
         padding: 3,
-        /** Adjust the height to your preference */
         maxHeight: "70vh",
-        overflowY: "auto",
+        overflowY: "scroll",
         borderRadius: 2,
       }}
     >

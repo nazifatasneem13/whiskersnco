@@ -118,13 +118,7 @@ const FormCard = (props) => {
           >
             {isDeleting ? "Deleting..." : props.deleteBtnText}
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setShowDetailsPopup(true)}
-          >
-            View Full
-          </Button>
+
           {props.approveBtn && (
             <Button
               variant="contained"
