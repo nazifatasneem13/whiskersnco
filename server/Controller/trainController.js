@@ -119,9 +119,9 @@ const generateTrainingGuide = async (req, res, next) => {
 - Tailor exercises to the pet's developmental stage (puppy, adult, senior).`;
     // Use Groq's chat completion to generate the training guide
     const groqResponse = await groqClient.chat.completions.create({
-      model: "gemma2-9b-it", // Ensure the model ID is correct and accessible
+      model: "llama-3.3-70b-versatile",
       temperature: 0.7,
-      max_tokens: 1000, // Adjust based on desired response length
+      max_tokens: 26860,
       messages: [
         {
           role: "system",
