@@ -121,7 +121,7 @@ const generateTrainingGuide = async (req, res, next) => {
     const groqResponse = await groqClient.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       temperature: 0.7,
-      max_tokens: 26860,
+      max_tokens: 1000,
       messages: [
         {
           role: "system",

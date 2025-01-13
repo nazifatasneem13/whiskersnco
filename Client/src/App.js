@@ -1,5 +1,6 @@
+// App.js
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Navbar from "./Components/NavBar/Navbar";
 import Profile from "./Components/Profile.jsx";
 import Home from "./Components/Home/Home";
@@ -17,19 +18,32 @@ import TrainYourPet from "./Components/Train/TrainYourPet.js";
 import PostPetSection from "./Components/Services/PostPetSection";
 import AdoptSection from "./Components/Services/AdoptSection";
 import CommunicationPage from "./Components/Communication";
+import ChatbotPage from "./Components/ChatbotLoader";
+import { Box, Fab } from "@mui/material";
+import ChatIcon from "@mui/icons-material/Chat";
 import "./App.css";
 
+// Your Layout component
 const Layout = ({ children }) => (
-  <>
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      minHeight: "100vh",
+    }}
+  >
     <Navbar title="Whiskers-n-Co" />
-    {children}
+    <Box component="main" sx={{ flex: 1, padding: "1rem" }}>
+      {children}
+    </Box>
     <Footer title="Whiskers-n-Co" />
-  </>
+  </Box>
 );
 
 const App = () => {
   return (
     <Router>
+      {/* Define all your routes */}
       <Routes>
         <Route
           path="/"
@@ -128,7 +142,6 @@ const App = () => {
           }
         />
         <Route path="/admin-111424" element={<AdminLogin />} />
-
         <Route
           path="/profile"
           element={
@@ -145,7 +158,32 @@ const App = () => {
             </Layout>
           }
         />
+
+        {/* NEW: The Chatbot route */}
+        <Route
+          path="/chatbot"
+          element={
+            <Layout>
+              <ChatbotPage />
+            </Layout>
+          }
+        />
       </Routes>
+
+      {/* Floating Button that links to /chatbot */}
+      <Link to="/chatbot" style={{ textDecoration: "none" }}>
+        <Fab
+          color="primary"
+          sx={{
+            position: "fixed",
+            bottom: 16,
+            right: 16,
+            zIndex: 9999, // ensure it sits on top
+          }}
+        >
+          <ChatIcon />
+        </Fab>
+      </Link>
     </Router>
   );
 };
