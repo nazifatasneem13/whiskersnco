@@ -120,7 +120,6 @@ const AdminLogin = () => {
             </Typography>
             <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
               <TextField
-                label="Username"
                 variant="outlined"
                 fullWidth
                 value={username}
@@ -128,7 +127,6 @@ const AdminLogin = () => {
                 margin="normal"
               />
               <TextField
-                label="Password"
                 variant="outlined"
                 type="password"
                 fullWidth

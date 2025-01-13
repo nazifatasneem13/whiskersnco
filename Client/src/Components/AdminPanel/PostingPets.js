@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PetCards from "./PetCards";
+import { Box, Grid, CircularProgress, Typography } from "@mui/material";
 
 const PostingPets = () => {
   const [requests, setRequests] = useState([]);
@@ -25,23 +26,46 @@ const PostingPets = () => {
   }, []);
 
   return (
-    <div className="pet-container">
+    <Box
+      sx={{
+        backgroundColor: "#f5f8fc",
+        p: 3,
+        borderRadius: 2,
+        /* Fix the component's height so it remains the same even if empty */
+        height: "70vh",
+        overflowY: "auto",
+      }}
+    >
       {loading ? (
-        <p>Loading...</p>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+        >
+          <CircularProgress />
+        </Box>
       ) : requests.length > 0 ? (
-        requests.map((request, index) => (
-          <PetCards
-            key={request._id}
-            pet={request}
-            updateCards={fetchRequests}
-            deleteBtnText={"Reject"}
-            approveBtn={true}
-          />
-        ))
+        <Grid container spacing={2}>
+          {requests.map((request) => (
+            <Grid item xs={12} sm={6} md={4} key={request._id}>
+              <PetCards
+                pet={request}
+                updateCards={fetchRequests}
+                deleteBtnText="Reject"
+                approveBtn={true}
+              />
+            </Grid>
+          ))}
+        </Grid>
       ) : (
-        <p>No requests available</p>
+        <Box textAlign="center" mt={4}>
+          <Typography variant="h6" color="text.secondary">
+            No requests available
+          </Typography>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

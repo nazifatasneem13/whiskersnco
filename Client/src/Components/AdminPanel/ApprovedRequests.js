@@ -1,45 +1,86 @@
-import React, { useState, useEffect } from 'react'
-import PetCards from './PetCards'
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Typography,
+  CircularProgress,
+  Grid,
+  Box,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PetsIcon from "@mui/icons-material/Pets";
+import PetCards from "./PetCards";
 
 const ApprovedRequests = () => {
-  const [requests, setRequests] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch('http://localhost:4000/approvedPets')
+      const response = await fetch("http://localhost:4000/approvedPets");
       if (!response.ok) {
-        throw new Error('An error occurred')
+        throw new Error("An error occurred");
       }
-      const data = await response.json()
-      setRequests(data)
+      const data = await response.json();
+      setRequests(data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-
-    fetchRequests()
-  }, [])
+    fetchRequests();
+  }, []);
 
   return (
-    <div className='pet-container'>
+    <Box
+      sx={{
+        backgroundColor: "#f5f8fc",
+        padding: 3,
+        /** Adjust the height to your preference */
+        maxHeight: "70vh",
+        overflowY: "auto",
+        borderRadius: 2,
+      }}
+    >
       {loading ? (
-        <p>Loading...</p>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+        >
+          <CircularProgress />
+        </Box>
+      ) : requests.length > 0 ? (
+        <Grid container spacing={2}>
+          {requests.map((request) => (
+            <Grid item xs={12} sm={6} md={4} key={request._id}>
+              <PetCards
+                pet={request}
+                updateCards={fetchRequests}
+                deleteBtnText={
+                  <>
+                    <DeleteIcon sx={{ mr: 0.5 }} />
+                    Delete Post
+                  </>
+                }
+                approveBtn={false}
+              />
+            </Grid>
+          ))}
+        </Grid>
       ) : (
-        requests.length > 0 ? (
-          requests.map((request, index) => (
-            <PetCards key={request._id} pet={request} updateCards={fetchRequests} deleteBtnText={"Delete Post"} approveBtn={false}/>
-          ))
-        ) : (
-          <p>No Approved Pets available</p>
-        )
+        <Box textAlign="center" mt={4}>
+          <Typography variant="body1" mt={4} textAlign="center">
+            <PetsIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+            No Approved Pets available
+          </Typography>
+        </Box>
       )}
-    </div>
-  )
-}
+    </Box>
+  );
+};
 
-export default ApprovedRequests
+export default ApprovedRequests;
