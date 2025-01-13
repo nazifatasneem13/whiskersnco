@@ -159,13 +159,31 @@ const PetsViewer = (props) => {
       </CardContent>
 
       {showPopup && (
-        <div className="popup">
-          <div className="popup-content">
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              width: "90%",
+              maxWidth: "1100px",
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "2rem",
+            }}
+          >
             <AdoptForm closeForm={togglePopup} pet={props.pet} />
           </div>
-          <Button onClick={togglePopup} variant="text">
-            Close <i className="fa fa-times"></i>
-          </Button>
         </div>
       )}
     </Card>
