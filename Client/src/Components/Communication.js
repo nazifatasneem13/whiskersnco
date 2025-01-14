@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   List,
@@ -56,24 +56,37 @@ const Communication = () => {
     fetchChats();
   }, [currentUser._id]);
 
-  // Fetch messages for the selected chat
-  useEffect(() => {
+  // Extract fetchMessages to reuse in multiple useEffect hooks
+  const fetchMessages = useCallback(async () => {
     if (selectedChat) {
-      const fetchMessages = async () => {
-        try {
-          const response = await fetch(
-            `http://localhost:4000/messages/${selectedChat.chatId}`
-          );
-          const data = await response.json();
-          setMessages(data || []); // Ensure it's an array
-        } catch (error) {
-          console.error("Fetch Messages Error:", error);
-        }
-      };
-
-      fetchMessages();
+      try {
+        const response = await fetch(
+          `http://localhost:4000/messages/${selectedChat.chatId}`
+        );
+        const data = await response.json();
+        setMessages(data || []); // Ensure it's an array
+      } catch (error) {
+        console.error("Fetch Messages Error:", error);
+      }
     }
   }, [selectedChat]);
+
+  // Fetch messages when selectedChat changes
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat, fetchMessages]);
+
+  // Set up interval to fetch messages every 10 seconds when a chat is selected
+  useEffect(() => {
+    if (!selectedChat) return;
+
+    const intervalId = setInterval(() => {
+      fetchMessages();
+    }, 5000); // 10,000 milliseconds = 10 seconds
+
+    // Cleanup interval on component unmount or when selectedChat changes
+    return () => clearInterval(intervalId);
+  }, [selectedChat, fetchMessages]);
 
   // Handle selecting a chat
   const handleChatSelect = (chat) => {
@@ -130,19 +143,19 @@ const Communication = () => {
 
   return (
     <Box sx={{ display: "flex", maxHeight: "auto" }}>
-      {/* Sidebar for Chat List */}
       <Box sx={{ width: "25%", borderRight: "1px solid #ddd", padding: 2 }}>
         <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
           Chats
         </Typography>
         <Typography variant="subtitle1">Chat with Donator</Typography>
-        {/*current user is adopter here */}
+
         <List>
           {adopterChats.map((chat) => (
             <ListItem
               key={chat.chatId}
               button
               onClick={() => handleChatSelect(chat)}
+              selected={selectedChat?.chatId === chat.chatId} // Highlight selected chat
             >
               <Avatar sx={{ marginRight: 2, bgcolor: adopterColor }}>
                 {chat.name ? chat.name[0] : "A"}
@@ -150,7 +163,7 @@ const Communication = () => {
               <ListItemText
                 primary={
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {chat.email || "Unknown"}
+                    {chat.name || "Unknown"}
                     <Box
                       sx={{
                         width: 10,
@@ -179,6 +192,7 @@ const Communication = () => {
               key={chat.chatId}
               button
               onClick={() => handleChatSelect(chat)}
+              selected={selectedChat?.chatId === chat.chatId} // Highlight selected chat
             >
               <Avatar sx={{ marginRight: 2, bgcolor: adopteeColor }}>
                 {chat.name ? chat.name[0] : "D"}
@@ -210,10 +224,9 @@ const Communication = () => {
       <Box
         sx={{
           flex: 1,
-          display: "auto",
-
-          maxHeight: "auto",
+          display: "flex",
           flexDirection: "column",
+          maxHeight: "auto",
         }}
       >
         {selectedChat ? (
@@ -366,6 +379,12 @@ const Communication = () => {
                 variant="outlined"
                 multiline
                 maxRows={4}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
               />
               <Button
                 onClick={handleSendMessage}
