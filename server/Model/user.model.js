@@ -15,32 +15,47 @@ const UserSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.uid; // Require password only if `uid` is not present
+      },
     },
     img: {
       type: String,
       required: false,
     },
-
     desc: {
       type: String,
       required: false,
     },
-
     petTypes: {
-      type: [String], // Array to hold multiple pet types
+      type: [String],
       required: false,
     },
-    vaccinationStatuses: {
-      type: [String], // Array for multiple vaccination statuses
+    areas: {
+      type: [String],
       required: false,
-      enum: ["vaccinated", "non-vaccinated"],
+      enum: [
+        "Barishal",
+        "Chattogram",
+        "Dhaka",
+        "Khulna",
+        "Mymensingh",
+        "Rajshahi",
+        "Rangpur",
+        "Sylhet",
+      ],
     },
-    preferredPetTypes: {
-      type: [String], // Array for multiple preferred pet types
-      required: false,
-      enum: ["stray", "domesticated"],
+    uid: {
+      type: String,
+      required: false, // Optional, only for Google users
+      unique: true, // Ensure uniqueness for Google users
     },
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Pet", // Assuming you have a Pet model
+      },
+    ],
   },
   {
     timestamps: true,
