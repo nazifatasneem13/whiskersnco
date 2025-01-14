@@ -1,4 +1,15 @@
+// src/Components/AdminNavBar.js
+
 import React, { useState, useEffect } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Button,
+  IconButton,
+} from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 function AdminNavBar() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -13,14 +24,34 @@ function AdminNavBar() {
     };
   }, []);
 
+  const handleLogout = () => {
+    window.location.reload();
+  };
+
   return (
-    <nav className="navbar">
-      <div className="navbar-brand">Admin Panel</div>
-      <div className="navbar-time">{currentTime.toLocaleString()}</div>
-      <h3 className="logout-btn" onClick={() => window.location.reload()}>
-        Logout
-      </h3>
-    </nav>
+    <AppBar position="static" color="primary">
+      <Toolbar>
+        {/* Brand Name */}
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          Admin Panel
+        </Typography>
+
+        {/* Current Time */}
+        <Typography variant="body1" sx={{ marginRight: 2 }}>
+          {currentTime.toLocaleString()}
+        </Typography>
+
+        {/* Logout Button */}
+        <Button
+          color="secondary"
+          variant="contained"
+          startIcon={<LogoutIcon />}
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
+      </Toolbar>
+    </AppBar>
   );
 }
 
