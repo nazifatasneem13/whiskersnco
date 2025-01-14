@@ -1,19 +1,20 @@
 const express = require("express");
-const router = express.Router();
 const {
   deleteUser,
   getUser,
   savePreferences,
   updateUser,
-  getCurrentUser,
+  addToWishlist,
 } = require("../Controller/user.controller"); // Ensure this path is correct
 const { verifyToken } = require("../middleware/jwt"); // Ensure this path is correct
 
-// Define routes
+const router = express.Router();
+
 router.delete("/:id", verifyToken, deleteUser);
 router.get("/:id", verifyToken, getUser);
-router.get("/profile", verifyToken, getCurrentUser); // Route to get current user profile
-router.put("/update", verifyToken, updateUser); // Route to update user profile
 router.post("/preferences", verifyToken, savePreferences);
+router.get("/profile", verifyToken, getUser);
+router.put("/update", verifyToken, updateUser);
+router.post("/wishlist", verifyToken, addToWishlist);
 
 module.exports = router; // Correct CommonJS export
