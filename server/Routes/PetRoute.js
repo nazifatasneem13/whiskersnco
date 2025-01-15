@@ -10,8 +10,9 @@ const {
   getPreferredPets,
   predictBreed,
   approveadoptRequest,
+  allPetsDisplay,
 } = require("../Controller/PetController");
-
+const { verifyToken } = require("../middleware/jwt"); // Ensure this path is correct
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -39,6 +40,7 @@ const upload = multer({
 // Routes
 router.get("/requests", (req, res) => allPets("Pending", req, res));
 router.get("/approvedPets", (req, res) => allPets("Approved", req, res));
+router.post("/approvedPetsDisplay", allPetsDisplay("Approved"));
 router.get("/adoptedPets", (req, res) => allPets("Delivered", req, res));
 router.post("/services", upload.single("picture"), postPetRequest);
 router.put("/approving/:id", approveRequest);
