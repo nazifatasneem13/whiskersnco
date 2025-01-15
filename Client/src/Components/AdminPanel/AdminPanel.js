@@ -1,16 +1,31 @@
 import React from "react";
-import { Container } from "@mui/material";
+import { Box } from "@mui/material";
 import AdminNavBar from "./AdminNavBar";
 import AdminFooter from "./AdminFooter";
 import AdminScreen from "./AdminScreen";
 
 const AdminPanel = () => {
   return (
-    <Container maxWidth="auto" sx={{ mt: 10, mb: 4 }}>
+    <Box
+      sx={{
+        width: "110vw", // Full viewport width
+        height: "110vh", // Full viewport height
+        display: "flex",
+        flexDirection: "column", // Stack children vertically
+        overflow: "hidden", // Prevent scrolling
+      }}
+    >
       <AdminNavBar />
-      <AdminScreen />
+      <Box
+        sx={{
+          flex: 1, // Take up remaining space between NavBar and Footer
+          overflowY: "auto", // Allow scrolling for content
+        }}
+      >
+        <AdminScreen />
+      </Box>
       <AdminFooter />
-    </Container>
+    </Box>
   );
 };
 
