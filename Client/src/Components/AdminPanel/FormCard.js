@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Card,
+  CardMedia,
   CardContent,
   Typography,
   Button,
@@ -84,6 +85,7 @@ const FormCard = (props) => {
         borderRadius: 2,
         padding: 2,
         marginBottom: 2,
+        maxWidth: 290,
       }}
     >
       <CardContent>
@@ -103,7 +105,7 @@ const FormCard = (props) => {
           Previous Pet Experience: {props.form.previousExperience}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Having Other Pets? {props.form.familyComposition}
+          Family composition: {props.form.familyComposition}
         </Typography>
         <Typography variant="caption" display="block" gutterBottom>
           {formatTimeAgo(props.form.updatedAt)}
