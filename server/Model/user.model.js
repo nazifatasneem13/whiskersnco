@@ -56,6 +56,18 @@ const UserSchema = new Schema(
         ref: "Pet", // Assuming you have a Pet model
       },
     ],
+    blockedBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    Hasblocked: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamps: true,
