@@ -61,9 +61,9 @@ const AdminScreen = () => {
       sx={{
         display: "flex",
         justifyContent: "flex-start",
-        padding: "50px 30px",
+        padding: "20px 30px",
         backgroundColor: "#f1f1f1",
-        height: "100vh",
+        height: "90vh",
       }}
     >
       {/* Left Navigation Panel */}
@@ -73,7 +73,7 @@ const AdminScreen = () => {
           backgroundColor: "#121858", // Midnight Blue for the sidebar
           color: "#ffffff",
           borderRadius: "10px",
-          padding: "10px",
+          padding: "15px",
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           marginRight: "20px",
         }}
@@ -101,14 +101,39 @@ const AdminScreen = () => {
                 "&:hover": { backgroundColor: "#1e3c72", color: "#ffffff" },
                 borderRadius: "8px",
                 margin: "5px 0",
+                position: "relative",
               }}
             >
+              {screen === item.value && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    left: 0,
+                    height: "100%",
+                    width: "4px",
+                    backgroundColor: "#ffffff", // White left border for the active item
+                    borderRadius: "2px",
+                  }}
+                />
+              )}
               {item.icon && (
                 <Box sx={{ marginRight: "10px", color: "inherit" }}>
                   {item.icon}
                 </Box>
               )}
-              <ListItemText primary={item.label} />
+              <ListItemText
+                primary={
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontSize: screen === item.value ? "1.05rem" : "1rem", // Slightly larger text for active label
+                      transition: "all 0.3s ease", // Smooth transition for visual changes
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                }
+              />
             </ListItemButton>
           ))}
         </List>
