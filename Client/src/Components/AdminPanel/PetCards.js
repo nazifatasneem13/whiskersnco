@@ -101,7 +101,7 @@ const PetCards = (props) => {
     >
       <CardMedia
         component="img"
-        height="200"
+        height="230"
         image={props.pet.filename}
         alt={props.pet.name}
         sx={{ borderRadius: 1 }}
@@ -116,6 +116,9 @@ const PetCards = (props) => {
         </Typography>
         <Typography variant="body2" color="text.secondary">
           <b>Type:</b> {props.pet.type}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <b>Breed:</b> {props.pet.breed}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           <b>Age:</b> {props.pet.age}
