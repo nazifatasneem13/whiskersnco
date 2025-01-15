@@ -10,13 +10,16 @@ import {
   Paper,
   Avatar,
   Divider,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import BlockIcon from "@mui/icons-material/Block"; // Import Block Icon
 
 const Communication = () => {
-  const [adopterChats, setAdopterChats] = useState([]); // Chats where user is adopter
-  const [adopteeChats, setAdopteeChats] = useState([]); // Chats where user is adoptee
-  const [selectedChat, setSelectedChat] = useState(null); // Currently selected chat
-  const [messages, setMessages] = useState([]); // Messages for the selected chat
+  const [adopterChats, setAdopterChats] = useState([]);
+  const [adopteeChats, setAdopteeChats] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
 
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -39,7 +42,7 @@ const Communication = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const adopterData = await adopterResponse.json();
-        setAdopterChats(adopterData || []); // Ensure it's an array
+        setAdopterChats(adopterData || []);
 
         // Fetch adoptee chats
         const adopteeResponse = await fetch(
@@ -47,7 +50,7 @@ const Communication = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const adopteeData = await adopteeResponse.json();
-        setAdopteeChats(adopteeData || []); // Ensure it's an array
+        setAdopteeChats(adopteeData || []);
       } catch (error) {
         console.error("Fetch Chats Error:", error);
       }
@@ -60,29 +63,37 @@ const Communication = () => {
   const fetchMessages = useCallback(async () => {
     if (selectedChat) {
       try {
+        const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:4000/messages/${selectedChat.chatId}`
+          `http://localhost:4000/messages/${selectedChat.chatId}?userId=${currentUser._id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
+        if (response.status === 403) {
+          // Access blocked
+          alert("You have been blocked by this user.");
+          setSelectedChat(null);
+          return;
+        }
         const data = await response.json();
-        setMessages(data || []); // Ensure it's an array
+        setMessages(data || []);
       } catch (error) {
         console.error("Fetch Messages Error:", error);
       }
     }
-  }, [selectedChat]);
+  }, [selectedChat, currentUser._id]);
 
   // Fetch messages when selectedChat changes
   useEffect(() => {
     fetchMessages();
   }, [selectedChat, fetchMessages]);
 
-  // Set up interval to fetch messages every 10 seconds when a chat is selected
+  // Set up interval to fetch messages every 5 seconds when a chat is selected
   useEffect(() => {
     if (!selectedChat) return;
 
     const intervalId = setInterval(() => {
       fetchMessages();
-    }, 5000); // 10,000 milliseconds = 10 seconds
+    }, 5000); // 5,000 milliseconds = 5 seconds
 
     // Cleanup interval on component unmount or when selectedChat changes
     return () => clearInterval(intervalId);
@@ -98,10 +109,12 @@ const Communication = () => {
     if (!messageInput.trim()) return;
 
     try {
-      const response = await fetch("http://localhost:4000/messages", {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:4000/chats/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           chatId: selectedChat.chatId,
@@ -118,28 +131,60 @@ const Communication = () => {
     }
   };
 
-  // Handle status updates
+  // Handle status updates (including blocking)
   const handleStatusUpdate = async (status) => {
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `http://localhost:4000/chats/update-status`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             chatId: selectedChat.chatId,
             petId: selectedChat.petId,
             status,
+            userId: currentUser._id, // Pass userId in the request body
           }),
         }
       );
-      window.location.reload();
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+        if (status === "blocked") {
+          // If blocked, reset the selected chat
+          setSelectedChat(null);
+        } else {
+          window.location.reload();
+        }
+      } else {
+        alert(data.error || "Failed to update status.");
+      }
     } catch (error) {
       console.error("Update Status Error:", error);
     }
   };
+
+  // Handle blocking a user (Only for Adoptees)
+  const handleBlockUser = async () => {
+    if (!selectedChat) return;
+
+    const confirmBlock = window.confirm(
+      `Are you sure you want to block ${selectedChat.email}? This action cannot be undone.`
+    );
+    if (!confirmBlock) return;
+
+    // Use handleStatusUpdate with 'blocked' status
+    await handleStatusUpdate("blocked");
+  };
+
+  // Determine if the current user is the adoptee in the selected chat
+  const isAdoptee =
+    selectedChat &&
+    adopteeChats.some((chat) => chat.chatId === selectedChat.chatId);
 
   return (
     <Box sx={{ display: "flex", maxHeight: "auto" }}>
@@ -155,7 +200,7 @@ const Communication = () => {
               key={chat.chatId}
               button
               onClick={() => handleChatSelect(chat)}
-              selected={selectedChat?.chatId === chat.chatId} // Highlight selected chat
+              selected={selectedChat?.chatId === chat.chatId}
             >
               <Avatar sx={{ marginRight: 2, bgcolor: adopterColor }}>
                 {chat.name ? chat.name[0] : "A"}
@@ -185,14 +230,13 @@ const Communication = () => {
         <Typography variant="subtitle1" sx={{ marginTop: 2 }}>
           Chat with Adopters
         </Typography>
-        {/*current user is adoptee here */}
         <List>
           {adopteeChats.map((chat) => (
             <ListItem
               key={chat.chatId}
               button
               onClick={() => handleChatSelect(chat)}
-              selected={selectedChat?.chatId === chat.chatId} // Highlight selected chat
+              selected={selectedChat?.chatId === chat.chatId}
             >
               <Avatar sx={{ marginRight: 2, bgcolor: adopteeColor }}>
                 {chat.name ? chat.name[0] : "D"}
@@ -306,6 +350,19 @@ const Communication = () => {
               >
                 Cancel
               </Button>
+
+              {/* Block Button (Only for Adoptees) */}
+              {isAdoptee && (
+                <Tooltip title="Block User">
+                  <IconButton
+                    color="error"
+                    onClick={handleBlockUser}
+                    sx={{ marginLeft: 2 }}
+                  >
+                    <BlockIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
             </Box>
 
             <Box

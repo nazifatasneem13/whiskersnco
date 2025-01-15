@@ -9,32 +9,40 @@ import {
   Typography,
   Container,
 } from "@mui/material";
-
+import axios from "axios";
 const Pets = () => {
   const [filter, setFilter] = useState("all");
   const [breed, setBreed] = useState("");
   const [petsData, setPetsData] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [error, setError] = useState(null);
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const userEmail = currentUser ? currentUser.email : null;
 
-  useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const response = await fetch("http://localhost:4000/approvedPets");
-        if (!response.ok) {
-          throw new Error("An error occurred");
-        }
-        const data = await response.json();
-        setPetsData(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchRequests = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const { data } = await axios.get("http://localhost:4000/users/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const userId = data._id;
 
+      const petsResponse = await axios.post(
+        "http://localhost:4000/approvedPetsDisplay",
+        { userId }
+      );
+
+      setPetsData(petsResponse.data);
+    } catch (error) {
+      console.error("Error fetching preferred pets or user ID:", error);
+      setError("Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchRequests();
   }, []);
 
@@ -92,7 +100,7 @@ const Pets = () => {
             </Typography>
           ) : filteredPets.length > 0 ? (
             filteredPets.map((petDetail, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
+              <Grid item xs={12} sm={6} md={3} key={index}>
                 <PetsViewer pet={petDetail} />
               </Grid>
             ))
