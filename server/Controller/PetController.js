@@ -11,7 +11,6 @@ console.log(tf.version.tfjs);
 // Define paths for model JSON files (TensorFlow.js format)
 const dogModelPath = path.join(__dirname, "../Model/Dog/model.json");
 const catModelPath = path.join(__dirname, "../Model/Cat/model.json");
-const birdModelPath = path.join(__dirname, "../Model/Bird/model.json");
 
 let dogModel, catModel;
 
@@ -30,209 +29,6 @@ const loadModels = async () => {
 };
 
 loadModels(); // Load models at server startup
-
-const birdBreedLabels = [
-  "black_footed_albatross",
-  "laysan_albatross",
-  "sooty_albatross",
-  "groove_billed_ani",
-  "crested_auklet",
-  "least_auklet",
-  "parakeet_auklet",
-  "rhinoceros_auklet",
-  "brewer_blackbird",
-  "red_winged_blackbird",
-  "rusty_blackbird",
-  "yellow_headed_blackbird",
-  "bobolink",
-  "indigo_bunting",
-  "lazuli_bunting",
-  "painted_bunting",
-  "cardinal",
-  "spotted_catbird",
-  "gray_catbird",
-  "yellow_breasted_chat",
-  "eastern_towhee",
-  "chuck_will_widow",
-  "brandt_cormorant",
-  "red_faced_cormorant",
-  "pelagic_cormorant",
-  "bronzed_cowbird",
-  "shiny_cowbird",
-  "brown_creeper",
-  "american_crow",
-  "fish_crow",
-  "black_billed_cuckoo",
-  "mangrove_cuckoo",
-  "yellow_billed_cuckoo",
-  "gray_crowned_rosy_finch",
-  "purple_finch",
-  "northern_flicker",
-  "acadian_flycatcher",
-  "great_crested_flycatcher",
-  "least_flycatcher",
-  "olive_sided_flycatcher",
-  "scissor_tailed_flycatcher",
-  "vermilion_flycatcher",
-  "yellow_bellied_flycatcher",
-  "frigatebird",
-  "northern_fulmar",
-  "gadwall",
-  "american_goldfinch",
-  "european_goldfinch",
-  "boat_tailed_grackle",
-  "eared_grebe",
-  "horned_grebe",
-  "pied_billed_grebe",
-  "western_grebe",
-  "blue_grosbeak",
-  "evening_grosbeak",
-  "pine_grosbeak",
-  "rose_breasted_grosbeak",
-  "pigeon_guillemot",
-  "california_gull",
-  "glaucous_winged_gull",
-  "heermann_gull",
-  "herring_gull",
-  "ivory_gull",
-  "ring_billed_gull",
-  "slaty_backed_gull",
-  "western_gull",
-  "anna_hummingbird",
-  "ruby_throated_hummingbird",
-  "rufous_hummingbird",
-  "green_violetear",
-  "long_tailed_jaeger",
-  "pomarine_jaeger",
-  "blue_jay",
-  "florida_jay",
-  "green_jay",
-  "dark_eyed_junco",
-  "tropical_kingbird",
-  "gray_kingbird",
-  "belted_kingfisher",
-  "green_kingfisher",
-  "pied_kingfisher",
-  "ringed_kingfisher",
-  "white_breasted_kingfisher",
-  "red_legged_kittiwake",
-  "horned_lark",
-  "pacific_loon",
-  "mallard",
-  "western_meadowlark",
-  "hooded_merganser",
-  "red_breasted_merganser",
-  "mockingbird",
-  "nighthawk",
-  "clark_nutcracker",
-  "white_breasted_nuthatch",
-  "baltimore_oriole",
-  "hooded_oriole",
-  "orchard_oriole",
-  "scott_oriole",
-  "ovenbird",
-  "brown_pelican",
-  "white_pelican",
-  "western_wood_pewee",
-  "sayornis",
-  "american_pipit",
-  "whip_poor_will",
-  "horned_puffin",
-  "common_raven",
-  "white_necked_raven",
-  "american_redstart",
-  "geococcyx",
-  "loggerhead_shrike",
-  "great_grey_shrike",
-  "baird_sparrow",
-  "black_throated_sparrow",
-  "brewer_sparrow",
-  "chipping_sparrow",
-  "clay_colored_sparrow",
-  "house_sparrow",
-  "field_sparrow",
-  "fox_sparrow",
-  "grasshopper_sparrow",
-  "harris_sparrow",
-  "henslow_sparrow",
-  "le_conte_sparrow",
-  "lincoln_sparrow",
-  "nelson_sharp_tailed_sparrow",
-  "savannah_sparrow",
-  "seaside_sparrow",
-  "song_sparrow",
-  "tree_sparrow",
-  "vesper_sparrow",
-  "white_crowned_sparrow",
-  "white_throated_sparrow",
-  "cape_glossy_starlings",
-  "bank_swallow",
-  "barn_swallow",
-  "cliff_swallow",
-  "tree_swallow",
-  "scarlet_tanager",
-  "summer_tanager",
-  "artic_tern",
-  "black_tern",
-  "caspian_tern",
-  "common_tern",
-  "elegant_tern",
-  "forsters_tern",
-  "least_tern",
-  "green_tailed_towhee",
-  "brown_thrasher",
-  "sage_thrasher",
-  "black_capped_vireo",
-  "blue_headed_vireo",
-  "philadelphia_vireo",
-  "red_eyed_vireo",
-  "warbling_vireo",
-  "white_eyed_vireo",
-  "yellow_throated_vireo",
-  "bay_breasted_warbler",
-  "black_and_white_warbler",
-  "black_throated_blue_warbler",
-  "blue_winged_warbler",
-  "canada_warbler",
-  "cape_may_warbler",
-  "cerulean_warbler",
-  "chestnut_sided_warbler",
-  "golden_winged_warbler",
-  "hooded_warbler",
-  "kentucky_warbler",
-  "magnolia_warbler",
-  "mourning_warbler",
-  "myrtle_warbler",
-  "nashville_warbler",
-  "orange_crowned_warbler",
-  "palm_warbler",
-  "pine_warbler",
-  "prairie_warbler",
-  "prothonotary_warbler",
-  "swainson_warbler",
-  "tennessee_warbler",
-  "wilson_warbler",
-  "worm_eating_warbler",
-  "yellow_warbler",
-  "northern_waterthrush",
-  "louisiana_waterthrush",
-  "bohemian_waxwing",
-  "cedar_waxwing",
-  "american_three_toed_woodpecker",
-  "pileated_woodpecker",
-  "red_bellied_woodpecker",
-  "red_cockaded_woodpecker",
-  "red_headed_woodpecker",
-  "downy_woodpecker",
-  "bewick_wren",
-  "cactus_wren",
-  "carolina_wren",
-  "house_wren",
-  "marsh_wren",
-  "rock_wren",
-  "winter_wren",
-  "common_yellowthroat",
-];
 
 // Define breed labels
 const dogBreedLabels = [
@@ -431,38 +227,87 @@ const deletePost = async (req, res) => {
   }
 };
 
-// Controller to get pets based on user preferences
 const getPreferredPets = (reqStatus) => async (req, res) => {
   try {
     const { userId } = req.body;
+    console.log(
+      `Received request to fetch pets for userId: ${userId} with status: ${reqStatus}`
+    );
+
     if (!userId) {
+      console.error("User ID is missing in the request body.");
       return res.status(400).json({ message: "User ID is required" });
     }
 
     const user = await User.findById(userId);
-    if (!user || !user.petTypes || user.petTypes.length === 0) {
-      return res.status(404).json({ message: "No matching preferences found" });
+    if (!user) {
+      console.error(`User not found. userId: ${userId}`);
+      return res.status(404).json({ message: "User not found." });
     }
 
-    // Fetch pets that match the user's preferences and have the specified status
+    if (!user.petTypes || user.petTypes.length === 0) {
+      console.error(`User has no pet preferences. userId: ${userId}`);
+      return res
+        .status(404)
+        .json({ message: "No matching preferences found." });
+    }
+
+    // 1. Users who have blocked the current user
+    const blockedByUsersIds = user.blockedBy; // Array of User IDs
+
+    // Fetch emails of users who have blocked the current user
+    const blockedByUsers = await User.find({
+      _id: { $in: blockedByUsersIds },
+    }).select("email");
+    const blockedByEmails = blockedByUsers.map((u) => u.email);
+    console.log(
+      `Users who have blocked current user (${userId}):`,
+      blockedByEmails
+    );
+
+    // 2. Users whom the current user has blocked
+    const usersWhomUserHasBlocked = await User.find({
+      blockedBy: userId,
+    }).select("email");
+    const blockedUsersEmails = usersWhomUserHasBlocked.map((u) => u.email);
+    console.log(
+      `Users whom current user (${userId}) has blocked:`,
+      blockedUsersEmails
+    );
+
+    // Combine both blocked emails
+    const allBlockedEmails = [...blockedByEmails, ...blockedUsersEmails];
+    console.log(`All blocked emails for userId ${userId}:`, allBlockedEmails);
+
+    // Fetch pets that match the user's preferences, have the specified status,
+    // and are not owned by blocked users
     const pets = await Pet.find({
       status: reqStatus, // Filter by status
       $or: [
         { type: { $in: user.petTypes } }, // Match pets with user's preferred pet types
         { division: { $in: user.areas } }, // Match pets where the division matches user's areas
       ],
+      $and: [
+        { email: { $nin: allBlockedEmails } },
+        { email: { $nin: user.email } },
+      ], // Exclude pets owned by blocked users
     }).sort({ updatedAt: -1 });
 
+    console.log(`Number of pets found for userId ${userId}: ${pets.length}`);
+
     if (pets.length === 0) {
+      console.log(
+        `No pets found for userId: ${userId} with status: ${reqStatus}`
+      );
       return res
         .status(404)
-        .json({ message: "No pets found for the given preferences" });
+        .json({ message: "No pets found for the given preferences." });
     }
 
     res.status(200).json(pets);
   } catch (error) {
     console.error("Error fetching preferred pets:", error);
-    res.status(500).json({ message: "Server error while fetching pets" });
+    res.status(500).json({ message: "Server error while fetching pets." });
   }
 };
 
@@ -503,6 +348,72 @@ const approveadoptRequest = async (req, res) => {
   }
 };
 
+const allPetsDisplay = (reqStatus) => async (req, res) => {
+  try {
+    const { userId } = req.body;
+    console.log(
+      `Received request to fetch pets for userId: ${userId} with status: ${reqStatus}`
+    );
+
+    if (!userId) {
+      console.error("User ID is missing in the request body.");
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      console.error(`User not found. userId: ${userId}`);
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // 1. Users who have blocked the current user
+    const blockedByUsersIds = user.blockedBy; // Array of User IDs
+
+    // Fetch emails of users who have blocked the current user
+    const blockedByUsers = await User.find({
+      _id: { $in: blockedByUsersIds },
+    }).select("email");
+    const blockedByEmails = blockedByUsers.map((u) => u.email);
+    console.log(
+      `Users who have blocked current user (${userId}):`,
+      blockedByEmails
+    );
+
+    const usersWhomUserHasBlocked = await User.find({
+      blockedBy: userId,
+    }).select("email");
+    const blockedUsersEmails = usersWhomUserHasBlocked.map((u) => u.email);
+    console.log(
+      `Users whom current user (${userId}) has blocked:`,
+      blockedUsersEmails
+    );
+
+    const allBlockedEmails = [...blockedByEmails, ...blockedUsersEmails];
+    console.log(`All blocked emails for userId ${userId}:`, allBlockedEmails);
+
+    const data = await Pet.find({ status: reqStatus }).sort({ updatedAt: -1 });
+    const pets = await Pet.find({
+      status: reqStatus, // Filter by status
+
+      email: { $nin: allBlockedEmails }, // Exclude pets owned by blocked users
+    }).sort({ updatedAt: -1 });
+
+    if (pets.length === 0) {
+      console.log(
+        `No pets found for userId: ${userId} with status: ${reqStatus}`
+      );
+      return res
+        .status(404)
+        .json({ message: "No pets found for the given preferences." });
+    }
+
+    res.status(200).json(pets);
+  } catch (error) {
+    console.error("Error fetching preferred pets:", error);
+    res.status(500).json({ message: "Server error while fetching pets." });
+  }
+};
+
 // Export controllers
 module.exports = {
   postPetRequest,
@@ -512,4 +423,5 @@ module.exports = {
   predictBreed,
   getPreferredPets,
   approveadoptRequest,
+  allPetsDisplay,
 };

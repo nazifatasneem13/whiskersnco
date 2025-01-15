@@ -7,19 +7,69 @@ const Pet = require("../Model/PetModel");
 
 const updateChatStatus = async (req, res) => {
   try {
-    const { chatId, petId, status } = req.body;
+    const { chatId, petId, status, userId } = req.body;
 
-    if (!["active", "passive", "sent", "delivered"].includes(status)) {
-      return res.status(400).json({ error: "Invalid status" });
+    // Validate required fields
+    if (!chatId || !petId || !status || !userId) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
+
+    // Validate status
+    const validStatuses = ["active", "passive", "sent", "delivered", "blocked"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Invalid status." });
     }
 
     // Find the chat
     const chat = await Chat.findById(chatId);
     if (!chat) {
-      return res.status(404).json({ error: "Chat not found" });
+      return res.status(404).json({ error: "Chat not found." });
     }
 
-    // Handle status updates
+    // Handle 'blocked' status
+    if (status === "blocked") {
+      // Verify that the userId is the adoptee in the chat
+      if (chat.adopteeId.toString() !== userId.toString()) {
+        return res
+          .status(403)
+          .json({ error: "Only adoptees can block adopters." });
+      }
+
+      const adopterId = chat.adopterId;
+
+      // Fetch the adopter user
+      const adopter = await User.findById(adopterId);
+      if (!adopter) {
+        return res.status(404).json({ error: "Adopter not found." });
+      }
+
+      // Check if already blocked
+      if (adopter.blockedBy.includes(userId)) {
+        return res.status(400).json({ error: "User is already blocked." });
+      }
+
+      // Add adoptee's ID to adopter's blockedBy array
+      adopter.blockedBy.push(userId);
+      await adopter.save();
+      //Hasblocked
+      const adoptee = await User.findById(userId);
+      if (!adoptee) {
+        return res.status(404).json({ error: "Adoptee not found." });
+      }
+
+      adoptee.Hasblocked.push(adopterId);
+      await adoptee.save();
+      // Update chat status to 'blocked'
+      chat.status = "blocked";
+      await chat.save();
+
+      // Optionally, delete existing messages for privacy
+      await Message.deleteMany({ chatId: chat._id });
+
+      return res.status(200).json({ message: "User blocked successfully." });
+    }
+
+    // Handle other statuses
     if (status === "sent") {
       // Adoptee sends the pet
       await Pet.findByIdAndUpdate(petId, { status: "Sent" }, { new: true });
@@ -74,7 +124,7 @@ const updateChatStatus = async (req, res) => {
       await chat.save();
       const adopter = await User.findById(chat.adopterId);
       if (!adopter) {
-        return res.status(404).json({ error: "Adopter not found" });
+        return res.status(404).json({ error: "Adopter not found." });
       }
 
       const adopterEmail = adopter.email;
@@ -90,13 +140,13 @@ const updateChatStatus = async (req, res) => {
     } else {
       return res
         .status(400)
-        .json({ error: "Invalid action for the user's role in the chat" });
+        .json({ error: "Invalid action for the user's role in the chat." });
     }
 
-    res.status(200).json({ message: "Chat status updated successfully" });
+    res.status(200).json({ message: "Chat status updated successfully." });
   } catch (error) {
     console.error("Error updating chat status:", error);
-    res.status(500).json({ error: "Failed to update chat status" });
+    res.status(500).json({ error: "Failed to update chat status." });
   }
 };
 
@@ -180,11 +230,65 @@ const sendMessage = async (req, res) => {
     res.status(500).json({ error: "Failed to send message" });
   }
 };
+const blockUser = async (req, res) => {
+  try {
+    const { blockedUserId } = req.body;
+    const currentUserId = req.user._id; // Assuming you have authentication middleware
 
+    if (currentUserId.toString() === blockedUserId) {
+      return res.status(400).json({ error: "You cannot block yourself." });
+    }
+
+    // Add currentUserId to blockedUser's blockedBy array
+    const blockedUser = await User.findById(blockedUserId);
+    if (!blockedUser) {
+      return res.status(404).json({ error: "User to block not found." });
+    }
+
+    // Check if already blocked
+    if (blockedUser.blockedBy.includes(currentUserId)) {
+      return res.status(400).json({ error: "User is already blocked." });
+    }
+
+    blockedUser.blockedBy.push(currentUserId);
+    await blockedUser.save();
+
+    // Update chat statuses between currentUser and blockedUser to 'blocked'
+    await Chat.updateMany(
+      {
+        $or: [
+          { adopterId: currentUserId, adopteeId: blockedUserId },
+          { adopterId: blockedUserId, adopteeId: currentUserId },
+        ],
+      },
+      { status: "blocked" }
+    );
+
+    // Optionally, delete existing messages
+    await Message.deleteMany({
+      chatId: {
+        $in: (
+          await Chat.find({
+            $or: [
+              { adopterId: currentUserId, adopteeId: blockedUserId },
+              { adopterId: blockedUserId, adopteeId: currentUserId },
+            ],
+          })
+        ).map((chat) => chat._id),
+      },
+    });
+
+    res.status(200).json({ message: "User blocked successfully." });
+  } catch (error) {
+    console.error("Error blocking user:", error);
+    res.status(500).json({ error: "Failed to block user." });
+  }
+};
 module.exports = {
   getAdopterChats,
   getAdopteeChats,
   getMessages,
   sendMessage,
   updateChatStatus,
+  blockUser,
 };
