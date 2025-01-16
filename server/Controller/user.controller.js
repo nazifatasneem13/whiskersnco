@@ -98,6 +98,70 @@ const addToWishlist = async (req, res, next) => {
   }
 };
 
+const getBlockedUser = async (req, res, next) => {
+  try {
+    let user;
+    // Check if 'uid' is available (Google users)
+    if (req.uid) {
+      user = await User.findOne({ uid: req.uid }).populate(
+        "Hasblocked",
+        "email"
+      );
+    } else {
+      // Otherwise, find the user by 'userId' and populate 'Hasblocked'
+      user = await User.findById(req.userId).populate("Hasblocked", "email");
+    }
+
+    // If the user is not found, return a 404 error
+    if (!user) return res.status(404).send("User not found.");
+
+    // Extract the emails of blocked users
+    const blockedUserEmails = user.Hasblocked.map(
+      (blockedUser) => blockedUser.email
+    );
+
+    // Return the blocked users' emails
+    res.status(200).send({ blockedUserEmails });
+  } catch (err) {
+    next(err);
+  }
+};
+const unblockUser = async (req, res) => {
+  try {
+    const { email } = req.body; // The email to unblock
+    const userId = req.userId; // Current user's ID
+
+    const user = await User.findById(userId);
+    const userToUnblock = await User.findOne({ email });
+
+    if (!userToUnblock) {
+      return res.status(404).send("User to unblock not found.");
+    }
+
+    // Remove userToUnblock's ID from the current user's Hasblocked list
+    user.Hasblocked = user.Hasblocked.filter(
+      (id) => id.toString() !== userToUnblock._id.toString()
+    );
+    userToUnblock.Hasblocked = userToUnblock.Hasblocked.filter(
+      (id) => id.toString() !== user._id.toString()
+    );
+    // Remove the current user's ID from userToUnblock's blockedBy list
+    userToUnblock.blockedBy = userToUnblock.blockedBy.filter(
+      (id) => id.toString() !== userId.toString()
+    );
+    user.blockedBy = user.blockedBy.filter(
+      (id) => id.toString() !== userToUnblock.toString()
+    );
+
+    await user.save();
+    await userToUnblock.save();
+
+    res.status(200).send({ message: "User successfully unblocked" });
+  } catch (err) {
+    res.status(500).send("Server error while unblocking user");
+  }
+};
+
 // Export the functions
 module.exports = {
   deleteUser,
@@ -105,4 +169,6 @@ module.exports = {
   savePreferences,
   updateUser,
   addToWishlist,
+  getBlockedUser,
+  unblockUser,
 };

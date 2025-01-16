@@ -50,7 +50,19 @@ const updateChatStatus = async (req, res) => {
 
       // Add adoptee's ID to adopter's blockedBy array
       adopter.blockedBy.push(userId);
+
       await adopter.save();
+
+      // Delete only AdoptForms related to the adopter for this petId
+      const result = await Chat.deleteMany({
+        petId: petId.toString(),
+        adopteeId: userId,
+        adopterId: adopterId,
+      });
+      console.log(
+        `${result.deletedCount} AdoptForms deleted for petId ${petId} and email ${adopterEmail}`
+      );
+
       //Hasblocked
       const adoptee = await User.findById(userId);
       if (!adoptee) {
@@ -65,7 +77,7 @@ const updateChatStatus = async (req, res) => {
 
       // Optionally, delete existing messages for privacy
       await Message.deleteMany({ chatId: chat._id });
-
+      await Pet.findByIdAndUpdate(petId, { status: "Approved" }, { new: true });
       return res.status(200).json({ message: "User blocked successfully." });
     }
 
