@@ -10,14 +10,17 @@ import {
   Container,
 } from "@mui/material";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
+
 const Pets = () => {
   const [filter, setFilter] = useState("all");
-  const [breed, setBreed] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // Single input for both name and breed
   const [petsData, setPetsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const userEmail = currentUser ? currentUser.email : null;
+  const location = useLocation();
 
   const fetchRequests = async () => {
     try {
@@ -43,16 +46,21 @@ const Pets = () => {
   };
 
   useEffect(() => {
+    if (location.state?.petName) {
+      setSearchTerm(location.state.petName);
+    }
     fetchRequests();
-  }, []);
+  }, [location.state]);
 
   const filteredPets = petsData
     .filter((pet) => pet.email !== userEmail)
     .filter((pet) => (filter === "all" ? true : pet.type === filter))
-    .filter((pet) =>
-      breed === ""
-        ? true
-        : pet.breed.toLowerCase().includes(breed.toLowerCase())
+    .filter(
+      (pet) =>
+        searchTerm === ""
+          ? true
+          : pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            pet.breed.toLowerCase().includes(searchTerm.toLowerCase()) // Check both name and breed
     );
 
   return (
@@ -85,9 +93,9 @@ const Pets = () => {
           </Select>
 
           <TextField
-            placeholder="Search by breed"
-            value={breed}
-            onChange={(e) => setBreed(e.target.value)}
+            placeholder="Search by name or breed"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             variant="outlined"
             sx={{ minWidth: 300 }}
           />
@@ -97,6 +105,10 @@ const Pets = () => {
           {loading ? (
             <Typography variant="body1" textAlign="center" width="100%">
               Loading...
+            </Typography>
+          ) : error ? (
+            <Typography variant="body1" textAlign="center" width="100%">
+              {error}
             </Typography>
           ) : filteredPets.length > 0 ? (
             filteredPets.map((petDetail, index) => (

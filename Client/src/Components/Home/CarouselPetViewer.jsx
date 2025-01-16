@@ -25,7 +25,7 @@ const CarouselPetViewer = ({ pet }) => {
 
     if (userConfirmed) {
       // Navigate to the /pets page with the selected pet's ID
-      navigate("/pets", { state: { petId: pet._id } });
+      navigate("/pets", { state: { petName: pet.name } });
     }
   };
 
