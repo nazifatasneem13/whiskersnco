@@ -19,6 +19,11 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  CircularProgress,
+  Snackbar,
 } from "@mui/material";
 import { Delete, Settings } from "@mui/icons-material";
 import axios from "axios";
@@ -26,6 +31,10 @@ import upload from "../utils/upload.js";
 import fetchUserProfile from "../utils/fetchUserProfile";
 
 const Profile = () => {
+  const [blockedEmails, setBlockedEmails] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar state
   const [user, setUser] = useState({
     username: "",
     email: "",
@@ -40,22 +49,43 @@ const Profile = () => {
   const [message, setMessage] = useState("");
   const [activeTab, setActiveTab] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const data = await fetchUserProfile();
-        setUser(data);
+        const token = localStorage.getItem("token");
+        const userResponse = await axios.get(
+          "http://localhost:4000/users/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUser(userResponse.data);
+
+        // Fetch blocked users
+        await fetchBlocked();
         await fetchWishlistDetails();
       } catch (err) {
         console.error(err);
-        setMessage("Session expired. Please log in again.");
-        localStorage.removeItem("token");
-        localStorage.removeItem("currentUser");
-        window.location.href = "/login";
+        // Handle session expiry
       }
     };
 
+    const fetchBlocked = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "http://localhost:4000/users/blocked/hasblocked",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        // Access the emails properly and update the state
+        setBlockedEmails(response.data.blockedUserEmails || []);
+      } catch (err) {
+        console.error("Failed to fetch blocked details:", err);
+      }
+    };
     const fetchWishlistDetails = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -156,6 +186,28 @@ const Profile = () => {
       );
     }
   };
+  const unblockUser = async (email) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:4000/users/unblock",
+        { email },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Update UI after unblocking
+      setBlockedEmails(
+        blockedEmails.filter((blockedEmail) => blockedEmail !== email)
+      );
+      setMessage(response.data.message || "User unblocked successfully.");
+      window.location.reload();
+    } catch (err) {
+      console.error("Failed to unblock user:", err);
+      setError("Error unblocking user.");
+    }
+  };
 
   return (
     <Container maxWidth="md" sx={{ mt: 5, mb: 20 }}>
@@ -188,6 +240,7 @@ const Profile = () => {
       <Tabs value={activeTab} onChange={handleTabChange} centered>
         <Tab label="User Details" />
         <Tab label="Wishlist" />
+        <Tab label="Others" />
       </Tabs>
 
       {/* Tab Content */}
@@ -274,6 +327,37 @@ const Profile = () => {
               </Typography>
             )}
           </Grid>
+        </Box>
+      )}
+
+      {activeTab === 2 && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h5">Blocked Users</Typography>
+          {error && <Typography color="error">{error}</Typography>}
+          <List>
+            {blockedEmails.map((email, index) => (
+              <ListItem
+                key={index}
+                sx={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <ListItemText primary={email} />
+                <IconButton
+                  color="secondary"
+                  onClick={() => unblockUser(email)}
+                  aria-label="unblock"
+                >
+                  <Delete />
+                </IconButton>
+              </ListItem>
+            ))}
+          </List>
+
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000}
+            onClose={() => setOpenSnackbar(false)}
+            message={message}
+          />
         </Box>
       )}
 
