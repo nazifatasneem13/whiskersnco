@@ -197,6 +197,12 @@ function AdoptForm({ pet, closeForm }) {
               variant="body1"
               sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
             >
+              <b>Breed:</b> {pet.breed}
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
+            >
               <b>Age:</b> {pet.age} months
             </Typography>
             <Typography
