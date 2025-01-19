@@ -413,6 +413,61 @@ const allPetsDisplay = (reqStatus) => async (req, res) => {
     res.status(500).json({ message: "Server error while fetching pets." });
   }
 };
+// Predict breed from image upload
+const predictBreedFromImage = async (req, res) => {
+  try {
+    const { type } = req.body;
+    if (!req.file || !type) {
+      return res.status(400).json({ error: "Image and type are required" });
+    }
+
+    const imageBuffer = fs.readFileSync(req.file.path);
+    const processedImage = await sharp(imageBuffer).resize(250, 250).toBuffer();
+    const tensor = tf.node
+      .decodeImage(processedImage, 3)
+      .expandDims(0)
+      .div(255.0); // Normalize image
+
+    let model, breedLabels;
+    if (type === "Dog") {
+      if (!dogModel) {
+        return res.status(500).json({ error: "Dog model is not loaded yet." });
+      }
+      model = dogModel;
+      breedLabels = dogBreedLabels;
+    } else if (type === "Cat") {
+      if (!catModel) {
+        return res.status(500).json({ error: "Cat model is not loaded yet." });
+      }
+      model = catModel;
+      breedLabels = catBreedLabels;
+    } else {
+      return res.status(400).json({ error: "Unsupported pet type" });
+    }
+
+    const prediction = model.predict(tensor);
+    const predictedIndex = tf.argMax(prediction, 1).dataSync()[0];
+    const breed = breedLabels[predictedIndex];
+
+    // Now, search the DB for pets with the predicted breed
+    const pets = await Pet.find({ breed }).sort({ updatedAt: -1 });
+
+    if (pets.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No pets found for the predicted breed." });
+    }
+
+    res.status(200).json({ breed, pets });
+  } catch (error) {
+    console.error("Error predicting breed from image:", error);
+    res.status(500).json({ error: "Server error" });
+  } finally {
+    if (req.file && req.file.path) {
+      fs.unlinkSync(req.file.path); // Clean up the uploaded image file
+    }
+  }
+};
 
 // Export controllers
 module.exports = {
@@ -424,4 +479,5 @@ module.exports = {
   getPreferredPets,
   approveadoptRequest,
   allPetsDisplay,
+  predictBreedFromImage,
 };

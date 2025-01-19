@@ -178,8 +178,6 @@ const updateChatStatus = async (req, res) => {
         { new: true }
       );
 
-      // Optionally delete the chat after delivery is confirmed
-      await Chat.findByIdAndDelete(chatId);
       const result = await AdoptForm.deleteMany({ petId: petId.toString() });
 
       console.log(
@@ -352,6 +350,62 @@ const blockUser = async (req, res) => {
     res.status(500).json({ error: "Failed to block user." });
   }
 };
+
+const getArchivedAdopterChats = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const chats = await Chat.find({
+      adopterId: userId,
+      $or: [{ status: "sent" }, { status: "delivered" }],
+    })
+      .populate("adopteeId", "name email")
+      .populate("petId", "name");
+
+    // Map the results to include the necessary details
+    const adopterChats = chats.map((chat) => ({
+      chatId: chat._id,
+      name: chat.adopteeId.name,
+      email: chat.adopteeId.email,
+      petName: chat.petId.name,
+      petId: chat.petId._id,
+      status: chat.status,
+    }));
+
+    res.status(200).json(adopterChats);
+  } catch (error) {
+    console.error("Error fetching adopter chats:", error);
+    res.status(500).json({ error: "Failed to fetch adopter chats" });
+  }
+};
+
+const getArchivedAdopteeChats = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const chats = await Chat.find({
+      adopteeId: userId,
+      status: "delivered",
+    })
+      .populate("adopterId", "name email")
+      .populate("petId", "name");
+
+    const adopteeChats = chats.map((chat) => ({
+      chatId: chat._id,
+      name: chat.adopterId.name,
+      email: chat.adopterId.email,
+      petName: chat.petId.name,
+      petId: chat.petId._id,
+      status: chat.status,
+    }));
+
+    res.status(200).json(adopteeChats);
+  } catch (error) {
+    console.error("Error fetching adoptee chats:", error);
+    res.status(500).json({ error: "Failed to fetch adoptee chats" });
+  }
+};
+
 module.exports = {
   getAdopterChats,
   getAdopteeChats,
@@ -359,4 +413,6 @@ module.exports = {
   sendMessage,
   updateChatStatus,
   blockUser,
+  getArchivedAdopterChats,
+  getArchivedAdopteeChats,
 };

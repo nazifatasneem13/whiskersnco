@@ -11,6 +11,7 @@ const {
   predictBreed,
   approveadoptRequest,
   allPetsDisplay,
+  predictBreedFromImage,
 } = require("../Controller/PetController");
 const { verifyToken } = require("../middleware/jwt"); // Ensure this path is correct
 // Configure multer storage
@@ -49,5 +50,9 @@ router.post("/preferredPets", getPreferredPets("Approved"));
 router.put("/approvingadopt/:id", approveadoptRequest);
 // New route for breed prediction
 router.post("/predict-breed", upload.single("image"), predictBreed);
-
+router.get(
+  "/predictBreedFromImage",
+  upload.single("image"),
+  predictBreedFromImage
+);
 module.exports = router;

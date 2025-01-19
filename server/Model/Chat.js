@@ -15,7 +15,7 @@ const chatSchema = new mongoose.Schema(
     petId: { type: mongoose.Schema.Types.ObjectId, ref: "Pet", required: true },
     status: {
       type: String,
-      enum: ["active", "passive", "sent", "delivered", "blocked"], // Added "blocked"
+      enum: ["active", "passive", "sent", "delivered", "blocked"],
       default: "active",
     },
   },
