@@ -117,7 +117,7 @@ const generateTrainingGuide = async (req, res, next) => {
 ### Additional Context:
 - The guide should consider breed-specific behavior traits.
 - Tailor exercises to the pet's developmental stage (puppy, adult, senior).`;
-    // Use Groq's chat completion to generate the training guide
+
     const groqResponse = await groqClient.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       temperature: 0.7,

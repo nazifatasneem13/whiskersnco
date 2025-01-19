@@ -22,13 +22,12 @@ import {
   List,
   ListItem,
   ListItemText,
-  CircularProgress,
   Snackbar,
 } from "@mui/material";
 import { Delete, Settings } from "@mui/icons-material";
 import axios from "axios";
 import upload from "../utils/upload.js";
-import fetchUserProfile from "../utils/fetchUserProfile";
+//import fetchUserProfile from "../utils/fetchUserProfile";
 
 const Profile = () => {
   const [blockedEmails, setBlockedEmails] = useState([]);
@@ -49,6 +48,7 @@ const Profile = () => {
   const [message, setMessage] = useState("");
   const [activeTab, setActiveTab] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [userPets, setUserPets] = useState([]);
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -67,6 +67,17 @@ const Profile = () => {
       } catch (err) {
         console.error(err);
         // Handle session expiry
+      }
+    };
+    const fetchUserPets = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:4000/profile/get", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserPets(response.data);
+      } catch (err) {
+        console.error("Error fetching user's pets:", err);
       }
     };
 
@@ -102,6 +113,7 @@ const Profile = () => {
     };
 
     fetchUser();
+    fetchUserPets();
   }, []);
 
   const handleRemoveFromWishlist = async (petId) => {
@@ -240,7 +252,8 @@ const Profile = () => {
       <Tabs value={activeTab} onChange={handleTabChange} centered>
         <Tab label="User Details" />
         <Tab label="Wishlist" />
-        <Tab label="Others" />
+        <Tab label="Blocked" />
+        <Tab label="Pets" />
       </Tabs>
 
       {/* Tab Content */}
@@ -358,6 +371,49 @@ const Profile = () => {
             onClose={() => setOpenSnackbar(false)}
             message={message}
           />
+        </Box>
+      )}
+      {activeTab === 3 && (
+        <Box>
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
+            My Pets
+          </Typography>
+          <Grid container spacing={3}>
+            {userPets.length > 0 ? (
+              userPets.map((pet) => (
+                <Grid item xs={12} sm={6} md={4} key={pet._id}>
+                  <Card>
+                    <CardMedia
+                      component="img"
+                      height="200"
+                      image={pet.filename}
+                      alt={pet.name}
+                    />
+                    <CardContent>
+                      <Typography variant="h6">{pet.name}</Typography>
+                      <Typography variant="body2">
+                        <b>Type:</b> {pet.type}
+                      </Typography>
+                      <Typography variant="body2">
+                        <b>Breed:</b> {pet.breed}
+                      </Typography>
+                      <Typography variant="body2">
+                        <b>Location:</b> {pet.area}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))
+            ) : (
+              <Typography
+                variant="body1"
+                color="textSecondary"
+                sx={{ width: "100%", textAlign: "center", mt: 3 }}
+              >
+                No pets found.
+              </Typography>
+            )}
+          </Grid>
         </Box>
       )}
 
