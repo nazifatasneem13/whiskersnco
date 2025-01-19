@@ -53,7 +53,7 @@ const Communication = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `http://localhost:4000/users/getuserprofile/profile`,
+        `http://localhost:4000/profile/getuserprofile/profile`,
         { email },
         {
           headers: {

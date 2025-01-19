@@ -44,11 +44,14 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [profileImage, setProfileImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(""); // For preview
+  const [imagePreview, setImagePreview] = useState("");
   const [message, setMessage] = useState("");
   const [activeTab, setActiveTab] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [userPets, setUserPets] = useState([]);
+  const [userReviews, setUserReviews] = useState([]);
+  const [replyContent, setReplyContent] = useState("");
+  const [replyError, setReplyError] = useState("");
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -111,10 +114,55 @@ const Profile = () => {
         console.error("Failed to fetch wishlist details:", err);
       }
     };
+    const fetchUserReviews = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "http://localhost:4000/profile/reviews",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUserReviews(response.data);
+      } catch (err) {
+        console.error("Error fetching user reviews:", err);
+      }
+    };
 
+    fetchUserReviews();
     fetchUser();
     fetchUserPets();
   }, []);
+  const handleAddReply = async (reviewId) => {
+    if (!replyContent.trim()) {
+      setReplyError("Reply content cannot be empty.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:4000/profile/reply",
+        { reviewId, content: replyContent },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Update reviews with the new reply
+      setUserReviews((prevReviews) =>
+        prevReviews.map((review) =>
+          review._id === reviewId
+            ? { ...review, replies: [...review.replies, response.data.reply] }
+            : review
+        )
+      );
+
+      setReplyContent(""); // Clear input
+      setReplyError(""); // Clear error
+    } catch (err) {
+      console.error("Error adding reply:", err);
+      setReplyError("Failed to add reply. Please try again.");
+    }
+  };
 
   const handleRemoveFromWishlist = async (petId) => {
     try {
@@ -253,7 +301,8 @@ const Profile = () => {
         <Tab label="User Details" />
         <Tab label="Wishlist" />
         <Tab label="Blocked" />
-        <Tab label="Pets" />
+        <Tab label="My Pets" />
+        <Tab label="My Reviews" />
       </Tabs>
 
       {/* Tab Content */}
@@ -411,6 +460,82 @@ const Profile = () => {
                 sx={{ width: "100%", textAlign: "center", mt: 3 }}
               >
                 No pets found.
+              </Typography>
+            )}
+          </Grid>
+        </Box>
+      )}
+      {activeTab === 4 && (
+        <Box>
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
+            My Reviews
+          </Typography>
+          <Grid container spacing={3}>
+            {userReviews.length > 0 ? (
+              userReviews.map((review) => (
+                <Grid item xs={12} key={review._id}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6">
+                        {review.petId?.name || "Unknown Pet"}
+                      </Typography>
+                      <Typography variant="body2">
+                        <b>Review:</b> {review.content}
+                      </Typography>
+                      <Typography variant="body2">
+                        <b>Reviewer:</b>{" "}
+                        {review.reviewerId?.username || "Anonymous"}
+                      </Typography>
+                      <Typography variant="body2">
+                        <b>Reviewed By:</b> {review.status || "undefined"}
+                      </Typography>
+                      <Typography variant="body2">
+                        <b>Timestamp:</b>{" "}
+                        {new Date(review.timestamp).toLocaleString()}
+                      </Typography>
+
+                      {/* Display Replies */}
+                      {review.replies.length > 0 && (
+                        <Box sx={{ mt: 2 }}>
+                          <Typography variant="subtitle2">Replies:</Typography>
+                          {review.replies.map((reply, index) => (
+                            <Typography
+                              key={index}
+                              variant="body2"
+                              sx={{ marginLeft: 2, marginTop: 1 }}
+                            >
+                              {reply.content} -{" "}
+                            </Typography>
+                          ))}
+                        </Box>
+                      )}
+
+                      {/* Add Reply Input */}
+                      <Box sx={{ mt: 2 }}>
+                        <TextField
+                          size="small"
+                          placeholder="Write a reply..."
+                          value={replyContent}
+                          onChange={(e) => setReplyContent(e.target.value)}
+                          error={!!replyError}
+                          helperText={replyError}
+                          fullWidth
+                        />
+                        <Button
+                          variant="contained"
+                          sx={{ mt: 1 }}
+                          onClick={() => handleAddReply(review._id)}
+                        >
+                          Reply
+                        </Button>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))
+            ) : (
+              <Typography variant="body1" color="textSecondary">
+                No reviews found.
               </Typography>
             )}
           </Grid>

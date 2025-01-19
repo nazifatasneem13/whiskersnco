@@ -17,7 +17,7 @@ import NearbyVets from "./Components/NearbyVets/NearbyVets";
 import TrainYourPet from "./Components/Train/TrainYourPet.js";
 import PostPetSection from "./Components/Services/PostPetSection";
 import AdoptSection from "./Components/Services/AdoptSection";
-import CommunicationPage from "./Components/Communication";
+import CommunicationPage from "./Components/Communication/Communication";
 import ChatbotPage from "./Components/ChatbotLoader";
 import { Box, Fab } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
