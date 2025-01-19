@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import BlockIcon from "@mui/icons-material/Block"; // Import Block Icon
 import ProfileModal from "./ProfileModal";
+import ArchivedChats from "./ArchivedChats";
 import axios from "axios";
 const Communication = () => {
   const [adopterChats, setAdopterChats] = useState([]);
@@ -42,6 +43,8 @@ const Communication = () => {
   //profile modal
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileData, setProfileData] = useState({});
+  const [archiveModalOpen, setarchiveModalOpen] = useState(false);
+  const [archiveData, setarchiveData] = useState({});
 
   // Fetch profile data and open modal
   const handleOpenProfile = async (email) => {
@@ -75,7 +78,12 @@ const Communication = () => {
     setProfileModalOpen(false);
     setProfileData({});
   };
-
+  const handleOpenArchive = async () => {
+    setarchiveModalOpen(true);
+  };
+  const handleCloseArchive = () => {
+    setarchiveModalOpen(false);
+  };
   // Function to handle opening the review dialog
   const openReviewDialog = (status) => {
     setCurrentStatus(status);
@@ -176,7 +184,7 @@ const Communication = () => {
   };
 
   // Handle status updates (including blocking)
-  const handleStatusUpdate = async (status) => {
+  const handleStatusUpdate = async (status, review = "") => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -192,17 +200,14 @@ const Communication = () => {
             petId: selectedChat.petId,
             status,
             userId: currentUser._id, // Pass userId in the request body
+            review: review, // Ensure review is passed
           }),
         }
       );
       const data = await response.json();
       if (response.ok) {
         alert(data.message);
-        if (status === "blocked") {
-          setSelectedChat(null);
-        } else {
-          window.location.reload();
-        }
+        window.location.reload();
       } else {
         alert(data.error || "Failed to update status.");
       }
@@ -251,7 +256,7 @@ const Communication = () => {
               <ListItemText
                 primary={
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {chat.name || "Unknown"}
+                    {chat.email || "Unknown"}
                     <Box
                       sx={{
                         width: 10,
@@ -305,6 +310,15 @@ const Communication = () => {
             </ListItem>
           ))}
         </List>
+        <Divider />
+
+        <Typography
+          variant="subtitle1"
+          sx={{ marginTop: 8, padding: 2, cursor: "pointer", color: "blue" }}
+          onClick={() => handleOpenArchive()}
+        >
+          Archived Chats
+        </Typography>
       </Box>
 
       {/* Chat Area */}
@@ -538,6 +552,7 @@ const Communication = () => {
         onClose={handleCloseProfile}
         profileData={profileData}
       />
+      <ArchivedChats open={archiveModalOpen} onClose={handleCloseArchive} />
     </Box>
   );
 };
