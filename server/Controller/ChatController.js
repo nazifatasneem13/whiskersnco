@@ -97,6 +97,7 @@ const updateChatStatus = async (req, res) => {
             reviewingId: adopter._id,
             reviewerId: userId, // Adoptee who is reviewing
             petId,
+            status: "Bydonator",
             content: review,
           });
 
@@ -122,6 +123,7 @@ const updateChatStatus = async (req, res) => {
           const newReview = await Review.create({
             reviewingId: adoptee._id,
             reviewerId: userId, // Adopter who is reviewing
+            status: "Byadoptor",
             petId,
             content: review,
           });

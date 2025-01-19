@@ -7,7 +7,6 @@ const {
   addToWishlist,
   getBlockedUser,
   unblockUser,
-  getUserProfile,
 } = require("../Controller/user.controller"); // Ensure this path is correct
 const { verifyToken } = require("../middleware/jwt"); // Ensure this path is correct
 
@@ -21,5 +20,5 @@ router.post("/preferences", verifyToken, savePreferences);
 router.get("/profile", verifyToken, getUser);
 router.put("/update", verifyToken, updateUser);
 router.post("/wishlist", verifyToken, addToWishlist);
-router.post("/getuserprofile/profile", getUserProfile);
+
 module.exports = router; // Correct CommonJS export
