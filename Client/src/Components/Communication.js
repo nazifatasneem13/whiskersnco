@@ -12,9 +12,14 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import BlockIcon from "@mui/icons-material/Block"; // Import Block Icon
-
+import ProfileModal from "./ProfileModal";
+import axios from "axios";
 const Communication = () => {
   const [adopterChats, setAdopterChats] = useState([]);
   const [adopteeChats, setAdopteeChats] = useState([]);
@@ -30,74 +35,113 @@ const Communication = () => {
   const adopterColor = "#3f51b5"; // Blue for Adopter
   const adopteeColor = "#f50057"; // Pink for Adoptee
 
-  // Fetch adopter and adoptee chat lists
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const token = localStorage.getItem("token");
+  //review
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [reviewText, setReviewText] = useState("");
+  const [currentStatus, setCurrentStatus] = useState("");
+  //profile modal
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [profileData, setProfileData] = useState({});
 
-        // Fetch adopter chats
-        const adopterResponse = await fetch(
-          `http://localhost:4000/chats/adopter-chat-list/${currentUser._id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const adopterData = await adopterResponse.json();
-        setAdopterChats(adopterData || []);
+  // Fetch profile data and open modal
+  const handleOpenProfile = async (email) => {
+    console.log("Email sent to backend:", email); // Debug log
 
-        // Fetch adoptee chats
-        const adopteeResponse = await fetch(
-          `http://localhost:4000/chats/adoptee-chat-list/${currentUser._id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const adopteeData = await adopteeResponse.json();
-        setAdopteeChats(adopteeData || []);
-      } catch (error) {
-        console.error("Fetch Chats Error:", error);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `http://localhost:4000/users/getuserprofile/profile`,
+        { email },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setProfileData(response.data);
+      setProfileModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+      if (error.response && error.response.status === 404) {
+        alert("User profile not found.");
+      } else {
+        alert("An error occurred while fetching the profile.");
       }
-    };
+    }
+  };
 
-    fetchChats();
-  }, [currentUser._id]);
+  const handleCloseProfile = () => {
+    setProfileModalOpen(false);
+    setProfileData({});
+  };
 
-  // Extract fetchMessages to reuse in multiple useEffect hooks
-  const fetchMessages = useCallback(async () => {
-    if (selectedChat) {
-      try {
-        const token = localStorage.getItem("token");
+  // Function to handle opening the review dialog
+  const openReviewDialog = (status) => {
+    setCurrentStatus(status);
+    setReviewDialogOpen(true);
+  };
+
+  // Function to handle submitting the review
+  const submitReview = async () => {
+    if (reviewText.trim()) {
+      await handleStatusUpdate(currentStatus, reviewText.trim()); // Include reviewText in the status update
+    }
+    setReviewDialogOpen(false);
+    setReviewText("");
+  };
+
+  // Fetch adopter and adoptee chat lists and messages
+  const fetchChatsAndMessages = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Fetch adopter chats
+      const adopterResponse = await fetch(
+        `http://localhost:4000/chats/adopter-chat-list/${currentUser._id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const adopterData = await adopterResponse.json();
+      setAdopterChats(adopterData || []);
+
+      // Fetch adoptee chats
+      const adopteeResponse = await fetch(
+        `http://localhost:4000/chats/adoptee-chat-list/${currentUser._id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const adopteeData = await adopteeResponse.json();
+      setAdopteeChats(adopteeData || []);
+
+      // Fetch messages if a chat is selected
+      if (selectedChat) {
         const response = await fetch(
           `http://localhost:4000/messages/${selectedChat.chatId}?userId=${currentUser._id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (response.status === 403) {
-          // Access blocked
           alert("You have been blocked by this user.");
           setSelectedChat(null);
           return;
         }
-        const data = await response.json();
-        setMessages(data || []);
-      } catch (error) {
-        console.error("Fetch Messages Error:", error);
+        const messagesData = await response.json();
+        setMessages(messagesData || []);
       }
+    } catch (error) {
+      console.error("Fetch Error:", error);
     }
-  }, [selectedChat, currentUser._id]);
+  }, [currentUser._id, selectedChat]);
 
-  // Fetch messages when selectedChat changes
+  // Fetch chats and messages initially and every 5 seconds
   useEffect(() => {
-    fetchMessages();
-  }, [selectedChat, fetchMessages]);
-
-  // Set up interval to fetch messages every 5 seconds when a chat is selected
-  useEffect(() => {
-    if (!selectedChat) return;
+    fetchChatsAndMessages(); // Initial fetch
 
     const intervalId = setInterval(() => {
-      fetchMessages();
-    }, 5000); // 5,000 milliseconds = 5 seconds
+      fetchChatsAndMessages(); // Fetch every 5 seconds
+    }, 5000);
 
-    // Cleanup interval on component unmount or when selectedChat changes
+    // Cleanup interval on component unmount or selectedChat change
     return () => clearInterval(intervalId);
-  }, [selectedChat, fetchMessages]);
+  }, [fetchChatsAndMessages]);
 
   // Handle selecting a chat
   const handleChatSelect = (chat) => {
@@ -155,7 +199,6 @@ const Communication = () => {
       if (response.ok) {
         alert(data.message);
         if (status === "blocked") {
-          // If blocked, reset the selected chat
           setSelectedChat(null);
         } else {
           window.location.reload();
@@ -177,8 +220,8 @@ const Communication = () => {
     );
     if (!confirmBlock) return;
 
-    // Use handleStatusUpdate with 'blocked' status
     await handleStatusUpdate("blocked");
+    window.location.reload();
   };
 
   // Determine if the current user is the adoptee in the selected chat
@@ -275,8 +318,13 @@ const Communication = () => {
       >
         {selectedChat ? (
           <>
-            <Typography variant="h6" sx={{ padding: 2 }}>
-              Chat with {selectedChat.email}{" "}
+            <Typography
+              variant="h6"
+              sx={{ padding: 2, cursor: "pointer", color: "blue" }}
+              onClick={() => handleOpenProfile(selectedChat.email)}
+            >
+              {selectedChat.email}
+
               <Box
                 component="span"
                 sx={{
@@ -313,7 +361,8 @@ const Communication = () => {
               <Typography variant="h6" sx={{ padding: 2 }}>
                 Status Update
               </Typography>
-              {/* Buttons for adoptee */}
+
+              {/* Button for Adoptee to mark as "Sent" */}
               {adopteeChats.some(
                 (chat) =>
                   chat.chatId === selectedChat.chatId &&
@@ -323,13 +372,13 @@ const Communication = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => handleStatusUpdate("sent")}
+                  onClick={() => openReviewDialog("sent")}
                 >
                   Sent
                 </Button>
               )}
 
-              {/* Buttons for adopter */}
+              {/* Button for Adopter to mark as "Delivered" */}
               {adopterChats.some(
                 (chat) => chat.chatId === selectedChat.chatId
               ) &&
@@ -337,7 +386,7 @@ const Communication = () => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => handleStatusUpdate("delivered")}
+                    onClick={() => openReviewDialog("delivered")}
                   >
                     Delivered
                   </Button>
@@ -459,6 +508,36 @@ const Communication = () => {
           </Typography>
         )}
       </Box>
+      <Dialog
+        open={reviewDialogOpen}
+        onClose={() => setReviewDialogOpen(false)}
+      >
+        <DialogTitle>Write a Review</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            multiline
+            rows={4}
+            fullWidth
+            variant="outlined"
+            placeholder="Write your review here (max 200 words)"
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            inputProps={{ maxLength: 200 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setReviewDialogOpen(false)}>Cancel</Button>
+          <Button onClick={submitReview} variant="contained" color="primary">
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <ProfileModal
+        open={profileModalOpen}
+        onClose={handleCloseProfile}
+        profileData={profileData}
+      />
     </Box>
   );
 };

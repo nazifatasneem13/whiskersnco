@@ -2,12 +2,12 @@ const Chat = require("../Model/Chat");
 const Message = require("../Model/Message");
 const User = require("../Model/user.model");
 const AdoptForm = require("../Model/AdoptFormModel");
-
+const Review = require("../Model/review");
 const Pet = require("../Model/PetModel");
 
 const updateChatStatus = async (req, res) => {
   try {
-    const { chatId, petId, status, userId } = req.body;
+    const { chatId, petId, status, userId, review } = req.body;
 
     // Validate required fields
     if (!chatId || !petId || !status || !userId) {
@@ -81,9 +81,65 @@ const updateChatStatus = async (req, res) => {
       return res.status(200).json({ message: "User blocked successfully." });
     }
 
+    //handle review
+    if (status === "sent") {
+      if (review) {
+        console.log("Review for adopter:", review);
+
+        try {
+          const adopter = await User.findById(chat.adopterId);
+          if (!adopter) {
+            return res.status(404).json({ error: "Adopter not found" });
+          }
+
+          // Save review for adopter
+          const newReview = await Review.create({
+            reviewingId: adopter._id,
+            reviewerId: userId, // Adoptee who is reviewing
+            petId,
+            content: review,
+          });
+
+          console.log("Saved review for adopter:", newReview);
+        } catch (error) {
+          console.error("Error saving review for adopter:", error);
+          return res
+            .status(500)
+            .json({ error: "Failed to save review for adopter." });
+        }
+      }
+    } else if (status === "delivered") {
+      if (review) {
+        console.log("Review for donator:", review);
+
+        try {
+          const adoptee = await User.findById(chat.adopteeId);
+          if (!adoptee) {
+            return res.status(404).json({ error: "Donator not found" });
+          }
+
+          // Save review for donator
+          const newReview = await Review.create({
+            reviewingId: adoptee._id,
+            reviewerId: userId, // Adopter who is reviewing
+            petId,
+            content: review,
+          });
+
+          console.log("Saved review for donator:", newReview);
+        } catch (error) {
+          console.error("Error saving review for donator:", error);
+          return res
+            .status(500)
+            .json({ error: "Failed to save review for donator." });
+        }
+      }
+    }
+
     // Handle other statuses
     if (status === "sent") {
       // Adoptee sends the pet
+
       await Pet.findByIdAndUpdate(petId, { status: "Sent" }, { new: true });
       chat.status = "sent";
       await chat.save();
