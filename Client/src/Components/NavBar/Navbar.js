@@ -23,35 +23,61 @@ const Navbar = ({ title, children }) => {
   const [notifications, setNotifications] = useState([]);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [unreadCount, setUnreadCount] = useState(0); // New state for unread count
   const navigate = useNavigate();
   const location = useLocation();
 
   // Fetch notifications when the notification panel is opened
-  const fetchNotifications = async () => {
+  // Fetch unread count
+  const fetchUnreadCount = async () => {
     try {
       const token = localStorage.getItem("token");
-      const userId = currentUser?._id;
-
-      if (!userId) return;
-
       const response = await axios.get(
-        `http://localhost:4000/notifications/${userId}`,
+        "http://localhost:4000/notifications/notifications/unread",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setUnreadCount(response.data.unreadCount || 0);
+    } catch (err) {
+      console.error("Error fetching unread count:", err);
+    }
+  };
+
+  // Fetch notifications and mark as read
+  const fetchAndMarkNotificationsAsRead = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Fetch notifications
+      const response = await axios.get(
+        `http://localhost:4000/notifications/notifications`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setNotifications(response.data);
+
+      // Mark notifications as read
+      await axios.put(
+        "http://localhost:4000/notifications/notifications/read",
+        {},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setNotifications(response.data);
+      // Reset unread count
+      setUnreadCount(0);
     } catch (err) {
-      console.error("Error fetching notifications:", err);
+      console.error("Error fetching or marking notifications as read:", err);
     }
   };
 
   const handleToggleNotifications = () => {
     setIsNotificationOpen((prev) => !prev);
     if (!isNotificationOpen) {
-      fetchNotifications(); // Fetch notifications only when opening the panel
+      fetchAndMarkNotificationsAsRead();
     }
   };
 
@@ -77,7 +103,7 @@ const Navbar = ({ title, children }) => {
 
   useEffect(() => {
     // Ensure the notification tab is closed on refresh
-    setIsNotificationOpen(false);
+    fetchUnreadCount();
     const validateUser = () => {
       const token = localStorage.getItem("token");
       const storedUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -214,7 +240,7 @@ const Navbar = ({ title, children }) => {
             )}
             {/* Notification Icon */}
             <IconButton onClick={handleToggleNotifications}>
-              <Badge badgeContent={notifications.length} color="error">
+              <Badge badgeContent={unreadCount} color="error">
                 <Notifications />
               </Badge>
             </IconButton>
