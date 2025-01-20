@@ -13,7 +13,8 @@ const wishlistRouter = require("./Routes/wishlist");
 const communicationRouter = require("./Routes/ChatRoutes");
 const profilerouter = require("./Routes/profileroute.js");
 const msgRouter = require("./Routes/MessageRoutes");
-const trainRoute = require("./Routes/TrainRoute"); // Import the training guide route
+const trainRoute = require("./Routes/TrainRoute");
+const notifyroutes = require("./Routes/notifyroutes");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const path = require("path");
@@ -55,6 +56,7 @@ app.use("/wishlist", wishlistRouter);
 app.use("/profile", profilerouter);
 app.use("/chats", communicationRouter);
 app.use("/messages", msgRouter);
+app.use("/notifications", notifyroutes);
 // Database connection
 mongoose
   .connect(process.env.MONGODB_URI, {})

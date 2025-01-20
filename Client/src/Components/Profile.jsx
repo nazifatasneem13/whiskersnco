@@ -495,7 +495,8 @@ const Profile = () => {
                       </Typography>
 
                       {/* Display Replies */}
-                      {review.replies.length > 0 && (
+                      {Array.isArray(review.replies) &&
+                      review.replies.length > 0 ? (
                         <Box sx={{ mt: 2 }}>
                           <Typography variant="subtitle2">Replies:</Typography>
                           {review.replies.map((reply, index) => (
@@ -508,6 +509,14 @@ const Profile = () => {
                             </Typography>
                           ))}
                         </Box>
+                      ) : (
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          sx={{ mt: 2 }}
+                        >
+                          No replies yet.
+                        </Typography>
                       )}
 
                       {/* Add Reply Input */}

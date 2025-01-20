@@ -4,6 +4,7 @@ const User = require("../Model/user.model");
 const AdoptForm = require("../Model/AdoptFormModel");
 const Review = require("../Model/review");
 const Pet = require("../Model/PetModel");
+const Notification = require("../Model/Notification");
 
 const updateChatStatus = async (req, res) => {
   try {
@@ -142,9 +143,22 @@ const updateChatStatus = async (req, res) => {
     if (status === "sent") {
       // Adoptee sends the pet
 
-      await Pet.findByIdAndUpdate(petId, { status: "Sent" }, { new: true });
+      const pet = await Pet.findByIdAndUpdate(
+        petId,
+        { status: "Sent" },
+        { new: true }
+      );
       chat.status = "sent";
       await chat.save();
+      // Notify both users
+      await Notification.create({
+        userId: chat.adopteeId, // Adoptee (donator)
+        message: `You have sent ${pet.name} to the adopter.`,
+      });
+      await Notification.create({
+        userId: chat.adopterId, // Adopter
+        message: `The donator has sent ${pet.name} to you.`,
+      });
     } else if (status === "delivered") {
       chat.status = "delivered";
       await chat.save();
@@ -170,7 +184,7 @@ const updateChatStatus = async (req, res) => {
       const adopterPhone = adoptForm.phoneNo;
 
       // Update the pet model with adopter's email and phone number
-      await Pet.findByIdAndUpdate(
+      const pet = await Pet.findByIdAndUpdate(
         petId,
         {
           email: adopterEmail,
@@ -179,6 +193,14 @@ const updateChatStatus = async (req, res) => {
         },
         { new: true }
       );
+      await Notification.create({
+        userId: chat.adopteeId, // Adoptee (donator)
+        message: `${pet.name} has been successfully delivered to the adopter.`,
+      });
+      await Notification.create({
+        userId: chat.adopterId, // Adopter
+        message: `You have successfully received ${pet.name}.`,
+      });
 
       const result = await AdoptForm.deleteMany({ petId: petId.toString() });
 
@@ -187,7 +209,11 @@ const updateChatStatus = async (req, res) => {
       );
     } else if (status === "passive") {
       // Cancel the chat
-      await Pet.findByIdAndUpdate(petId, { status: "Approved" }, { new: true });
+      const pet = await Pet.findByIdAndUpdate(
+        petId,
+        { status: "Approved" },
+        { new: true }
+      );
       chat.status = "passive";
       await chat.save();
       const adopter = await User.findById(chat.adopterId);
@@ -205,6 +231,16 @@ const updateChatStatus = async (req, res) => {
       console.log(
         `${result.deletedCount} AdoptForms deleted for petId ${petId} and email ${adopterEmail}`
       );
+
+      // Notify both users
+      await Notification.create({
+        userId: chat.adopteeId, // Adoptee (donator)
+        message: `The adoption process for ${pet.name} has been canceled.`,
+      });
+      await Notification.create({
+        userId: chat.adopterId, // Adopter
+        message: `The adoption process for ${pet.name} has been canceled by the donator.`,
+      });
     } else {
       return res
         .status(400)

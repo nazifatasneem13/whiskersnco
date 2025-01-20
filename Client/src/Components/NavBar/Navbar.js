@@ -7,19 +7,77 @@ import {
   Avatar,
   Box,
   Typography,
+  Badge,
+  IconButton,
 } from "@mui/material";
+import { Notifications } from "@mui/icons-material";
+import NotificationsPage from "../NotificationPanel/NotificationsPage";
 import MessageModal from "../MessageModal/MessageModal";
 import logo from "./images/logo.jpeg";
+import axios from "axios";
 
 const Navbar = ({ title, children }) => {
   const [currentUser, setCurrentUser] = useState(
     JSON.parse(localStorage.getItem("currentUser"))
   );
+  const [notifications, setNotifications] = useState([]);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Fetch notifications when the notification panel is opened
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = currentUser?._id;
+
+      if (!userId) return;
+
+      const response = await axios.get(
+        `http://localhost:4000/notifications/${userId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setNotifications(response.data);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    }
+  };
+
+  const handleToggleNotifications = () => {
+    setIsNotificationOpen((prev) => !prev);
+    if (!isNotificationOpen) {
+      fetchNotifications(); // Fetch notifications only when opening the panel
+    }
+  };
+
+  const handleRestrictedNavigation = (path) => {
+    if (currentUser) {
+      navigate(path);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("currentUser");
+    setCurrentUser(null);
+    navigate("/login");
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    navigate("/login");
+  };
+
   useEffect(() => {
+    // Ensure the notification tab is closed on refresh
+    setIsNotificationOpen(false);
     const validateUser = () => {
       const token = localStorage.getItem("token");
       const storedUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -39,34 +97,6 @@ const Navbar = ({ title, children }) => {
 
     validateUser();
   }, [location, navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("currentUser");
-    setCurrentUser(null);
-    navigate("/login");
-  };
-
-  const handleRestrictedNavigation = (path) => {
-    if (currentUser) {
-      navigate(path);
-    } else {
-      setIsModalOpen(true);
-    }
-  };
-
-  const handleNorestriction = (path) => {
-    navigate(path);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    navigate("/login");
-  };
-
-  const close = () => {
-    setIsModalOpen(false);
-  };
 
   return (
     <>
@@ -108,7 +138,7 @@ const Navbar = ({ title, children }) => {
               { label: "Find Vets", path: "/nearby-vets" },
               { label: "Train", path: "/trainpets" },
               { label: "Contact", path: "/contact" },
-              { label: "Communication", path: "/communication" },
+              { label: "Chats", path: "/communication" },
             ].map((link) => (
               <Button
                 key={link.path}
@@ -128,7 +158,7 @@ const Navbar = ({ title, children }) => {
                 onClick={() =>
                   link.path === "/services" || link.path === "/pets"
                     ? handleRestrictedNavigation(link.path)
-                    : handleNorestriction(link.path)
+                    : navigate(link.path)
                 }
               >
                 {link.label}
@@ -136,7 +166,7 @@ const Navbar = ({ title, children }) => {
             ))}
           </Box>
 
-          {/* Profile and Action Buttons */}
+          {/* Profile and Notifications */}
           <Box display="flex" alignItems="center" gap={2}>
             {currentUser ? (
               <>
@@ -182,34 +212,31 @@ const Navbar = ({ title, children }) => {
                 Login
               </Button>
             )}
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "#19275c",
-                borderRadius: "20px",
-                color: "#fff",
-                textTransform: "capitalize",
-                "&:hover": {
-                  backgroundColor: "#00aaff",
-                },
-              }}
-              onClick={() => handleRestrictedNavigation("/services")}
-            >
-              Give a Pet
-            </Button>
+            {/* Notification Icon */}
+            <IconButton onClick={handleToggleNotifications}>
+              <Badge badgeContent={notifications.length} color="error">
+                <Notifications />
+              </Badge>
+            </IconButton>
           </Box>
         </Toolbar>
         <MessageModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          close={close}
           message="You have to log in to access this feature."
         />
       </AppBar>
-      {/* Render children if provided */}
-      {children ? (
-        <Box>{React.cloneElement(children, { currentUser })}</Box>
-      ) : null}
+
+      {/* Floating Notifications Panel */}
+      {isNotificationOpen && (
+        <NotificationsPage
+          notifications={notifications}
+          onClose={handleToggleNotifications}
+        />
+      )}
+
+      {/* Render children */}
+      {children && <Box>{React.cloneElement(children, { currentUser })}</Box>}
     </>
   );
 };

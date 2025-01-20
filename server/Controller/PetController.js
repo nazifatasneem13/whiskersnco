@@ -1,5 +1,6 @@
 const Pet = require("../Model/PetModel");
 const ChatModel = require("../Model/Chat");
+const Notification = require("../Model/Notification");
 const fs = require("fs");
 const path = require("path");
 const cloudinary = require("../config/cloudinary.js");
@@ -188,6 +189,16 @@ const approveRequest = async (req, res) => {
     if (!pet) {
       return res.status(404).json({ error: "Pet not found" });
     }
+    const user = await User.findOne({ email: pet.email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Create a notification
+    await Notification.create({
+      userId: user._id,
+      message: `Your request for ${pet.name} has been ${status.toLowerCase()}.`,
+    });
     res.status(200).json(pet);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -220,7 +231,15 @@ const deletePost = async (req, res) => {
     // Delete the image from Cloudinary (if needed)
     const filename = pet.filename.split("/").pop().split(".")[0]; // Extract public_id from Cloudinary URL
     await cloudinary.uploader.destroy(filename);
+    const user = await User.findOne({ email: pet.email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
+    await Notification.create({
+      userId: adopter._id,
+      message: `Your request for ${pet.name} has been deleted, try out again.`,
+    });
     res.status(200).json({ message: "Pet deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -342,6 +361,15 @@ const approveadoptRequest = async (req, res) => {
       petId: pet._id,
     });
 
+    // Create a notification
+    await Notification.create({
+      userId: adopter._id,
+      message: `Your request for ${pet.name} has been approved, check chats for continuing the process.`,
+    });
+    await Notification.create({
+      userId: adoptee._id,
+      message: `${adopter.email} has shown interest to adopt your pet ${pet.name},check chats for continuing the process.`,
+    });
     res.status(200).json({ pet, chat });
   } catch (err) {
     res.status(500).json({ error: err.message });
