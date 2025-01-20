@@ -32,9 +32,9 @@ app.use(helmet());
 
 // Configure CORS
 const corsOptions = {
-  origin: "http://localhost:3000", // Update this to your frontend's URL in production
+  origin: "http://localhost:3000",
   credentials: true,
-  methods: "GET, POST, PUT, DELETE, OPTIONS",
+  methods: "GET, POST, PUT, DELETE, OPTIONS, PATCH",
   allowedHeaders: "Content-Type, Authorization",
 };
 

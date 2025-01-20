@@ -225,8 +225,85 @@ const deleteTrainingGuide = async (req, res, next) => {
   }
 };
 
+const updateProgress = async (req, res) => {
+  try {
+    const { id, progress } = req.body; // Extract ID and progress data from the request body
+
+    // Validate inputs
+    if (!id || !Array.isArray(progress)) {
+      return res.status(400).json({ error: "Invalid input data." });
+    }
+
+    // Find the training guide by ID
+    const guide = await TrainingGuide.findOne({ trainId: id });
+
+    if (!guide) {
+      return res.status(404).json({ error: "Training guide not found." });
+    }
+
+    // Update the progress field
+    guide.progress = progress;
+    await guide.save(); // Save the updated guide
+
+    return res.status(200).json(guide); // Return the updated guide
+  } catch (error) {
+    console.error("Error updating progress:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating progress." });
+  }
+};
+const getArchivedGuides = async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res
+      .status(400)
+      .json({ error: "Email query parameter is required." });
+  }
+
+  try {
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const userId = user._id;
+
+    const archivedGuides = await TrainingGuide.find({ userId, archived: true });
+    res.status(200).json({ archivedGuides });
+  } catch (error) {
+    console.error("Error fetching archived guides:", error);
+    res.status(500).json({ error: "Failed to fetch archived guides." });
+  }
+};
+
+const archiveGuide = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    // Find the guide and mark it as archived
+    const guide = await TrainingGuide.findOne({ trainId: id });
+    if (!guide) {
+      return res.status(404).json({ error: "Guide not found." });
+    }
+
+    guide.archived = true;
+    await guide.save();
+
+    res.status(200).json({ message: "Guide archived successfully!" });
+  } catch (error) {
+    console.error("Error archiving guide:", error);
+    res.status(500).json({ error: "Failed to archive guide." });
+  }
+};
+
 module.exports = {
   generateTrainingGuide,
   getTrainingGuides,
   deleteTrainingGuide,
+  updateProgress,
+  getArchivedGuides,
+  archiveGuide,
 };

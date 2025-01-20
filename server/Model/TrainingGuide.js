@@ -38,6 +38,19 @@ const TrainingGuideSchema = new Schema(
       type: String,
       required: true,
     },
+    progress: {
+      type: [
+        {
+          week: { type: Number, required: true },
+          completed: { type: Boolean, required: true, default: false },
+        },
+      ],
+      default: [],
+    },
+    archived: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

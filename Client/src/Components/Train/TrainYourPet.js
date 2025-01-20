@@ -36,6 +36,8 @@ import ReactMarkdown from "react-markdown";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import jsPDF from "jspdf"; // Importing jsPDF for PDF export
+import { TrackChanges as TrackChangesIcon } from "@mui/icons-material";
+import { Checkbox } from "@mui/material";
 
 // Import dayjs and required plugins
 import dayjs from "dayjs";
@@ -152,11 +154,238 @@ const TrainYourPet = () => {
   });
 
   // Calendar State
-  const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [guidesOnDate, setGuidesOnDate] = useState([]);
 
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const userEmail = currentUser ? currentUser.email : null;
+
+  const [openProgressTracker, setOpenProgressTracker] = useState(false);
+  const [progressGuide, setProgressGuide] = useState(null);
+  const [showGenerateNewGuide, setShowGenerateNewGuide] = useState(false);
+  const [archivedGuides, setArchivedGuides] = useState([]);
+
+  const [openArchivedGuides, setOpenArchivedGuides] = useState(false);
+
+  useEffect(() => {
+    const fetchArchivedGuides = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `http://localhost:4000/train/archived-guides?email=${encodeURIComponent(
+            userEmail
+          )}`
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error || "Failed to fetch archived guides."
+          );
+        }
+
+        const data = await response.json();
+        setArchivedGuides(data.archivedGuides);
+      } catch (err) {
+        setSnackbar({
+          open: true,
+          message: err.message || "Failed to fetch archived guides.",
+          severity: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (openArchivedGuides) {
+      fetchArchivedGuides();
+    }
+  }, [openArchivedGuides, userEmail]);
+
+  const openTracker = (guide) => {
+    setProgressGuide(guide);
+    setOpenProgressTracker(true);
+  };
+
+  const closeTracker = () => {
+    setOpenProgressTracker(false);
+    setProgressGuide(null);
+  };
+
+  const initializeProgress = () => {
+    if (!progressGuide?.progress || progressGuide.progress.length === 0) {
+      const initialProgress = Array.from({ length: 4 }, (_, index) => ({
+        week: index + 1,
+        completed: false,
+      }));
+      setProgressGuide((prev) => ({
+        ...prev,
+        progress: initialProgress,
+      }));
+    }
+  };
+  const handleGenerateNewGuide = async () => {
+    if (!age || isNaN(age) || Number(age) < 0) {
+      setSnackbar({
+        open: true,
+        message: "Please enter a valid non-negative number for age in months.",
+        severity: "error",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Archive the current guide
+      if (progressGuide) {
+        await fetch(`http://localhost:4000/train/archive-guide`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: progressGuide.trainId }),
+        });
+      }
+
+      // Generate a new guide
+      const payload = {
+        petName: progressGuide.petName,
+        type: progressGuide.type,
+        breed: progressGuide.breed,
+        age: Number(age),
+        email: userEmail,
+      };
+
+      const response = await fetch(
+        `http://localhost:4000/train/training-guide`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || "Failed to generate training guide."
+        );
+      }
+
+      const newGuide = await response.json();
+      setTrainingGuides([newGuide, ...trainingGuides]);
+      setFilteredGuides([newGuide, ...trainingGuides]);
+      setSnackbar({
+        open: true,
+        message: "New training guide generated successfully!",
+        severity: "success",
+      });
+      setShowGenerateNewGuide(false);
+      closeTracker();
+    } catch (err) {
+      console.error("Error generating new guide:", err);
+      setSnackbar({
+        open: true,
+        message: err.message || "Failed to generate new guide.",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleProgress = (week) => {
+    const updatedProgress = [...(progressGuide?.progress || [])];
+
+    // Find the task's index in the progress array
+    const taskIndex = updatedProgress.findIndex((p) => p.week === week);
+
+    // Prevent toggling future tasks until the current task is completed
+    if (taskIndex > 0 && !updatedProgress[taskIndex - 1]?.completed) {
+      setSnackbar({
+        open: true,
+        message: `Complete Week ${week - 1} before updating Week ${week}.`,
+        severity: "warning",
+      });
+      return;
+    }
+
+    // Prevent unchecking tasks that are already completed
+    if (updatedProgress[taskIndex]?.completed) {
+      return;
+    }
+
+    // Mark the task as completed
+    if (taskIndex >= 0) {
+      updatedProgress[taskIndex].completed = true;
+    } else {
+      updatedProgress.push({ week, completed: true });
+    }
+
+    setProgressGuide((prev) => ({ ...prev, progress: updatedProgress }));
+  };
+
+  const saveProgressChanges = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:4000/train/training-guide/progress`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: progressGuide.trainId,
+            progress: progressGuide.progress,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update progress.");
+      }
+
+      const updatedGuide = await response.json();
+      setProgressGuide(updatedGuide);
+      setSnackbar({
+        open: true,
+        message: "Progress saved successfully!",
+        severity: "success",
+      });
+      closeTracker();
+      window.location.reload();
+      // Check if all progress tasks are completed
+      if (updatedGuide.progress.every((task) => task.completed)) {
+        setSnackbar({
+          open: true,
+          message: "All tasks completed! You can now generate a new guide.",
+          severity: "success",
+        });
+        setShowGenerateNewGuide(true); // Show option to generate a new guide
+      } else {
+        setSnackbar({
+          open: true,
+          message: "Progress saved successfully!",
+          severity: "success",
+        });
+      }
+    } catch (err) {
+      console.error("Error saving progress:", err);
+      setSnackbar({
+        open: true,
+        message: err.message || "Failed to save progress.",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Call this when opening the tracker
+  useEffect(() => {
+    if (openProgressTracker) initializeProgress();
+  }, [openProgressTracker, initializeProgress]);
 
   useEffect(() => {
     if (!userEmail) {
@@ -235,20 +464,6 @@ const TrainYourPet = () => {
 
     setFilteredGuides(guides);
   }, [searchTerm, filterType, filterBreed, sortOption, trainingGuides]);
-
-  // Handle Calendar Date Selection
-  useEffect(() => {
-    const guidesForDate = trainingGuides.filter((guide) => {
-      const guideDate = dayjs(guide.createdAt);
-      return (
-        guideDate.year() === selectedDate.year() &&
-        guideDate.month() === selectedDate.month() &&
-        guideDate.date() === selectedDate.date()
-      );
-    });
-
-    setGuidesOnDate(guidesForDate);
-  }, [selectedDate, trainingGuides]);
 
   const handleGenerateGuide = async (e) => {
     e.preventDefault();
@@ -422,6 +637,14 @@ const TrainYourPet = () => {
     doc.save(`${guide.petName}_Training_Guide.pdf`);
   };
 
+  // Reset Filters Function
+  const resetFilters = () => {
+    setSearchTerm("");
+    setFilterType("");
+    setFilterBreed("");
+    setSortOption("");
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ maxWidth: 1400, margin: "0 auto", padding: 4 }}>
@@ -463,9 +686,7 @@ const TrainYourPet = () => {
                   }}
                   label="Pet Type"
                 >
-                  <MenuItem value="">
-                    <em>Select Pet Type</em>
-                  </MenuItem>
+                  {/* Removed "All Types" MenuItem */}
                   {Object.keys(petData).map((typeOption) => (
                     <MenuItem key={typeOption} value={typeOption}>
                       {typeOption}
@@ -489,14 +710,13 @@ const TrainYourPet = () => {
                   onChange={(e) => setBreed(e.target.value)}
                   label={type ? "Select Breed" : "Select Pet Type first"}
                 >
-                  <MenuItem value="">
-                    <em>{type ? "Select Breed" : "Select Pet Type first"}</em>
-                  </MenuItem>
-                  {petData[type]?.map((b) => (
-                    <MenuItem key={b} value={b}>
-                      {b}
-                    </MenuItem>
-                  ))}
+                  {/* Removed "All Breeds" MenuItem */}
+                  {type &&
+                    petData[type]?.map((b) => (
+                      <MenuItem key={b} value={b}>
+                        {b}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
               <TextField
@@ -533,38 +753,13 @@ const TrainYourPet = () => {
           {/* Calendar and Search, Filter, Sort Section */}
           <Grid item xs={12} md={6}>
             <Grid container spacing={2}>
-              {/* Calendar Section */}
-              <Grid item xs={12}>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Training Schedule
-                </Typography>
-                <DatePicker
-                  label="Select Date"
-                  value={selectedDate}
-                  onChange={(newValue) => setSelectedDate(newValue)}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                />
-                {guidesOnDate.length > 0 && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Guides on {selectedDate.format("MM/DD/YYYY")}:
-                    </Typography>
-                    {guidesOnDate.map((guide) => (
-                      <Typography key={guide.trainId} variant="body2">
-                        - {guide.petName} ({guide.type})
-                      </Typography>
-                    ))}
-                  </Box>
-                )}
-              </Grid>
-
               {/* Search, Filter, Sort Section */}
               <Grid item xs={12}>
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="h6" fontWeight="bold" gutterBottom>
                     Search & Manage Your Training Guides
                   </Typography>
-                  <Grid container spacing={2}>
+                  <Grid container spacing={2} alignItems="center">
                     {/* Search Bar */}
                     <Grid item xs={12} sm={6}>
                       <TextField
@@ -592,12 +787,13 @@ const TrainYourPet = () => {
                         <Select
                           labelId="filter-type-label"
                           value={filterType}
-                          onChange={(e) => setFilterType(e.target.value)}
+                          onChange={(e) => {
+                            setFilterType(e.target.value);
+                            setFilterBreed(""); // Reset breed when filter type changes
+                          }}
                           label="Filter by Type"
                         >
-                          <MenuItem value="">
-                            <em>All Types</em>
-                          </MenuItem>
+                          {/* Removed "All Types" MenuItem */}
                           {Object.keys(petData).map((typeOption) => (
                             <MenuItem key={typeOption} value={typeOption}>
                               {typeOption}
@@ -623,9 +819,7 @@ const TrainYourPet = () => {
                           onChange={(e) => setFilterBreed(e.target.value)}
                           label="Filter by Breed"
                         >
-                          <MenuItem value="">
-                            <em>All Breeds</em>
-                          </MenuItem>
+                          {/* Removed "All Breeds" MenuItem */}
                           {filterType &&
                             petData[filterType]?.map((b) => (
                               <MenuItem key={b} value={b}>
@@ -655,6 +849,25 @@ const TrainYourPet = () => {
                           <MenuItem value="name_desc">Name (Z-A)</MenuItem>
                         </Select>
                       </FormControl>
+                    </Grid>
+
+                    {/* Reset Filters Button */}
+                    <Grid item xs={12} sm={6}>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        fullWidth
+                        onClick={resetFilters}
+                      >
+                        Reset Filters
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={() => setOpenArchivedGuides(true)}
+                        sx={{ mt: 3 }}
+                      >
+                        See Archived Guides
+                      </Button>
                     </Grid>
                   </Grid>
                 </Box>
@@ -721,6 +934,15 @@ const TrainYourPet = () => {
                                   color="error"
                                 >
                                   <Delete />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Track Progress">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => openTracker(guide)}
+                                  color="success"
+                                >
+                                  <TrackChangesIcon />
                                 </IconButton>
                               </Tooltip>
                             </CardActions>
@@ -806,6 +1028,203 @@ const TrainYourPet = () => {
             variant="contained"
           >
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openArchivedGuides}
+        onClose={() => setOpenArchivedGuides(false)}
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle>
+          Archived Guides
+          <IconButton
+            size="small"
+            onClick={() => setOpenArchivedGuides(false)}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          {loading ? (
+            <CircularProgress />
+          ) : archivedGuides.length === 0 ? (
+            <Typography>No archived guides available.</Typography>
+          ) : (
+            <Grid container spacing={2}>
+              {archivedGuides.map((guide) => (
+                <Grid item xs={12} sm={6} md={4} key={guide.trainId}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6">{guide.petName}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Breed: {guide.breed}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Age: {guide.age} months
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Archived on:{" "}
+                        {dayjs(guide.updatedAt).format("MM/DD/YYYY")}
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Tooltip title="View Guide">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleSelectGuide(guide)}
+                          color="primary"
+                        >
+                          <Info />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Export as PDF">
+                        <IconButton
+                          size="small"
+                          onClick={() => exportGuideAsPDF(guide)}
+                          color="secondary"
+                        >
+                          <DownloadIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={openProgressTracker}
+        onClose={closeTracker}
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle>
+          {progressGuide?.petName}'s Training Roadmap
+          <IconButton
+            size="small"
+            onClick={closeTracker}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          {/* Task Progress */}
+          {Array.from({ length: 4 }, (_, index) => {
+            const week = index + 1;
+            const isCompleted = progressGuide?.progress?.find(
+              (p) => p.week === week
+            )?.completed;
+
+            const isDisabled =
+              index > 0 &&
+              !progressGuide?.progress?.find((p) => p.week === week - 1)
+                ?.completed;
+
+            return (
+              <Box
+                key={week}
+                display="flex"
+                flexDirection="column"
+                p={2}
+                mb={2}
+                sx={{
+                  border: "1px solid",
+                  borderColor: isCompleted ? "green" : "grey.300",
+                  borderRadius: 2,
+                  backgroundColor: isCompleted
+                    ? "rgba(0, 128, 0, 0.1)"
+                    : "white",
+                }}
+              >
+                <Typography variant="h6" gutterBottom>
+                  Week {week}: Task {week}
+                </Typography>
+
+                <Checkbox
+                  checked={!!isCompleted}
+                  onChange={() => handleToggleProgress(week)}
+                  disabled={isCompleted || isDisabled} // Prevent unchecking and disabling based on conditions
+                  sx={{ ml: "auto" }}
+                />
+              </Box>
+            );
+          })}
+          <Button
+            onClick={saveProgressChanges}
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            sx={{
+              backgroundColor: "#121858", // Midnight Blue
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#0f144d",
+              },
+            }}
+          >
+            {loading ? "Saving..." : "Save Changes"}
+          </Button>
+          {/* Display current age after updates */}
+          {progressGuide?.progress?.every((task) => task.completed) && (
+            <Box mt={3} textAlign="center">
+              <Typography variant="h6">
+                Current Age of {progressGuide?.petName}: {progressGuide?.age}{" "}
+                months
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+
+        <DialogActions>
+          {/* Generate New Guide Button (after all tasks are saved) */}
+          {progressGuide?.progress?.every((task) => task.completed) && (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              width="100%"
+              p={2}
+            >
+              <Typography variant="body1" gutterBottom>
+                All tasks are complete! Would you like to generate a new guide
+                for {progressGuide?.petName}?
+              </Typography>
+              <TextField
+                label="Current Age in Months"
+                fullWidth
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                margin="normal"
+                required
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleGenerateNewGuide}
+                disabled={loading}
+                sx={{
+                  backgroundColor: "#121858", // Midnight Blue
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#0f144d",
+                  },
+                }}
+              >
+                {loading ? "Generating..." : "Generate New Guide"}
+              </Button>
+            </Box>
+          )}
+          <Button onClick={closeTracker} color="secondary">
+            Close
           </Button>
         </DialogActions>
       </Dialog>
