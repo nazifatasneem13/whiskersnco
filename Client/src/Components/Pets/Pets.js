@@ -21,7 +21,11 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 
 const Pets = () => {
-  const [filter, setFilter] = useState("all");
+  // General filter for overall pet type filtering
+  const [generalFilter, setGeneralFilter] = useState("all");
+  // Predict-specific filter for breed prediction
+  const [predictFilter, setPredictFilter] = useState("all");
+
   const [searchTerm, setSearchTerm] = useState("");
   const [petsData, setPetsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,10 +38,12 @@ const Pets = () => {
     message: "",
     severity: "success",
   });
+
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const userEmail = currentUser ? currentUser.email : null;
   const location = useLocation();
 
+  // Fetch user profile and approved pets
   const fetchRequests = async () => {
     try {
       setLoading(true);
@@ -64,10 +70,13 @@ const Pets = () => {
   useEffect(() => {
     if (location.state?.petName) {
       setSearchTerm(location.state.petName);
+      // Clear location state after setting searchTerm
+      window.history.replaceState({}, document.title);
     }
     fetchRequests();
   }, [location.state]);
 
+  // Handle image upload
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -80,15 +89,18 @@ const Pets = () => {
     }
   };
 
+  // Reset image upload and predict filter
   const handleReset = () => {
     setImage(null);
     setFileName("");
     setPreview(null);
     setSearchTerm("");
+    setPredictFilter("all"); // Reset predict-specific filter
   };
 
+  // Predict breed based on uploaded image
   const handlePredictBreed = async () => {
-    if (!image || filter === "all") {
+    if (!image || predictFilter === "all") {
       setSnackbar({
         open: true,
         message: "Please upload an image and select a pet type!",
@@ -99,7 +111,7 @@ const Pets = () => {
 
     const formData = new FormData();
     formData.append("image", image);
-    formData.append("type", filter);
+    formData.append("type", predictFilter); // Use predictFilter
 
     try {
       const response = await axios.post(
@@ -120,7 +132,7 @@ const Pets = () => {
       setSearchTerm(breed);
       setSnackbar({
         open: true,
-        message: `Similar to it`,
+        message: `Breed predicted: ${breed}`,
         severity: "success",
       });
     } catch (error) {
@@ -133,9 +145,12 @@ const Pets = () => {
     }
   };
 
+  // Filter pets based on generalFilter only
   const filteredPets = petsData
     .filter((pet) => pet.email !== userEmail)
-    .filter((pet) => (filter === "all" ? true : pet.type === filter))
+    .filter((pet) =>
+      generalFilter === "all" ? true : pet.type === generalFilter
+    )
     .filter((pet) =>
       searchTerm === ""
         ? true
@@ -162,6 +177,7 @@ const Pets = () => {
         padding: 4,
         backgroundColor: "#f9f9f9",
         borderRadius: 2,
+        position: "relative", // Ensure preview is positioned correctly
       }}
     >
       <Typography
@@ -178,30 +194,33 @@ const Pets = () => {
           justifyContent: "space-between",
           alignItems: "flex-start",
           marginBottom: 4,
+          flexWrap: "wrap",
+          gap: 2,
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel>Pet Type</InputLabel>
-            <Select
-              value={filter}
-              onChange={(event) => {
-                setFilter(event.target.value);
-                clearSearchOnInteraction();
-              }}
-              label="Pet Type"
-            >
-              <MenuItem value="all">All Pets</MenuItem>
-              <MenuItem value="Dog">Dog</MenuItem>
-              <MenuItem value="Cat">Cat</MenuItem>
-              <MenuItem value="Rabbit">Rabbit</MenuItem>
-              <MenuItem value="Bird">Bird</MenuItem>
-              <MenuItem value="Fish">Fish</MenuItem>
-              <MenuItem value="Other">Other</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
+        {/* General Filter */}
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel>Pet Type</InputLabel>
+          <Select
+            value={generalFilter}
+            onChange={(event) => {
+              setGeneralFilter(event.target.value);
+              // Optionally, reset search term when general filter changes
+              setSearchTerm("");
+            }}
+            label="Pet Type"
+          >
+            <MenuItem value="all">All Pets</MenuItem>
+            <MenuItem value="Dog">Dog</MenuItem>
+            <MenuItem value="Cat">Cat</MenuItem>
+            <MenuItem value="Rabbit">Rabbit</MenuItem>
+            <MenuItem value="Bird">Bird</MenuItem>
+            <MenuItem value="Fish">Fish</MenuItem>
+            <MenuItem value="Other">Other</MenuItem>
+          </Select>
+        </FormControl>
 
+        {/* Search and Predict Controls */}
         <Box
           sx={{
             display: "flex",
@@ -209,17 +228,50 @@ const Pets = () => {
             alignItems: "flex-end",
             gap: 2,
             flexGrow: 1,
+            minWidth: 300,
           }}
         >
           <TextField
             placeholder="Search by name or breed"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              if (generalFilter !== "all") {
+                setGeneralFilter("all"); // Reset general filter when typing in the search box
+              }
+              setSearchTerm(e.target.value);
+            }}
             variant="outlined"
             fullWidth
             sx={{ maxWidth: 600 }}
           />
-          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {/* Predict-specific Filter */}
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel>Predict Pet Type</InputLabel>
+              <Select
+                value={predictFilter}
+                onChange={(event) => {
+                  setPredictFilter(event.target.value);
+                  // Optionally, reset search term when predict filter changes
+                  // setSearchTerm("");
+                }}
+                label="Predict Pet Type"
+              >
+                <MenuItem value="all">All Pets</MenuItem>
+                <MenuItem value="Dog">Dog</MenuItem>
+                <MenuItem value="Cat">Cat</MenuItem>
+              </Select>
+            </FormControl>
+
+            {/* Upload Button */}
             <Button
               variant="outlined"
               color="primary"
@@ -235,6 +287,8 @@ const Pets = () => {
                 onChange={handleFileChange}
               />
             </Button>
+
+            {/* Find Button */}
             <Button
               variant="contained"
               color="secondary"
@@ -245,6 +299,8 @@ const Pets = () => {
             >
               Find
             </Button>
+
+            {/* Reset Button */}
             <Button
               variant="outlined"
               color="error"
@@ -259,12 +315,13 @@ const Pets = () => {
         </Box>
       </Box>
 
+      {/* Image Preview */}
       {preview && (
         <Paper
           elevation={3}
           sx={{
-            position: "absolute",
-            top: 20,
+            position: "fixed", // Changed from absolute to fixed
+            top: 100, // Adjusted top position to avoid overlapping with buttons
             right: 20,
             width: 300,
             padding: 2,
@@ -273,6 +330,7 @@ const Pets = () => {
             flexDirection: "column",
             alignItems: "center",
             zIndex: 10,
+            backgroundColor: "#fff",
           }}
         >
           <Box sx={{ position: "relative", width: "100%" }}>
@@ -299,6 +357,7 @@ const Pets = () => {
         </Paper>
       )}
 
+      {/* Pets Grid */}
       <Grid container spacing={3}>
         {loading ? (
           <Typography variant="body1" textAlign="center" width="100%">
@@ -321,6 +380,7 @@ const Pets = () => {
         )}
       </Grid>
 
+      {/* Snackbar for Notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
