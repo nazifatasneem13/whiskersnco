@@ -11,7 +11,8 @@ import {
   Grid,
   InputAdornment,
 } from "@mui/material";
-import { Search, LocationOn } from "@mui/icons-material";
+import { Tooltip } from "@mui/material";
+import { Search, LocationOn, MyLocation } from "@mui/icons-material";
 
 const NearbyVets = () => {
   const [city, setCity] = useState("");
@@ -53,7 +54,118 @@ const NearbyVets = () => {
       setLoading(false);
     }
   };
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
+      return;
+    }
 
+    setError(null);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
+          );
+
+          if (!response.ok) throw new Error("Failed to fetch location.");
+
+          const data = await response.json();
+          const district =
+            data.address.county || data.address.city || data.address.state;
+
+          if (district) {
+            setCity(district);
+            handleFetchVets(district);
+          } else {
+            setError("Unable to determine your urban center.");
+          }
+        } catch (err) {
+          setError("Error fetching location. Try again later.");
+          console.error(err);
+        }
+      },
+      () => {
+        setError("Unable to retrieve your location.");
+      }
+    );
+  };
+
+  const handleGetCurrentLocation3 = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setError(null);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
+          );
+
+          if (!response.ok) throw new Error("Failed to fetch location.");
+
+          const data = await response.json();
+
+          // Extract urban center prioritizing city, town, or village
+          const urbanCenter =
+            data.address.city || data.address.town || data.address.village;
+
+          if (urbanCenter) {
+            setCity(urbanCenter);
+            handleFetchVets(urbanCenter);
+          } else {
+            setError("Unable to determine your urban center.");
+          }
+        } catch (err) {
+          setError("Error fetching location. Try again later.");
+          console.error(err);
+        }
+      },
+      () => {
+        setError("Unable to retrieve your location.");
+      }
+    );
+  };
+
+  const handleGetCurrentLocationoption2 = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setError(null);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=veterinary&lat=LATITUDE&lon=LONGITUDE&radius=RADIUS_IN_METERS
+`
+          );
+
+          if (!response.ok) throw new Error("Failed to fetch location.");
+
+          const data = await response.json();
+          setCity(data.display_name || `${latitude}, ${longitude}`);
+          handleFetchVets(data.display_name);
+        } catch (err) {
+          setError("Error fetching location. Try again later.");
+          console.error(err);
+        }
+      },
+      () => {
+        setError("Unable to retrieve your location.");
+      }
+    );
+  };
   return (
     <Box
       sx={{
@@ -63,8 +175,8 @@ const NearbyVets = () => {
         borderRadius: "12px",
         boxShadow: 4,
         backgroundColor: "#ffffff",
-        minHeight: "400px", // Increased height for better visual balance
-        display: "flex", // Added flexbox
+        minHeight: "400px",
+        display: "flex",
         flexDirection: "column",
         justifyContent: "center",
       }}
@@ -108,6 +220,21 @@ const NearbyVets = () => {
             borderRadius: "8px",
           }}
         />
+        <Tooltip title="Current Location" arrow>
+          <Button
+            variant="contained"
+            startIcon={<MyLocation />}
+            onClick={handleGetCurrentLocation}
+            sx={{
+              backgroundColor: "#1e88e5",
+              color: "#fff",
+              paddingX: 2,
+              paddingY: 1.5,
+              "&:hover": { backgroundColor: "#1565c0" },
+              width: { xs: "100%", sm: "auto" },
+            }}
+          ></Button>
+        </Tooltip>
         <Button
           variant="contained"
           startIcon={<Search />}
