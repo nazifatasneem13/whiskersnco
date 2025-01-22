@@ -20,6 +20,22 @@ const sendMessage = async (req, res) => {
     });
 
     await message.save();
+    const chat = await Chat.findById(chatId);
+    if (!chat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
+
+    const recipientId =
+      chat.adopterId.toString() === senderId.toString()
+        ? chat.adopteeId
+        : chat.adopterId;
+
+    // Create a notification for the recipient
+    await Notification.create({
+      userId: recipientId,
+      message: `New message from ${senderId}`,
+    });
+
     res.status(201).json(message);
   } catch (error) {
     res.status(500).json({ error: "Failed to send message" });

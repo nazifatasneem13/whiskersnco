@@ -327,6 +327,21 @@ const sendMessage = async (req, res) => {
     const { chatId, senderId, content } = req.body;
 
     const newMessage = await Message.create({ chatId, senderId, content });
+    const chat = await Chat.findById(chatId);
+    if (!chat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
+
+    const recipientId =
+      chat.adopterId.toString() === senderId.toString()
+        ? chat.adopteeId
+        : chat.adopterId;
+    const recipient = await User.findById(recipientId);
+    // Create a notification for the recipient
+    await Notification.create({
+      userId: recipientId,
+      message: `New message from ${recipient.email}`,
+    });
 
     res.status(201).json(newMessage);
   } catch (error) {
