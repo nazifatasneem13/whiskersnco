@@ -54,31 +54,31 @@ const updateChatStatus = async (req, res) => {
 
       await adopter.save();
 
-      // Delete only AdoptForms related to the adopter for this petId
-      const result = await Chat.deleteMany({
-        petId: petId.toString(),
-        adopteeId: userId,
-        adopterId: adopterId,
-      });
-      console.log(
-        `${result.deletedCount} AdoptForms deleted for petId ${petId} and email ${adopterEmail}`
-      );
-
       //Hasblocked
-      const adoptee = await User.findById(userId);
+      const adopteeId = chat.adopteeId;
+      const adoptee = await User.findById(adopteeId);
       if (!adoptee) {
         return res.status(404).json({ error: "Adoptee not found." });
       }
 
       adoptee.Hasblocked.push(adopterId);
       await adoptee.save();
-      // Update chat status to 'blocked'
-      chat.status = "blocked";
-      await chat.save();
+      await Pet.findByIdAndUpdate(petId, { status: "Approved" }, { new: true });
+      // Delete only AdoptForms related to the adopter for this petId
+      const result = await Chat.deleteMany({
+        petId: petId.toString(),
+        adopteeId: userId,
+        adopterId: adopterId,
+      });
+      //chat.status = "blocked";
+      //await chat.save();
 
       // Optionally, delete existing messages for privacy
       await Message.deleteMany({ chatId: chat._id });
-      await Pet.findByIdAndUpdate(petId, { status: "Approved" }, { new: true });
+
+      console.log(
+        `${result.deletedCount} AdoptForms deleted for petId ${petId} and email ${adopterEmail}`
+      );
       return res.status(200).json({ message: "User blocked successfully." });
     }
 
