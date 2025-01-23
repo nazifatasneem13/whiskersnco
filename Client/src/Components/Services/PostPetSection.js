@@ -13,6 +13,7 @@ import {
   Grid,
   Snackbar, // Imported Snackbar
   Alert, // Imported Alert
+  Tooltip,
 } from "@mui/material";
 import {
   PhotoCamera,
@@ -71,7 +72,7 @@ const PostPetSection = () => {
   };
 
   const handlePredictBreed = async () => {
-    if (!picture || type === "None") {
+    if (!picture || (type !== "Dog" && type !== "Cat")) {
       setSnackbar({
         open: true,
         message: "Please upload a picture and select a pet type!",
@@ -299,49 +300,89 @@ const PostPetSection = () => {
                 <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
-
-            <TextField
-              label="Breed"
-              fullWidth
-              variant="outlined"
-              value={breed}
-              onChange={(e) => setBreed(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-
-            <Box sx={{ mb: 2 }}>
-              <Button
-                variant="contained"
-                component="label"
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <TextField
+                label="Breed"
                 fullWidth
-                startIcon={<PhotoCamera />}
-                sx={{ mb: 1 }}
-              >
-                Upload Picture
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-              </Button>
-              {fileName && (
+                variant="outlined"
+                value={breed}
+                onChange={(e) => setBreed(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+              <Tooltip title="Upload image" arrow>
+                <Button
+                  variant="contained"
+                  component="label"
+                  fullWidth
+                  startIcon={<PhotoCamera />}
+                  sx={{
+                    mb: 2,
+                    backgroundColor: "#121858",
+                    maxWidth: "12%",
+                  }}
+                >
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </Button>
+              </Tooltip>
+              {(type === "Dog" || type === "Cat") && (
+                <Tooltip title="Predict Breed" arrow>
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth
+                    onClick={handlePredictBreed}
+                    disabled={!picture}
+                    sx={{ mb: 2, maxWidth: "10%" }}
+                  >
+                    <Pets />
+                  </Button>
+                </Tooltip>
+              )}
+            </Box>
+
+            <Box>
+              <Typography variant="body2" color="textSecondary">
+                {fileName && (
+                  <>
+                    Selected file: {fileName}
+                    <Box
+                      sx={{
+                        display: "inline-block",
+                        marginLeft: 1,
+                        verticalAlign: "middle",
+                      }}
+                    >
+                      {/* Create a small preview image box */}
+                      {picture && (
+                        <img
+                          src={URL.createObjectURL(picture)}
+                          alt="Pet Preview"
+                          style={{
+                            maxWidth: "50px",
+                            maxHeight: "50px",
+                            borderRadius: "4px",
+                            border: "1px solid #ccc",
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </>
+                )}
+              </Typography>
+              {(type === "Dog" || type === "Cat") && (
                 <Typography variant="body2" color="textSecondary">
-                  Selected file: {fileName}
+                  Caution: Prediction maybe not always give correct result,
+                  specially in cases of mixed breed pets, if you feel like the
+                  prediction is not correct, you can always type out the correct
+                  breed!
                 </Typography>
               )}
-
-              <Button
-                type="button"
-                variant="outlined"
-                color="secondary"
-                fullWidth
-                onClick={handlePredictBreed}
-                disabled={!picture || type === "None"}
-                sx={{ mt: 1 }}
-              >
-                Predict Breed
-              </Button>
             </Box>
           </Grid>
 
