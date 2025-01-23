@@ -8,8 +8,13 @@ import {
   ListItemText,
   IconButton,
   Divider,
+  Avatar,
+  Badge,
+  Tooltip,
+  Chip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 
 const NotificationsPage = ({ onClose }) => {
   const [notifications, setNotifications] = useState([]);
@@ -38,53 +43,91 @@ const NotificationsPage = ({ onClose }) => {
     <Box
       sx={{
         position: "fixed",
-        bottom: 20,
+        top: 67,
         right: 20,
-        width: 350,
+        width: 320,
         maxHeight: 500,
         overflowY: "auto",
-        backgroundColor: "#fff",
-        boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
-        borderRadius: 2,
+        backgroundColor: "#f9f9f9",
+        boxShadow: "0px 6px 20px rgba(0,0,0,0.15)",
+        borderRadius: 3,
         zIndex: 1300,
       }}
     >
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: 2,
-          borderBottom: "1px solid #ddd",
+          padding: "12px 30px",
+          backgroundColor: "#19275c",
+          color: "#fff",
+          borderTopLeftRadius: 3,
+          borderTopRightRadius: 3,
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           Notifications
         </Typography>
-        <IconButton onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
+        <Tooltip title="Close">
+          <IconButton onClick={onClose} sx={{ color: "#fff" }}>
+            <CloseIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
-      <List>
+
+      {/* Notifications List */}
+      <List sx={{ padding: 0 }}>
         {notifications.length > 0 ? (
           notifications.map((notification, index) => (
             <React.Fragment key={index}>
-              <ListItem>
+              <ListItem
+                sx={{
+                  padding: "16px 24px",
+                  "&:hover": {
+                    backgroundColor: "#f0f8ff",
+                  },
+                }}
+              >
+                <Badge
+                  color="primary"
+                  variant={notification.isNew ? "dot" : "standard"}
+                  sx={{ marginRight: 2 }}
+                >
+                  <Avatar sx={{ bgcolor: "#19275c", color: "#fff" }}>
+                    <NotificationsNoneIcon />
+                  </Avatar>
+                </Badge>
                 <ListItemText
-                  primary={notification.message}
-                  secondary={new Date(notification.createdAt).toLocaleString()}
+                  primary={
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                      {notification.message}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary" }}
+                    >
+                      {new Date(notification.createdAt).toLocaleString()}
+                    </Typography>
+                  }
                 />
               </ListItem>
               {index < notifications.length - 1 && <Divider />}
             </React.Fragment>
           ))
         ) : (
-          <Typography
-            sx={{ padding: 2, textAlign: "center" }}
-            color="textSecondary"
-          >
-            No notifications available.
-          </Typography>
+          <Box sx={{ padding: 3, textAlign: "center" }}>
+            <NotificationsNoneIcon sx={{ fontSize: 48, color: "#ccc" }} />
+            <Typography
+              variant="h6"
+              sx={{ color: "text.secondary", marginTop: 2 }}
+            >
+              No notifications available.
+            </Typography>
+          </Box>
         )}
       </List>
     </Box>
