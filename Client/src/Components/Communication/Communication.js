@@ -471,7 +471,7 @@ const Communication = () => {
 
                   display: "flex",
                   gap: 4,
-                  justifyContent: "right",
+                  justifyContent: "space-evenly",
                   backgroundColor: "#e3f2fd", // Light yellow background for container
                   transition: "background-color 0.3s ease",
                   "&:hover": {
@@ -559,6 +559,7 @@ const Communication = () => {
                   </Tooltip>
                 )}
               </Box>
+
               <Box
                 variant="outlined"
                 sx={{
@@ -569,8 +570,8 @@ const Communication = () => {
                   maxWidth: "07%",
                   display: "10%",
                   gap: 4,
-                  justifyContent: "right",
-                  backgroundColor: "#e3f2fd", // Light yellow background for container
+                  justifyContent: "center",
+                  backgroundColor: "#e3f2fd",
                   transition: "background-color 0.3s ease",
                   "&:hover": {
                     backgroundColor: "#bbdefb", // Darker shade of blue on hover
