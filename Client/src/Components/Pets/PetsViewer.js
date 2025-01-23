@@ -89,7 +89,7 @@ const PetsViewer = (props) => {
   };
 
   return (
-    <Card sx={{ maxWidth: 345, margin: "20px", boxShadow: 3 }}>
+    <Card sx={{ maxWidth: 340, margin: "15px", boxShadow: 3 }}>
       <CardMedia
         component="img"
         height="200"
