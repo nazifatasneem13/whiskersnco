@@ -24,6 +24,12 @@ import {
   ListItemText,
   Snackbar,
 } from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import EmailIcon from "@mui/icons-material/Email";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PetsIcon from "@mui/icons-material/Pets";
+import HomeIcon from "@mui/icons-material/Home";
+
 import { Delete, Settings } from "@mui/icons-material";
 import axios from "axios";
 import upload from "../utils/upload.js";
@@ -283,7 +289,7 @@ const Profile = () => {
         <Avatar
           alt="Profile"
           src={imagePreview || user.img || "/default-pfp.png"} // Use preview if available
-          sx={{ width: 120, height: 120, mb: 2 }}
+          sx={{ width: 135, height: 135, mb: 2 }}
         />
         <Typography variant="h4" fontWeight="bold">
           {user.username || "Your Name"}
@@ -291,8 +297,28 @@ const Profile = () => {
         <Typography variant="body1" color="textSecondary">
           {user.email}
         </Typography>
-        <IconButton onClick={handleSettingsOpen} sx={{ mt: 2 }} color="primary">
+        <IconButton
+          onClick={handleSettingsOpen}
+          sx={{
+            mt: 2,
+            color: "primary",
+            display: "flex",
+            alignItems: "center",
+            gap: 1, // Gap between the icon and the text
+            transition: "transform 0.3s ease-in-out",
+            "&:hover": {
+              transform: "scale(1.05)", // Enlarge the button on hover for better feedback
+              backgroundColor: "transparent", // Removes the default hover background color
+            },
+            "&:hover .MuiTouchRipple-root": {
+              display: "none", // Disables the ripple effect on hover
+            },
+          }}
+        >
           <Settings />
+          <Typography variant="body2" color="textSecondary">
+            Update Profile
+          </Typography>
         </IconButton>
       </Box>
 
@@ -308,31 +334,158 @@ const Profile = () => {
       {/* Tab Content */}
       <Divider sx={{ my: 4 }} />
       {activeTab === 0 && (
-        <Box>
-          {/* User Details */}
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
+        <Box
+          sx={{
+            padding: 3,
+            backgroundColor: "#e8eaf6", // Light indigo background for a fresh look
+            borderRadius: 2,
+            boxShadow: "0 2px 5px rgba(0,0,0,0.1)", // Soft shadow for depth
+          }}
+        >
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            gutterBottom
+            color="black"
+            sx={{ fontSize: "1.7rem", fontFamily: "Arial" }}
+          >
             User Details
           </Typography>
+
           <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="Username"
-                fullWidth
-                variant="outlined"
-                value={user.username}
-                InputProps={{ readOnly: true }}
-                sx={{ mb: 2 }}
-              />
+            {/* Username Display */}
+            <Grid item xs={12} sm={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2, // Increase gap for better spacing
+                  padding: 2, // Padding for touch-friendly design
+                  backgroundColor: "#fff", // White background for cards
+                  borderRadius: 3, // Slightly rounded corners for card-like feel
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)", // Subtle shadow on each item
+                }}
+              >
+                <AccountCircleIcon
+                  color="primary"
+                  sx={{ fontSize: "2.7rem" }}
+                />
+                <Box>
+                  <Typography
+                    variant="subtitle1"
+                    color="textSecondary"
+                    sx={{ fontSize: "1.1rem" }}
+                  >
+                    Username
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    fontWeight="medium"
+                    sx={{ fontSize: "1.1em" }}
+                  >
+                    {user.username}
+                  </Typography>
+                </Box>
+              </Box>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Email"
-                fullWidth
-                variant="outlined"
-                value={user.email}
-                InputProps={{ readOnly: true }}
-                sx={{ mb: 2 }}
-              />
+
+            {/* Email Display */}
+            <Grid item xs={12} sm={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2, // Increase gap for better spacing
+                  padding: 2, // Padding for touch-friendly design
+                  backgroundColor: "#fff", // White background for cards
+                  borderRadius: 3, // Slightly rounded corners for card-like feel
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)", // Subtle shadow on each item
+                }}
+              >
+                <EmailIcon color="primary" sx={{ fontSize: "2.7rem" }} />
+                <Box>
+                  <Typography
+                    variant="subtitle1"
+                    color="textSecondary"
+                    sx={{ fontSize: "1.1rem" }}
+                  >
+                    Email
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    fontWeight="medium"
+                    sx={{ fontSize: "1.1rem" }}
+                  >
+                    {user.email}
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+
+            {/* Area Display */}
+            <Grid item xs={12} sm={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2, // Increase gap for better spacing
+                  padding: 2, // Padding for touch-friendly design
+                  backgroundColor: "#fff", // White background for cards
+                  borderRadius: 3, // Slightly rounded corners for card-like feel
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)", // Subtle shadow on each item
+                }}
+              >
+                <LocationOnIcon color="primary" sx={{ fontSize: "2.7rem" }} />
+                <Box>
+                  <Typography
+                    variant="subtitle1"
+                    color="textSecondary"
+                    sx={{ fontSize: "1.1rem" }}
+                  >
+                    Area(s)
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    fontWeight="medium"
+                    sx={{ fontSize: "1.1rem" }}
+                  >
+                    {user.areas && user.areas.join(", ")}
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+
+            {/* Number of Pets Adopted */}
+            <Grid item xs={12} sm={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2, // Increase gap for better spacing
+                  padding: 2, // Padding for touch-friendly design
+                  backgroundColor: "#fff", // White background for cards
+                  borderRadius: 3, // Slightly rounded corners for card-like feel
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)", // Subtle shadow on each item
+                }}
+              >
+                <PetsIcon color="primary" sx={{ fontSize: "2.7rem" }} />
+                <Box>
+                  <Typography
+                    variant="subtitle1"
+                    color="textSecondary"
+                    sx={{ fontSize: "1.1rem" }}
+                  >
+                    Pets Adopted
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    fontWeight="medium"
+                    sx={{ fontSize: "1.1rem" }}
+                  >
+                    {userPets.length}
+                  </Typography>
+                </Box>
+              </Box>
             </Grid>
           </Grid>
         </Box>
@@ -466,8 +619,14 @@ const Profile = () => {
         </Box>
       )}
       {activeTab === 4 && (
-        <Box>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
+        <Box sx={{ padding: 3 }}>
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            gutterBottom
+            sx={{ mb: 2 }}
+          >
+            {" "}
             My Reviews
           </Typography>
           <Grid container spacing={3}>
@@ -543,9 +702,15 @@ const Profile = () => {
                 </Grid>
               ))
             ) : (
-              <Typography variant="body1" color="textSecondary">
-                No reviews found.
-              </Typography>
+              <Grid item xs={12}>
+                <Typography
+                  variant="body1"
+                  color="textSecondary"
+                  sx={{ mt: 2 }} // Increased margin-top for better visual separation from the header
+                >
+                  No reviews found.
+                </Typography>
+              </Grid>
             )}
           </Grid>
         </Box>
