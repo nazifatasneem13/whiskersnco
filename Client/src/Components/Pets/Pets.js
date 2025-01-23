@@ -171,7 +171,7 @@ const Pets = () => {
 
   return (
     <Container
-      maxWidth="lg"
+      maxWidth="flex"
       sx={{
         mt: 4,
         mb: 10,
@@ -426,7 +426,7 @@ const Pets = () => {
       )}
 
       {/* Pets Grid */}
-      <Grid container spacing={3}>
+      <Grid container spacing={1} sx={{ display: "flex" }}>
         {loading ? (
           <Typography variant="body1" textAlign="center" width="100%">
             Loading...
@@ -437,7 +437,7 @@ const Pets = () => {
           </Typography>
         ) : filteredPets.length > 0 ? (
           filteredPets.map((petDetail, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid item xs={12} sm={6} md={3} key={index}>
               <PetsViewer pet={petDetail} />
             </Grid>
           ))

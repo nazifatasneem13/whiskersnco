@@ -179,22 +179,10 @@ const PreferredPetsCarousel = () => {
             }}
           >
             <Speed sx={{ color: "secondary.main" }} />
-            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-              Current Speed: {speedLevels[speedIndex]}
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              marginTop: "1rem",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-              Tap right to increase the speed. Tap left to decrease the speed.
-            </Typography>
+            <Typography
+              variant="body1"
+              sx={{ fontWeight: "bold" }}
+            ></Typography>
           </Box>
         </Box>
       ) : (

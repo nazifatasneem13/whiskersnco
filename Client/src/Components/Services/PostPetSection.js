@@ -329,19 +329,30 @@ const PostPetSection = () => {
                   <PhotoCamera />
                 </Button>
               </Tooltip>
+
               {(type === "Dog" || type === "Cat") && (
-                <Tooltip title="Predict Breed" arrow>
-                  <Button
-                    type="button"
-                    variant="outlined"
-                    color="secondary"
+                <Tooltip
+                  title={
+                    picture ? "Predict Breed" : "Please upload an image first"
+                  }
+                  arrow
+                >
+                  <Box
                     fullWidth
-                    onClick={handlePredictBreed}
-                    disabled={!picture}
-                    sx={{ mb: 2, maxWidth: "10%" }}
+                    sx={{ mb: 2, maxWidth: "10%", maxHeight: "flex" }}
                   >
-                    <Pets />
-                  </Button>
+                    <Button
+                      type="button"
+                      variant="outlined"
+                      color="secondary"
+                      fullWidth
+                      onClick={handlePredictBreed}
+                      disabled={!picture}
+                      sx={{ maxWidth: "10%", height: "100%" }}
+                    >
+                      <Pets />
+                    </Button>
+                  </Box>
                 </Tooltip>
               )}
             </Box>
@@ -375,6 +386,7 @@ const PostPetSection = () => {
                   </>
                 )}
               </Typography>
+
               {(type === "Dog" || type === "Cat") && (
                 <Typography variant="body2" color="textSecondary">
                   Caution: Prediction maybe not always give correct result,

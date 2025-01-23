@@ -8,8 +8,8 @@ const CardBelowHome = () => {
     <Box
       sx={{
         backgroundColor: "rgb(20, 20, 81)",
-        width: "84vw",
-        height: 180,
+        width: "flex",
+        minheight: "50vh",
         margin: "auto",
         padding: "10px",
         marginTop: "30px",
@@ -42,32 +42,63 @@ const CardBelowHome = () => {
       {/* Middle Text (corresponds to .right-para / .we-do) */}
       <Box
         sx={{
-          width: "35vw",
+          minwidth: "flex",
+          ml: 1,
+
           // If you had a custom CSS variable for --textGrey, replace it with your desired color
           color: "var(--textGrey)",
-          fontSize: "22px",
-          fontWeight: 500,
-          fontFamily: '"Montserrat", sans-serif',
-          lineHeight: 1.2,
-          textAlign: "left",
+
           paddingRight: "30px",
-          paddingLeft: "10px",
+          paddingLeft: "150px",
         }}
       >
-        <Typography
+        <Box
           sx={{
-            fontSize: "28px",
+            minwidth: "flex",
+            ml: 1,
+
+            // If you had a custom CSS variable for --textGrey, replace it with your desired color
+            color: "var(--textGrey)",
+            fontSize: "22px",
             fontWeight: 500,
-            color: "#ffffff", // or "aliceblue"
-            marginBottom: "10px",
+            fontFamily: '"Montserrat", sans-serif',
+            lineHeight: 1.2,
+            textAlign: "left",
+            paddingRight: "30px",
+            paddingLeft: "10px",
           }}
         >
-          OUR MISSION
-        </Typography>
-        We specialize in connecting the perfect pet with their forever home,
-        ensuring a seamless adoption process to spread joy and cultivate love.
-      </Box>
+          <Typography
+            sx={{
+              fontSize: "28px",
+              fontWeight: 500,
+              color: "#ffffff", // or "aliceblue"
+              marginBottom: "10px",
+            }}
+          >
+            OUR MISSION
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            minwidth: "flex",
+            ml: 1,
 
+            // If you had a custom CSS variable for --textGrey, replace it with your desired color
+            color: "var(--textGrey)",
+            fontSize: "22px",
+            fontWeight: 500,
+            fontFamily: '"Montserrat", sans-serif',
+            lineHeight: 1.2,
+            textAlign: "left",
+            paddingRight: "30px",
+            paddingLeft: "10px",
+          }}
+        >
+          We specialize in connecting the perfect pet with their forever home,
+          ensuring a seamless adoption process to spread joy and cultivate love.
+        </Box>
+      </Box>
       {/* Right Image (corresponds to .right-pic) */}
       <Box
         sx={{

@@ -10,6 +10,8 @@ const Home = (props) => {
   return (
     <Box
       sx={{
+        position: "center",
+        maxWidth: "flex",
         backgroundColor: "background.default",
         color: "text.primary",
         minHeight: "100vh",

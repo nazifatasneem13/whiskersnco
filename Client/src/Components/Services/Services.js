@@ -23,7 +23,7 @@ const Services = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 10 }}>
+    <Container maxWidth="flex" sx={{ mt: 4, mb: 10 }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

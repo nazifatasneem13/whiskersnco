@@ -1,6 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Card, CardMedia, CardContent, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
+} from "@mui/material";
 
 const CarouselPetViewer = ({ pet }) => {
   const navigate = useNavigate();
@@ -12,7 +19,8 @@ const CarouselPetViewer = ({ pet }) => {
   return (
     <Card
       sx={{
-        maxWidth: 300,
+        maxWidth: 350,
+        maxHeight: 400,
 
         borderRadius: "16px",
         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
@@ -27,7 +35,6 @@ const CarouselPetViewer = ({ pet }) => {
           backgroundColor: "#121858", // Midnight blue background
         },
       }}
-      onClick={handleViewPet}
     >
       {/* Pet Details */}
       <CardContent
@@ -81,6 +88,25 @@ const CarouselPetViewer = ({ pet }) => {
           }}
         >
           Breed: {pet.breed || "Unknown"}
+        </Box>
+        <Box>
+          <Button
+            type="button"
+            variant="outlined"
+            color="secondary"
+            onClick={handleViewPet}
+            sx={{
+              mt: 3,
+              color: "#ce93d8",
+              fontWeight: "bold",
+              "&:hover": {
+                background: "linear-gradient(90deg, #1b3a79, #19275c)",
+                color: "white",
+              },
+            }}
+          >
+            View
+          </Button>
         </Box>
       </CardContent>
     </Card>
