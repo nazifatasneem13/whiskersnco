@@ -54,87 +54,70 @@ const NearbyVets = () => {
       setLoading(false);
     }
   };
-  const handleGetCurrentLocation = () => {
+  const handleGetCurrentLocation = async () => {
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser.");
       return;
     }
 
     setError(null);
+    setLoading(true);
+    setVetClinics([]);
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
 
         try {
+          // Reverse geocode to get the city/district
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
           );
 
-          if (!response.ok) throw new Error("Failed to fetch location.");
+          if (!response.ok)
+            throw new Error("Failed to fetch location details.");
 
           const data = await response.json();
           const district =
             data.address.county || data.address.city || data.address.state;
 
           if (district) {
-            setCity(district);
-            handleFetchVets(district);
+            setCity(district); // Update the city in state
+            // Fetch vet clinics after location is determined
+            const vetsResponse = await fetch(
+              `https://nominatim.openstreetmap.org/search?format=json&q=veterinary+${district}`
+            );
+
+            if (!vetsResponse.ok)
+              throw new Error("Failed to fetch vet clinics.");
+
+            const vetsData = await vetsResponse.json();
+            const formattedVets = vetsData.map((place) => ({
+              name: place.display_name,
+              latitude: place.lat,
+              longitude: place.lon,
+              url: `https://www.google.com/maps?q=${place.display_name}`,
+            }));
+
+            setVetClinics(formattedVets);
           } else {
-            setError("Unable to determine your urban center.");
+            setError("Unable to determine your city or district.");
           }
         } catch (err) {
-          setError("Error fetching location. Try again later.");
+          setError("Error fetching location or vet clinics. Try again later.");
           console.error(err);
+        } finally {
+          setLoading(false);
         }
       },
-      () => {
+      (error) => {
         setError("Unable to retrieve your location.");
+        setLoading(false);
       }
     );
   };
 
-  const handleGetCurrentLocation3 = () => {
-    if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser.");
-      return;
-    }
-
-    setError(null);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
-          );
-
-          if (!response.ok) throw new Error("Failed to fetch location.");
-
-          const data = await response.json();
-
-          // Extract urban center prioritizing city, town, or village
-          const urbanCenter =
-            data.address.city || data.address.town || data.address.village;
-
-          if (urbanCenter) {
-            setCity(urbanCenter);
-            handleFetchVets(urbanCenter);
-          } else {
-            setError("Unable to determine your urban center.");
-          }
-        } catch (err) {
-          setError("Error fetching location. Try again later.");
-          console.error(err);
-        }
-      },
-      () => {
-        setError("Unable to retrieve your location.");
-      }
-    );
-  };
-
-  const handleGetCurrentLocationoption2 = () => {
+  const handleGetCurrentLocationoption = () => {
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser.");
       return;

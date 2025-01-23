@@ -337,10 +337,11 @@ const sendMessage = async (req, res) => {
         ? chat.adopteeId
         : chat.adopterId;
     const recipient = await User.findById(recipientId);
+    const sender = await User.findById(senderId);
     // Create a notification for the recipient
     await Notification.create({
       userId: recipientId,
-      message: `New message from ${recipient.email}`,
+      message: `New message from ${sender.email}`,
     });
 
     res.status(201).json(newMessage);
