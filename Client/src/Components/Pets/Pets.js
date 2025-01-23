@@ -19,6 +19,7 @@ import {
 import { PhotoCamera, Close } from "@mui/icons-material";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import Draggable from "react-draggable";
 
 const Pets = () => {
   // General filter for overall pet type filtering
@@ -371,54 +372,57 @@ const Pets = () => {
       </Box>
 
       {/* Image Preview */}
+
       {preview && (
-        <Paper
-          elevation={3}
-          sx={{
-            position: "fixed",
-            top: 100,
-            right: 20,
-            width: 320,
-            padding: 3,
-            borderRadius: 3,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            zIndex: 10,
-            backgroundColor: "#ffffff",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
-          }}
-        >
-          <Box sx={{ position: "relative", width: "100%" }}>
-            <IconButton
-              onClick={handleReset}
-              sx={{
-                position: "absolute",
-                top: -10,
-                right: -10,
-                backgroundColor: "#ffffff",
-                boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.1)",
-                color: "#e53935",
-                "&:hover": {
-                  backgroundColor: "#fdecea",
-                },
-              }}
-            >
-              <Close />
-            </IconButton>
-          </Box>
-          <img
-            src={preview}
-            alt="Preview"
-            style={{ maxWidth: "100%", borderRadius: 8 }}
-          />
-          <Typography
-            variant="body2"
-            sx={{ marginTop: 1, fontFamily: "'Poppins', sans-serif" }}
+        <Draggable>
+          <Paper
+            elevation={3}
+            sx={{
+              position: "fixed",
+              top: 100,
+              right: 20,
+              width: 320,
+              padding: 3,
+              borderRadius: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              zIndex: 10,
+              backgroundColor: "#ffffff",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+            }}
           >
-            {fileName}
-          </Typography>
-        </Paper>
+            <Box sx={{ position: "relative", width: "100%" }}>
+              <IconButton
+                onClick={handleReset}
+                sx={{
+                  position: "absolute",
+                  top: -10,
+                  right: -10,
+                  backgroundColor: "#ffffff",
+                  boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.1)",
+                  color: "#e53935",
+                  "&:hover": {
+                    backgroundColor: "#fdecea",
+                  },
+                }}
+              >
+                <Close />
+              </IconButton>
+            </Box>
+            <img
+              src={preview}
+              alt="Preview"
+              style={{ maxWidth: "100%", borderRadius: 8 }}
+            />
+            <Typography
+              variant="body2"
+              sx={{ marginTop: 1, fontFamily: "'Poppins', sans-serif" }}
+            >
+              {fileName}
+            </Typography>
+          </Paper>
+        </Draggable>
       )}
 
       {/* Pets Grid */}
