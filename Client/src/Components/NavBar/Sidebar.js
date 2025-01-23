@@ -26,7 +26,7 @@ import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import MessageModal from "../MessageModal/MessageModal";
 
 const Sidebar = ({ title }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [currentUser, setCurrentUser] = useState(
     JSON.parse(localStorage.getItem("currentUser"))
