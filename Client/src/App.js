@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Navbar from "./Components/NavBar/Navbar";
 import Profile from "./Components/Profile.jsx";
+import NewsPage from "./Components/NewsPage/NewsPage.js";
 import Home from "./Components/Home/Home";
 import Login from "./Pages/login/Login.jsx";
 import Register from "./Pages/register/Register.jsx";
@@ -130,6 +131,14 @@ const App = () => {
           element={
             <Layout>
               <Contact />
+            </Layout>
+          }
+        />
+        <Route
+          path="/news"
+          element={
+            <Layout>
+              <NewsPage />
             </Layout>
           }
         />
