@@ -1,78 +1,83 @@
 import React from "react";
-import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  Button,
-} from "@mui/material";
+import { Box, Card, CardMedia, CardContent, Typography } from "@mui/material";
 
 const CarouselPetViewer = ({ pet }) => {
-  // Retrieve the logged-in user's email from localStorage
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-  const userEmail = currentUser ? currentUser.email : null;
-
   const navigate = useNavigate();
 
   const handleViewPet = () => {
-    // Prompt the user with a confirmation dialog
-    const userConfirmed = window.confirm(
-      "Please check out our available pets to adopt."
-    );
-
-    if (userConfirmed) {
-      // Navigate to the /pets page with the selected pet's ID
-      navigate("/pets", { state: { petName: pet.name } });
-    }
-  };
-
-  const formatTimeAgo = (updatedAt) => {
-    const date = new Date(updatedAt);
-    return formatDistanceToNow(date, { addSuffix: true });
+    navigate("/pets", { state: { petName: pet.name } });
   };
 
   return (
     <Card
       sx={{
         maxWidth: 300,
+
         borderRadius: "16px",
         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
         margin: "1rem",
         backgroundColor: "#ffffff",
         cursor: "pointer",
-        "&:hover": { boxShadow: "0px 6px 12px rgba(0, 0, 0, 0.3)" },
+        position: "relative",
+        transition: "transform 0.3s ease, background-color 0.3s ease",
+        "&:hover, &:focus-within": {
+          transform: "scale(1.1)", // Slightly enlarge the card
+          boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.4)", // Stronger shadow on hover/touch
+          backgroundColor: "#121858", // Midnight blue background
+        },
       }}
       onClick={handleViewPet}
     >
-      {/* Pet Image */}
-      <CardMedia
-        component="img"
-        height="200"
-        image={pet.filename} // Cloudinary URL for the pet image
-        alt={pet.name}
-        sx={{ borderRadius: "16px 16px 0 0" }}
-      />
-
       {/* Pet Details */}
-      <CardContent sx={{ textAlign: "center", padding: "1rem" }}>
+      <CardContent
+        sx={{
+          textAlign: "center",
+          padding: "1rem",
+          color: "black", // Name text turns white on hover
+          "&:hover": {
+            color: "white", // Ensure hover keeps text white
+          },
+        }}
+      >
+        {" "}
+        {/* Pet Image */}
+        <CardMedia
+          component="img"
+          height="200"
+          image={pet.filename} // Replace with your image URL
+          alt={pet.name}
+          sx={{
+            borderRadius: "16px 16px 0 0",
+            transition: "opacity 0.3s ease",
+            "&:hover": {
+              opacity: 0.9, // Slightly dim image
+            },
+          }}
+        />
         <Typography
           variant="h6"
-          sx={{ fontWeight: "bold", color: "black", marginBottom: "0.5rem" }}
+          sx={{
+            fontWeight: "bold",
+            marginBottom: "0.5rem",
+            color: "inherit", // Inherit color from parent
+            transition: "color 0.3s ease",
+          }}
         >
           {pet.name}
         </Typography>
-
         <Box
           sx={{
-            backgroundColor: "#f4f4f4",
+            backgroundColor: "#f4f4f4", // Light gray background
             padding: "0.5rem",
             borderRadius: "12px",
             display: "inline-block",
-            color: "black",
             fontSize: "0.8rem",
+            color: "black", // Explicitly set text color to black
+            transition: "background-color 0.3s ease",
+            "&:hover": {
+              backgroundColor: "#e0e0e0", // Slightly darker gray on hover
+            },
           }}
         >
           Breed: {pet.breed || "Unknown"}
