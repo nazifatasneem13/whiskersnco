@@ -236,21 +236,55 @@ const Communication = () => {
 
   return (
     <Box sx={{ display: "flex", maxHeight: "auto" }}>
-      <Box sx={{ width: "25%", borderRight: "1px solid #ddd", padding: 2 }}>
-        <Typography variant="h6" sx={{ fontWeight: "bold", marginBottom: 2 }}>
+      <Box
+        sx={{
+          width: "25%",
+          borderRight: "1px solid #ddd",
+          padding: 2,
+          bgcolor: "background.paper", // Adds a neutral background color
+          height: "100vh", // Full height container
+          overflowY: "auto", // Enables scrolling
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: "bold",
+            marginBottom: 2,
+            color: "primary.main", // Highlight section titles
+          }}
+        >
           Chats
         </Typography>
-        <Typography variant="subtitle1">Chat with Donator</Typography>
 
-        <List>
+        {/* Chat with Donator */}
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: "medium", color: "secondary.main", mb: 1 }}
+        >
+          Chat with Donators
+        </Typography>
+        <List sx={{ mb: 2 }}>
           {adopterChats.map((chat) => (
             <ListItem
               key={chat.chatId}
               button
               onClick={() => handleChatSelect(chat)}
               selected={selectedChat?.chatId === chat.chatId}
+              sx={{
+                "&.Mui-selected": {
+                  bgcolor: "primary.light", // Selected item highlight
+                  color: "primary.contrastText",
+                  "&:hover": {
+                    bgcolor: "primary.dark",
+                  },
+                },
+                "&:hover": {
+                  bgcolor: "action.hover", // Hover effect
+                },
+              }}
             >
-              <Avatar sx={{ marginRight: 2, bgcolor: adopterColor }}>
+              <Avatar sx={{ marginRight: 2, bgcolor: "secondary.light" }}>
                 {chat.name ? chat.name[0] : "A"}
               </Avatar>
               <ListItemText
@@ -261,21 +295,26 @@ const Communication = () => {
                       sx={{
                         width: 10,
                         height: 10,
-                        bgcolor: adopterColor,
+                        bgcolor: "info.main",
                         borderRadius: "50%",
                         marginLeft: 1,
+                        boxShadow: 1, // Adds a subtle shadow
                       }}
                       title="Adopter"
                     />
                   </Box>
                 }
-                secondary={chat.email}
               />
             </ListItem>
           ))}
         </List>
         <Divider />
-        <Typography variant="subtitle1" sx={{ marginTop: 2 }}>
+
+        {/* Chat with Adopters */}
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: "medium", color: "secondary.main", mt: 2, mb: 1 }}
+        >
           Chat with Adopters
         </Typography>
         <List>
@@ -285,36 +324,57 @@ const Communication = () => {
               button
               onClick={() => handleChatSelect(chat)}
               selected={selectedChat?.chatId === chat.chatId}
+              sx={{
+                "&.Mui-selected": {
+                  bgcolor: "primary.light",
+                  color: "primary.contrastText",
+                  "&:hover": {
+                    bgcolor: "primary.dark",
+                  },
+                },
+                "&:hover": {
+                  bgcolor: "action.hover",
+                },
+              }}
             >
-              <Avatar sx={{ marginRight: 2, bgcolor: adopteeColor }}>
+              <Avatar sx={{ marginRight: 2, bgcolor: "secondary.light" }}>
                 {chat.name ? chat.name[0] : "D"}
               </Avatar>
               <ListItemText
                 primary={
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {chat.name || "Unknown"}
+                    {chat.email || "Unknown"}
                     <Box
                       sx={{
                         width: 10,
                         height: 10,
-                        bgcolor: adopteeColor,
+                        bgcolor: "info.main",
                         borderRadius: "50%",
                         marginLeft: 1,
+                        boxShadow: 1,
                       }}
                       title="Adoptee"
                     />
                   </Box>
                 }
-                secondary={chat.email}
               />
             </ListItem>
           ))}
         </List>
         <Divider />
 
+        {/* Archived Chats */}
         <Typography
           variant="subtitle1"
-          sx={{ marginTop: 8, padding: 2, cursor: "pointer", color: "blue" }}
+          sx={{
+            marginTop: 8,
+            padding: 2,
+            cursor: "pointer",
+            color: "primary.main",
+            "&:hover": {
+              textDecoration: "underline", // Adds interactivity on hover
+            },
+          }}
           onClick={() => handleOpenArchive()}
         >
           Archived Chats
@@ -327,105 +387,170 @@ const Communication = () => {
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          maxHeight: "auto",
+          maxHeight: "750px",
         }}
       >
         {selectedChat ? (
           <>
-            <Typography
-              variant="h6"
-              sx={{ padding: 2, cursor: "pointer", color: "blue" }}
-              onClick={() => handleOpenProfile(selectedChat.email)}
-            >
-              {selectedChat.email}
-
-              <Box
-                component="span"
-                sx={{
-                  display: "inline-block",
-                  width: 10,
-                  height: 10,
-                  bgcolor: adopterChats.some(
-                    (chat) => chat.chatId === selectedChat.chatId
-                  )
-                    ? adopterColor
-                    : adopteeColor,
-                  borderRadius: "50%",
-                  marginLeft: 1,
-                }}
-                title={
-                  adopterChats.some(
-                    (chat) => chat.chatId === selectedChat.chatId
-                  )
-                    ? "Adopter"
-                    : "Adoptee"
-                }
-              />
-            </Typography>
-
             <Box
               sx={{
                 padding: 2,
-                display: "flex",
-                gap: 2,
-                backgroundColor: "#f8bbd0",
-                justifyContent: "flex-end",
+
+                gap: "18px",
+                bgcolor: "background.default",
+                color: "text.primary",
+                display: "flex", // Set the display to flex to align children horizontally
+                alignItems: "center", // Align items vertically in the center
+                justifyContent: "space-around", // Distribute extra space between the elements
               }}
             >
-              <Typography variant="h6" sx={{ padding: 2 }}>
-                Status Update
-              </Typography>
-
-              {/* Button for Adoptee to mark as "Sent" */}
-              {adopteeChats.some(
-                (chat) =>
-                  chat.chatId === selectedChat.chatId &&
-                  chat.status === "active" &&
-                  selectedChat.status !== "sent"
-              ) && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => openReviewDialog("sent")}
+              {/* User Email and Status Indicator */}
+              <Box
+                sx={{
+                  flexGrow: 1, // Allows this box to grow and use available space
+                  p: 2,
+                  borderRadius: 4,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  backgroundColor: "#e3f2fd", // Light blue background
+                  transition: "background-color 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "#bbdefb", // Darker shade of blue on hover
+                  },
+                }}
+                onClick={() => handleOpenProfile(selectedChat.email)}
+                role="button"
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ flexGrow: 1, cursor: "pointer" }}
                 >
-                  Sent
-                </Button>
-              )}
+                  {selectedChat.email}
+                </Typography>
+                <Box
+                  sx={{
+                    width: 15,
+                    height: 15,
+                    borderRadius: "50%",
+                    transition: "transform 0.3s ease",
+                    bgcolor: adopterChats.some(
+                      (chat) => chat.chatId === selectedChat.chatId
+                    )
+                      ? "#81c784" // Green for adopters
+                      : "#ffb74d", // Orange for adoptees
+                    "&:hover": {
+                      transform: "scale(1.2)",
+                    },
+                  }}
+                  title={
+                    adopterChats.some(
+                      (chat) => chat.chatId === selectedChat.chatId
+                    )
+                      ? "Adopter"
+                      : "Adoptee"
+                  }
+                />
+              </Box>
 
-              {/* Button for Adopter to mark as "Delivered" */}
-              {adopterChats.some(
-                (chat) => chat.chatId === selectedChat.chatId
-              ) &&
-                selectedChat.status === "sent" && (
+              {/* Action Buttons and Status Update */}
+              <Box
+                sx={{
+                  flexGrow: 1, // Allows this box to grow more than the email/status box
+                  p: 2,
+
+                  borderRadius: 4,
+
+                  display: "flex",
+                  gap: 4,
+                  justifyContent: "right",
+                  backgroundColor: "#e3f2fd", // Light yellow background for container
+                  transition: "background-color 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "#bbdefb", // Darker shade of blue on hover
+                  },
+                }}
+              >
+                {/* Conditional Buttons for Actions */}
+                {adopteeChats.some(
+                  (chat) =>
+                    chat.chatId === selectedChat.chatId &&
+                    chat.status === "active" &&
+                    selectedChat.status !== "sent"
+                ) && (
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => openReviewDialog("delivered")}
+                    onClick={() => openReviewDialog("sent")}
+                    sx={{
+                      backgroundColor: "#64b5f6", // Light blue button
+                      transition: "background-color 0.3s, transform 0.3s",
+                      "&:hover": {
+                        backgroundColor: "#42a5f5", // Darker blue on hover
+                        transform: "translateY(-2px)",
+                      },
+                    }}
                   >
-                    Delivered
+                    Mark as Sent
                   </Button>
                 )}
 
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => handleStatusUpdate("passive")}
-              >
-                Cancel
-              </Button>
+                {adopterChats.some(
+                  (chat) => chat.chatId === selectedChat.chatId
+                ) &&
+                  selectedChat.status === "sent" && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => openReviewDialog("delivered")}
+                      sx={{
+                        backgroundColor: "#4caf50",
+                        transition: "background-color 0.3s, transform 0.3s",
+                        "&:hover": {
+                          backgroundColor: "#388e3c", // Darker green on hover
+                          transform: "translateY(-2px)",
+                        },
+                      }}
+                    >
+                      Mark as Delivered
+                    </Button>
+                  )}
 
-              {/* Block Button (Only for Adoptees) */}
-              {isAdoptee && (
-                <Tooltip title="Block User">
-                  <IconButton
-                    color="error"
-                    onClick={handleBlockUser}
-                    sx={{ marginLeft: 2 }}
-                  >
-                    <BlockIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleStatusUpdate("passive")}
+                  sx={{
+                    backgroundColor: "#e57373",
+                    transition: "background-color 0.3s, transform 0.3s",
+                    "&:hover": {
+                      backgroundColor: "#ef5350", // Darker red on hover
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                >
+                  Cancel
+                </Button>
+
+                {/* Block Button (Only for Adoptees) */}
+                {isAdoptee && (
+                  <Tooltip title="Block User" placement="top">
+                    <IconButton
+                      sx={{
+                        color: "#f44336", // Red icon
+                        transition: "color 0.3s, transform 0.3s",
+                        "&:hover": {
+                          color: "#d32f2f", // Darker red on hover
+                          transform: "rotate(90deg)",
+                        },
+                      }}
+                      onClick={handleBlockUser}
+                    >
+                      <BlockIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
             </Box>
 
             <Box
@@ -433,8 +558,9 @@ const Communication = () => {
                 flex: 1,
                 overflowY: "auto",
                 padding: 2,
-                backgroundColor: "#f5f5f5",
-                minHeight: "50vh",
+                backgroundColor: "#f5f5f5", // Soft background color for contrast
+                minHeight: "40vh",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.05)", // Adds subtle shadow for depth
               }}
             >
               {messages.map((message) => (
@@ -447,32 +573,47 @@ const Communication = () => {
                         ? "flex-end"
                         : "flex-start",
                     marginBottom: 1,
+                    padding: "0.5rem", // Adds more space around each message
                   }}
                 >
                   <Paper
+                    elevation={2} // Adds depth with shadow
                     sx={{
-                      padding: 1,
+                      padding: "0.8rem", // Generous padding for better readability
                       maxWidth: "60%",
                       backgroundColor:
                         message.senderId === currentUser._id
-                          ? senderColor
-                          : receiverColor,
-                      borderRadius: 2,
+                          ? "#e3f2fd"
+                          : "white", // Different colors for sender and receiver
+                      borderRadius: "12px", // Soft rounded corners for a modern look
                       position: "relative",
                     }}
                   >
-                    <Typography variant="body2">{message.content}</Typography>
-                    {message.timestamp && (
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        wordWrap: "break-word",
+                        fontSize: "16px",
+                      }}
+                    >
+                      {message.content}
+                    </Typography>
+                    {message.createdAt && (
                       <Typography
                         variant="caption"
                         sx={{
-                          position: "absolute",
-                          bottom: 2,
-                          right: 8,
+                          display: "block", // Makes the timestamp a block element to ensure it sits on its own line
+                          marginTop: "4px", // Adds space above the timestamp
                           color: "gray",
+                          fontSize: "0.75rem", // Smaller text for timestamp to make it less obtrusive
+                          textAlign: "right", // Aligns the timestamp to the right
                         }}
                       >
-                        {new Date(message.timestamp).toLocaleTimeString()}
+                        {new Date(message.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
                       </Typography>
                     )}
                   </Paper>
@@ -482,13 +623,13 @@ const Communication = () => {
 
             <Box
               sx={{
-                borderTop: "1px solid #ddd",
+                borderTop: "1px solid #e0e0e0", // Lighter and softer border color
                 padding: 2,
                 display: "flex",
                 alignItems: "center",
                 gap: 2,
                 maxHeight: "auto",
-                backgroundColor: "#f5f5f5",
+                backgroundColor: "white",
               }}
             >
               <TextField
@@ -499,6 +640,20 @@ const Communication = () => {
                 variant="outlined"
                 multiline
                 maxRows={4}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "8px", // Rounded corners for a modern look
+                    "& fieldset": {
+                      borderColor: "#ccc", // Lighter border color for the text field
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#b0bec5", // Hover effect with a slightly darker border
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#64b5f6", // Highlight color when the text field is focused
+                    },
+                  },
+                }}
                 onKeyPress={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -510,7 +665,25 @@ const Communication = () => {
                 onClick={handleSendMessage}
                 variant="contained"
                 color="primary"
-                sx={{ height: "fit-content" }}
+                sx={{
+                  height: "fit-content",
+                  px: 3, // Horizontal padding for a wider button appearance
+                  py: 1, // Vertical padding to increase the height slightly
+                  borderRadius: "8px", // Rounded corners for a modern look
+                  boxShadow: "0 3px 5px rgba(0,0,0,0.2)", // Updated shadow for a subtle lift effect
+                  textTransform: "none", // Prevent uppercase transform to keep text styling neutral
+                  fontSize: "1rem", // Larger font size for better readability
+                  fontWeight: "medium", // Medium weight for button text
+                  letterSpacing: "0.5px", // Slightly spaced characters for better readability
+                  transition: "background-color 0.2s, box-shadow 0.2s", // Smooth transitions for background and shadow
+                  "&:hover": {
+                    backgroundColor: "#1976d2", // Slightly darker shade on hover for the button
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.25)", // Deeper shadow on hover for a "lifted" effect
+                  },
+                  "&:active": {
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.2)", // Less pronounced shadow when the button is clicked
+                  },
+                }}
               >
                 Send
               </Button>
@@ -522,31 +695,82 @@ const Communication = () => {
           </Typography>
         )}
       </Box>
+
       <Dialog
         open={reviewDialogOpen}
         onClose={() => setReviewDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth={true}
+        sx={{
+          "& .MuiDialog-paper": {
+            // Styling the dialog box itself
+            borderRadius: "8px", // Rounded corners for a softer appearance
+            padding: "19px", // Padding around the dialog content
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)", // More pronounced shadow for a pop-out effect
+          },
+        }}
       >
-        <DialogTitle>Write a Review</DialogTitle>
+        <DialogTitle sx={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+          Write a Review
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             multiline
-            rows={4}
+            rows={5}
             fullWidth
             variant="outlined"
             placeholder="Write your review here (max 200 words)"
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
-            inputProps={{ maxLength: 200 }}
+            inputProps={{ maxLength: 300 }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "8px", // Matching rounded corners
+                "& fieldset": {
+                  borderColor: "#ccc", // Neutral, soft border color
+                },
+                "&:hover fieldset": {
+                  borderColor: "#b0bec5", // Slightly darker on hover
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#64b5f6", // Highlight color when focused
+                },
+              },
+            }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setReviewDialogOpen(false)}>Cancel</Button>
-          <Button onClick={submitReview} variant="contained" color="primary">
+
+        <DialogActions
+          sx={{ justifyContent: "space-between", padding: "8px 16px" }}
+        >
+          <Button
+            onClick={() => setReviewDialogOpen(false)}
+            sx={{
+              color: "grey", // Subtle color for cancel to de-emphasize
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.04)", // Very light grey on hover for minimal interaction feedback
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={submitReview}
+            variant="contained"
+            color="primary"
+            sx={{
+              boxShadow: "0 2px 4px rgba(0,0,0,0.2)", // Shadow for depth
+              "&:hover": {
+                backgroundColor: "#1976d2", // A darker blue on hover for better feedback
+              },
+            }}
+          >
             Submit
           </Button>
         </DialogActions>
       </Dialog>
+
       <ProfileModal
         open={profileModalOpen}
         onClose={handleCloseProfile}
