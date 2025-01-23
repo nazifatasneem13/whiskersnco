@@ -17,7 +17,8 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
-import BlockIcon from "@mui/icons-material/Block"; // Import Block Icon
+import BlockIcon from "@mui/icons-material/Block";
+import CloseOutlinedIcon from "@mui/icons-material/Close";
 import ProfileModal from "./ProfileModal";
 import ArchivedChats from "./ArchivedChats";
 import axios from "axios";
@@ -30,11 +31,21 @@ const Communication = () => {
 
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-  // Define color constants
-  const senderColor = "#DCF8C6"; // Light green for sent messages
-  const receiverColor = "#FFFFFF"; // White for received messages
-  const adopterColor = "#3f51b5"; // Blue for Adopter
-  const adopteeColor = "#f50057"; // Pink for Adoptee
+  const [isChatOpen, setIsChatOpen] = useState(false); // New state for chat open/close
+
+  // ... (other functions)
+
+  // Handle selecting a chat
+  const handleChatSelect = (chat) => {
+    setSelectedChat(chat);
+    setIsChatOpen(true); // Open the chat when selected
+  };
+
+  // Handle closing the chat
+  const handleCloseChat = () => {
+    setSelectedChat(null);
+    setIsChatOpen(false);
+  };
 
   //review
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
@@ -150,11 +161,6 @@ const Communication = () => {
     // Cleanup interval on component unmount or selectedChat change
     return () => clearInterval(intervalId);
   }, [fetchChatsAndMessages]);
-
-  // Handle selecting a chat
-  const handleChatSelect = (chat) => {
-    setSelectedChat(chat);
-  };
 
   // Handle sending a message
   const handleSendMessage = async () => {
@@ -430,6 +436,8 @@ const Communication = () => {
                 </Typography>
                 <Box
                   sx={{
+                    display: "flex",
+                    maxWidth: "30%",
                     width: 15,
                     height: 15,
                     borderRadius: "50%",
@@ -458,7 +466,7 @@ const Communication = () => {
                 sx={{
                   flexGrow: 1, // Allows this box to grow more than the email/status box
                   p: 2,
-
+                  maxWidth: "40%",
                   borderRadius: 4,
 
                   display: "flex",
@@ -550,6 +558,31 @@ const Communication = () => {
                     </IconButton>
                   </Tooltip>
                 )}
+              </Box>
+              <Box
+                variant="outlined"
+                sx={{
+                  flexGrow: 1, // Allows this box to grow more than the email/status box
+                  p: 2,
+
+                  borderRadius: 4,
+                  maxWidth: "07%",
+                  display: "10%",
+                  gap: 4,
+                  justifyContent: "right",
+                  backgroundColor: "#e3f2fd", // Light yellow background for container
+                  transition: "background-color 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "#bbdefb", // Darker shade of blue on hover
+                  },
+                }}
+              >
+                <Button
+                  onClick={handleCloseChat}
+                  sx={{ color: "gray", maxHeight: "flex" }}
+                >
+                  <CloseOutlinedIcon />
+                </Button>
               </Box>
             </Box>
 
