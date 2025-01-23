@@ -647,12 +647,24 @@ const TrainYourPet = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ maxWidth: 1400, margin: "0 auto", padding: 4 }}>
+      <Box
+        sx={{
+          maxWidth: 1400,
+          margin: "0 auto",
+          padding: 4,
+          fontFamily: "'Poppins', sans-serif", // Modern font family
+        }}
+      >
         <Typography
           variant="h4"
           fontWeight="bold"
           textAlign="center"
           marginBottom={3}
+          sx={{
+            color: "#19275c",
+            fontFamily: "'Poppins', sans-serif",
+            textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
+          }}
         >
           Generate Your Pet's Training Guide
         </Typography>
@@ -660,7 +672,27 @@ const TrainYourPet = () => {
         <Grid container spacing={4}>
           {/* Form Section */}
           <Grid item xs={12} md={6}>
-            <Box component="form" onSubmit={handleGenerateGuide} noValidate>
+            <Box
+              component="form"
+              onSubmit={handleGenerateGuide}
+              noValidate
+              sx={{
+                backgroundColor: "white",
+                padding: 4,
+                borderRadius: 4,
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                border: "1px solid #e0e0e0",
+              }}
+            >
+              <Typography
+                variant="h5"
+                fontWeight="bold"
+                textAlign="center"
+                gutterBottom
+                sx={{ color: "#19275c" }}
+              >
+                Create a New Guide
+              </Typography>
               <TextField
                 label="Pet Name"
                 fullWidth
@@ -669,6 +701,14 @@ const TrainYourPet = () => {
                 onChange={(e) => setPetName(e.target.value)}
                 margin="normal"
                 required
+                sx={{
+                  "& .MuiInputLabel-root": { color: "#19275c" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#19275c" },
+                    "&:hover fieldset": { borderColor: "#1b3a79" },
+                    "&.Mui-focused fieldset": { borderColor: "#1b3a79" },
+                  },
+                }}
               />
               <FormControl
                 fullWidth
@@ -676,7 +716,12 @@ const TrainYourPet = () => {
                 margin="normal"
                 required
               >
-                <InputLabel id="pet-type-label">Pet Type</InputLabel>
+                <InputLabel
+                  id="pet-type-label"
+                  sx={{ color: "#19275c", fontFamily: "'Poppins', sans-serif" }}
+                >
+                  Pet Type
+                </InputLabel>
                 <Select
                   labelId="pet-type-label"
                   value={type}
@@ -685,8 +730,14 @@ const TrainYourPet = () => {
                     setBreed(""); // Reset breed when type changes
                   }}
                   label="Pet Type"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#19275c" },
+                      "&:hover fieldset": { borderColor: "#1b3a79" },
+                      "&.Mui-focused fieldset": { borderColor: "#1b3a79" },
+                    },
+                  }}
                 >
-                  {/* Removed "All Types" MenuItem */}
                   {Object.keys(petData).map((typeOption) => (
                     <MenuItem key={typeOption} value={typeOption}>
                       {typeOption}
@@ -701,7 +752,10 @@ const TrainYourPet = () => {
                 required
                 disabled={!type}
               >
-                <InputLabel id="breed-label">
+                <InputLabel
+                  id="breed-label"
+                  sx={{ color: "#19275c", fontFamily: "'Poppins', sans-serif" }}
+                >
                   {type ? "Select Breed" : "Select Pet Type first"}
                 </InputLabel>
                 <Select
@@ -709,8 +763,14 @@ const TrainYourPet = () => {
                   value={breed}
                   onChange={(e) => setBreed(e.target.value)}
                   label={type ? "Select Breed" : "Select Pet Type first"}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#19275c" },
+                      "&:hover fieldset": { borderColor: "#1b3a79" },
+                      "&.Mui-focused fieldset": { borderColor: "#1b3a79" },
+                    },
+                  }}
                 >
-                  {/* Removed "All Breeds" MenuItem */}
                   {type &&
                     petData[type]?.map((b) => (
                       <MenuItem key={b} value={b}>
@@ -729,6 +789,14 @@ const TrainYourPet = () => {
                 margin="normal"
                 required
                 inputProps={{ min: 0 }}
+                sx={{
+                  "& .MuiInputLabel-root": { color: "#19275c" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#19275c" },
+                    "&:hover fieldset": { borderColor: "#1b3a79" },
+                    "&.Mui-focused fieldset": { borderColor: "#1b3a79" },
+                  },
+                }}
               />
               <Button
                 type="submit"
@@ -737,10 +805,11 @@ const TrainYourPet = () => {
                 sx={{
                   mt: 3,
                   mb: 2,
-                  backgroundColor: "#121858", // Midnight Blue
+                  background: "linear-gradient(90deg, #19275c, #1b3a79)",
                   color: "white",
+                  fontWeight: "bold",
                   "&:hover": {
-                    backgroundColor: "#0f144d",
+                    background: "linear-gradient(90deg, #1b3a79, #19275c)",
                   },
                 }}
                 disabled={loading}
@@ -750,13 +819,29 @@ const TrainYourPet = () => {
             </Box>
           </Grid>
 
-          {/* Calendar and Search, Filter, Sort Section */}
           <Grid item xs={12} md={6}>
             <Grid container spacing={2}>
               {/* Search, Filter, Sort Section */}
               <Grid item xs={12}>
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" fontWeight="bold" gutterBottom>
+                <Box
+                  sx={{
+                    mb: 3,
+                    backgroundColor: "#f9f9f9",
+                    padding: 3,
+                    borderRadius: 4,
+                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    gutterBottom
+                    sx={{
+                      color: "#19275c",
+                      textAlign: "center",
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
+                  >
                     Search & Manage Your Training Guides
                   </Typography>
                   <Grid container spacing={2} alignItems="center">
@@ -771,9 +856,18 @@ const TrainYourPet = () => {
                         InputProps={{
                           endAdornment: (
                             <InputAdornment position="end">
-                              <SearchIcon />
+                              <SearchIcon sx={{ color: "#19275c" }} />
                             </InputAdornment>
                           ),
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#19275c" },
+                            "&:hover fieldset": { borderColor: "#1b3a79" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#1b3a79",
+                            },
+                          },
                         }}
                       />
                     </Grid>
@@ -781,7 +875,13 @@ const TrainYourPet = () => {
                     {/* Filter by Type */}
                     <Grid item xs={6} sm={3}>
                       <FormControl fullWidth variant="outlined">
-                        <InputLabel id="filter-type-label">
+                        <InputLabel
+                          id="filter-type-label"
+                          sx={{
+                            color: "#19275c",
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
                           Filter by Type
                         </InputLabel>
                         <Select
@@ -792,8 +892,16 @@ const TrainYourPet = () => {
                             setFilterBreed(""); // Reset breed when filter type changes
                           }}
                           label="Filter by Type"
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              "& fieldset": { borderColor: "#19275c" },
+                              "&:hover fieldset": { borderColor: "#1b3a79" },
+                              "&.Mui-focused fieldset": {
+                                borderColor: "#1b3a79",
+                              },
+                            },
+                          }}
                         >
-                          {/* Removed "All Types" MenuItem */}
                           {Object.keys(petData).map((typeOption) => (
                             <MenuItem key={typeOption} value={typeOption}>
                               {typeOption}
@@ -809,8 +917,23 @@ const TrainYourPet = () => {
                         fullWidth
                         variant="outlined"
                         disabled={!filterType}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#19275c" },
+                            "&:hover fieldset": { borderColor: "#1b3a79" },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#1b3a79",
+                            },
+                          },
+                        }}
                       >
-                        <InputLabel id="filter-breed-label">
+                        <InputLabel
+                          id="filter-breed-label"
+                          sx={{
+                            color: "#19275c",
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
                           Filter by Breed
                         </InputLabel>
                         <Select
@@ -833,12 +956,29 @@ const TrainYourPet = () => {
                     {/* Sort Options */}
                     <Grid item xs={12} sm={6}>
                       <FormControl fullWidth variant="outlined">
-                        <InputLabel id="sort-label">Sort Guides</InputLabel>
+                        <InputLabel
+                          id="sort-label"
+                          sx={{
+                            color: "#19275c",
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          Sort Guides
+                        </InputLabel>
                         <Select
                           labelId="sort-label"
                           value={sortOption}
                           onChange={(e) => setSortOption(e.target.value)}
                           label="Sort Guides"
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              "& fieldset": { borderColor: "#19275c" },
+                              "&:hover fieldset": { borderColor: "#1b3a79" },
+                              "&.Mui-focused fieldset": {
+                                borderColor: "#1b3a79",
+                              },
+                            },
+                          }}
                         >
                           <MenuItem value="">
                             <em>No Sorting</em>
@@ -854,17 +994,36 @@ const TrainYourPet = () => {
                     {/* Reset Filters Button */}
                     <Grid item xs={12} sm={6}>
                       <Button
-                        variant="outlined"
-                        color="secondary"
-                        fullWidth
+                        variant="contained"
                         onClick={resetFilters}
+                        fullWidth
+                        sx={{
+                          background:
+                            "linear-gradient(90deg, #19275c, #1b3a79)",
+                          color: "white",
+                          fontWeight: "bold",
+                          "&:hover": {
+                            background:
+                              "linear-gradient(90deg, #1b3a79, #19275c)",
+                          },
+                        }}
                       >
                         Reset Filters
                       </Button>
                       <Button
                         variant="outlined"
                         onClick={() => setOpenArchivedGuides(true)}
-                        sx={{ mt: 3 }}
+                        fullWidth
+                        sx={{
+                          mt: 2,
+                          borderColor: "#19275c",
+                          color: "#19275c",
+                          fontWeight: "bold",
+                          "&:hover": {
+                            backgroundColor: "#f1f1f1",
+                            borderColor: "#1b3a79",
+                          },
+                        }}
                       >
                         See Archived Guides
                       </Button>
@@ -872,75 +1031,166 @@ const TrainYourPet = () => {
                   </Grid>
                 </Box>
 
-                {/* Training Guides Display */}
-                <Box sx={{ maxHeight: 400, overflowY: "auto" }}>
+                <Box
+                  sx={{
+                    maxHeight: 400,
+                    overflowY: "auto",
+                    padding: 2,
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: 4,
+                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
                   {loading ? (
                     <Box
                       sx={{
                         display: "flex",
                         justifyContent: "center",
-                        mt: 4,
+                        alignItems: "center",
+                        height: "100%",
                       }}
                     >
-                      <CircularProgress />
+                      <CircularProgress sx={{ color: "#19275c" }} />
                     </Box>
                   ) : filteredGuides.length === 0 ? (
-                    <Typography variant="body1" color="textSecondary">
+                    <Typography
+                      variant="body1"
+                      color="textSecondary"
+                      sx={{
+                        textAlign: "center",
+                        fontFamily: "'Poppins', sans-serif",
+                        color: "#19275c",
+                        padding: 2,
+                      }}
+                    >
                       No guides available. Generate a guide to get started!
                     </Typography>
                   ) : (
                     <Grid container spacing={2}>
                       {filteredGuides.map((guide) => (
                         <Grid item xs={12} sm={6} md={4} key={guide.trainId}>
-                          <Card>
-                            <CardContent>
-                              <Typography variant="h6" fontWeight="bold">
+                          <Card
+                            sx={{
+                              borderRadius: 4,
+                              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                              transition: "transform 0.2s, box-shadow 0.2s",
+                              "&:hover": {
+                                transform: "scale(1.02)",
+                                boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.2)",
+                              },
+                            }}
+                          >
+                            <CardContent
+                              sx={{
+                                padding: 3,
+                                textAlign: "center",
+                                backgroundColor: "#ffffff",
+                                borderBottom: "2px solid #19275c",
+                              }}
+                            >
+                              <Typography
+                                variant="h6"
+                                fontWeight="bold"
+                                sx={{
+                                  color: "#19275c",
+                                  fontFamily: "'Poppins', sans-serif",
+                                }}
+                              >
                                 {guide.petName} ({guide.type})
                               </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                Breed: {guide.breed}
+                              <Typography
+                                variant="body2"
+                                color="textSecondary"
+                                sx={{
+                                  marginY: 1,
+                                  fontFamily: "'Poppins', sans-serif",
+                                }}
+                              >
+                                <strong>Breed:</strong> {guide.breed}
                               </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                Age: {guide.age} months
+                              <Typography
+                                variant="body2"
+                                color="textSecondary"
+                                sx={{
+                                  fontFamily: "'Poppins', sans-serif",
+                                  marginBottom: 1,
+                                }}
+                              >
+                                <strong>Age:</strong> {guide.age} months
                               </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                Generated on:{" "}
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontFamily: "'Poppins', sans-serif",
+                                  color: "#707070",
+                                }}
+                              >
+                                <strong>Generated on:</strong>{" "}
                                 {dayjs(guide.createdAt).format("MM/DD/YYYY")}
                               </Typography>
                             </CardContent>
-                            <CardActions>
+                            <CardActions
+                              sx={{
+                                justifyContent: "center",
+                                padding: 2,
+                              }}
+                            >
                               <Tooltip title="View Training Guide">
                                 <IconButton
-                                  size="small"
+                                  size="medium"
                                   onClick={() => handleSelectGuide(guide)}
-                                  color="primary"
+                                  sx={{
+                                    color: "#19275c",
+                                    "&:hover": {
+                                      backgroundColor: "#e3e7f1",
+                                      color: "#1b3a79",
+                                    },
+                                  }}
                                 >
                                   <Info />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title="Export as PDF">
                                 <IconButton
-                                  size="small"
+                                  size="medium"
                                   onClick={() => exportGuideAsPDF(guide)}
-                                  color="secondary"
+                                  sx={{
+                                    color: "#19275c",
+                                    "&:hover": {
+                                      backgroundColor: "#e3e7f1",
+                                      color: "#1b3a79",
+                                    },
+                                  }}
                                 >
                                   <DownloadIcon />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title="Delete Training Guide">
                                 <IconButton
-                                  size="small"
+                                  size="medium"
                                   onClick={() => handleDeleteGuide(guide._id)}
-                                  color="error"
+                                  sx={{
+                                    color: "#e53935",
+                                    "&:hover": {
+                                      backgroundColor: "#fdecea",
+                                      color: "#c62828",
+                                    },
+                                  }}
                                 >
                                   <Delete />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title="Track Progress">
                                 <IconButton
-                                  size="small"
+                                  size="medium"
                                   onClick={() => openTracker(guide)}
-                                  color="success"
+                                  sx={{
+                                    color: "#43a047",
+                                    "&:hover": {
+                                      backgroundColor: "#e8f5e9",
+                                      color: "#388e3c",
+                                    },
+                                  }}
                                 >
                                   <TrackChangesIcon />
                                 </IconButton>
