@@ -1,24 +1,46 @@
 import React from "react";
-import "./MessageModal.scss";
+import PropTypes from "prop-types";
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 
 const MessageModal = ({ isOpen, onClose, close, message }) => {
-  if (!isOpen) return null;
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <p>{message}</p>
-        <div className="modal-button-container">
-          <button onClick={onClose} className="modal-button">
-            Go to login
-          </button>
-          <button onClick={close} className="modal-button">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      fullScreen={fullScreen}
+      aria-labelledby="message-dialog-title"
+      aria-describedby="message-dialog-description"
+    >
+      <DialogContent>
+        <Typography id="message-dialog-description" variant="body1">
+          {message}
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="primary" variant="contained">
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
+};
+
+MessageModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  close: PropTypes.func.isRequired,
+  message: PropTypes.string.isRequired,
 };
 
 export default MessageModal;

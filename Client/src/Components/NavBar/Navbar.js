@@ -9,8 +9,9 @@ import {
   Typography,
   Badge,
   IconButton,
+  Tooltip,
 } from "@mui/material";
-import { Notifications } from "@mui/icons-material";
+import { Notifications, Chat } from "@mui/icons-material";
 import NotificationsPage from "../NotificationPanel/NotificationsPage";
 import MessageModal from "../MessageModal/MessageModal";
 import logo from "./images/logo.jpeg";
@@ -139,15 +140,18 @@ const Navbar = ({ title, children }) => {
           {/* Logo */}
           <Box display="flex" alignItems="center" gap={2}>
             <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <img
-                  src={logo}
-                  alt="Logo"
-                  style={{ width: "40px", borderRadius: "50%" }}
-                />
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={1}
+                sx={{ marginLeft: "50px" }}
+              >
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: "bold", fontSize: "20px" }}
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "20px",
+                  }}
                 >
                   {title || "Whiskers-n-Co"}
                 </Typography>
@@ -160,12 +164,10 @@ const Navbar = ({ title, children }) => {
             {[
               { label: "Home", path: "/" },
               { label: "Services", path: "/services" },
-              { label: "Pets", path: "/pets" },
-              { label: "Find Vets", path: "/nearby-vets" },
-              { label: "Train", path: "/trainpets" },
-              { label: "Contact", path: "/contact" },
+
               { label: "Chats", path: "/communication" },
               { label: "News", path: "/news" },
+              { label: "Contact", path: "/contact" },
             ].map((link) => (
               <Button
                 key={link.path}
@@ -183,7 +185,16 @@ const Navbar = ({ title, children }) => {
                   },
                 }}
                 onClick={() =>
-                  link.path === "/services" || link.path === "/pets"
+                  link.path === "/services" ||
+                  link.path === "/pets" ||
+                  link.path === "/nearby-vets" ||
+                  link.path === "/news" ||
+                  link.path === "/communication" ||
+                  link.path === "/profile" ||
+                  link.path === "/trainpets" ||
+                  link.path === "/nearby-vets" ||
+                  link.path === "/wishlist" ||
+                  link.path === "/post-pet"
                     ? handleRestrictedNavigation(link.path)
                     : navigate(link.path)
                 }
@@ -208,19 +219,6 @@ const Navbar = ({ title, children }) => {
                   }}
                   onClick={() => navigate("/profile")}
                 />
-                <Button
-                  variant="text"
-                  sx={{
-                    color: "#000",
-                    textTransform: "capitalize",
-                    "&:hover": {
-                      backgroundColor: "#f5f5f5",
-                    },
-                  }}
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
               </>
             ) : (
               <Button
@@ -239,6 +237,12 @@ const Navbar = ({ title, children }) => {
                 Login
               </Button>
             )}
+            <Tooltip title="Chats">
+              <IconButton onClick={() => navigate("/communication")}>
+                <Chat />
+              </IconButton>
+            </Tooltip>
+
             {/* Notification Icon */}
             <IconButton onClick={handleToggleNotifications}>
               <Badge badgeContent={unreadCount} color="error">

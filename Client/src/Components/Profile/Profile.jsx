@@ -32,7 +32,7 @@ import HomeIcon from "@mui/icons-material/Home";
 
 import { Delete, Settings } from "@mui/icons-material";
 import axios from "axios";
-import upload from "../utils/upload.js";
+import upload from "../../utils/upload.js";
 //import fetchUserProfile from "../utils/fetchUserProfile";
 
 const Profile = () => {

@@ -1,8 +1,9 @@
-// App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Navbar from "./Components/NavBar/Navbar";
-import Profile from "./Components/Profile.jsx";
+import Profile from "./Components/Profile/Profile.jsx";
+import Wishlist from "./Components/Profile/wishlist.js";
+import MyPets from "./Components/Profile/mypets.js";
 import NewsPage from "./Components/NewsPage/NewsPage.js";
 import Home from "./Components/Home/Home";
 import Login from "./Pages/login/Login.jsx";
@@ -22,30 +23,48 @@ import CommunicationPage from "./Components/Communication/Communication";
 import ChatbotPage from "./Components/ChatbotLoader";
 import { Box, Fab } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
+import Sidebar from "./Components/NavBar/Sidebar"; // Import Sidebar
 import "./App.css";
 
-// Your Layout component
-const Layout = ({ children }) => (
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      minHeight: "100vh",
-    }}
-  >
-    <Navbar title="Whiskers-n-Co" />
-    <Box component="main" sx={{ flex: 1, padding: "1rem" }}>
-      {children}
+// Layout Component that includes Navbar, Sidebar, and Footer
+const Layout = ({ children }) => {
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      {/* Sidebar - Fixed to the left and above Navbar */}
+      <Sidebar />
+
+      {/* Navbar - Fixed at the top, but will be behind the sidebar */}
+      <Navbar title="Whiskers-n-Co" />
+
+      <Box sx={{ display: "flex", flex: 1 }}>
+        {/* Main Content Area */}
+        <Box
+          component="main"
+          sx={{
+            flex: 1,
+            padding: "1rem",
+
+            transition: "margin-left 0.3s",
+            "@media (max-width: 768px)": {
+              marginLeft: "0", // Sidebar disappears for smaller screens
+            },
+          }}
+        >
+          {children}
+        </Box>
+      </Box>
+
+      {/* Footer - Fixed at the bottom */}
+      <Footer title="Whiskers-n-Co" />
     </Box>
-    <Footer title="Whiskers-n-Co" />
-  </Box>
-);
+  );
+};
 
 const App = () => {
   return (
     <Router>
-      {/* Define all your routes */}
       <Routes>
+        {/* Define Routes */}
         <Route
           path="/"
           element={
@@ -160,6 +179,22 @@ const App = () => {
           }
         />
         <Route
+          path="/wishlist"
+          element={
+            <Layout>
+              <Wishlist />
+            </Layout>
+          }
+        />
+        <Route
+          path="/mypets"
+          element={
+            <Layout>
+              <MyPets />
+            </Layout>
+          }
+        />
+        <Route
           path="/communication"
           element={
             <Layout>
@@ -167,8 +202,6 @@ const App = () => {
             </Layout>
           }
         />
-
-        {/* NEW: The Chatbot route */}
         <Route
           path="/chatbot"
           element={
