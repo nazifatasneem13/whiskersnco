@@ -223,17 +223,18 @@ const NearbyVets = () => {
         <Tooltip title="Current Location" arrow>
           <Button
             variant="contained"
-            startIcon={<MyLocation />}
             onClick={handleGetCurrentLocation}
             sx={{
-              backgroundColor: "#1e88e5",
+              backgroundColor: "#1a237e",
               color: "#fff",
               paddingX: 2,
               paddingY: 1.5,
               "&:hover": { backgroundColor: "#1565c0" },
               width: { xs: "100%", sm: "auto" },
             }}
-          ></Button>
+          >
+            <MyLocation />
+          </Button>
         </Tooltip>
         <Button
           variant="contained"
@@ -244,7 +245,7 @@ const NearbyVets = () => {
             color: "#fff",
             paddingX: 4,
             paddingY: 1.5,
-            "&:hover": { backgroundColor: "#3949ab" },
+            "&:hover": { backgroundColor: "#1565c0" },
             width: { xs: "100%", sm: "auto" },
           }}
         >
