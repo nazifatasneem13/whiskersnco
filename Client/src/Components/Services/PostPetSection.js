@@ -314,7 +314,6 @@ const PostPetSection = () => {
                   variant="contained"
                   component="label"
                   fullWidth
-                  startIcon={<PhotoCamera />}
                   sx={{
                     mb: 2,
                     backgroundColor: "#121858",
@@ -327,6 +326,7 @@ const PostPetSection = () => {
                     accept="image/*"
                     onChange={handleFileChange}
                   />
+                  <PhotoCamera />
                 </Button>
               </Tooltip>
               {(type === "Dog" || type === "Cat") && (
