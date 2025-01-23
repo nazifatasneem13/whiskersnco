@@ -165,6 +165,7 @@ const Navbar = ({ title, children }) => {
               { label: "Train", path: "/trainpets" },
               { label: "Contact", path: "/contact" },
               { label: "Chats", path: "/communication" },
+              { label: "News", path: "/news" },
             ].map((link) => (
               <Button
                 key={link.path}
