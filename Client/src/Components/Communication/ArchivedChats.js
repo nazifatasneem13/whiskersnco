@@ -91,7 +91,7 @@ const ArchivedChats = ({ open, onClose }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Archived Chats</DialogTitle>
       <DialogContent>
         {adopterChats.length === 0 && adopteeChats.length === 0 ? (
@@ -189,9 +189,6 @@ const ArchivedChats = ({ open, onClose }) => {
                   }}
                 >
                   <Typography variant="body2">{message.content}</Typography>
-                  <Typography variant="caption" color="gray">
-                    {new Date(message.timestamp).toLocaleTimeString()}
-                  </Typography>
                 </Paper>
               </Box>
             ))}
