@@ -11,6 +11,8 @@ import {
   TextareaAutosize,
   CircularProgress,
   Grid,
+  Snackbar, // Imported Snackbar
+  Alert, // Imported Alert
 } from "@mui/material";
 import {
   PhotoCamera,
@@ -36,6 +38,11 @@ const PostPetSection = () => {
   const [fileName, setFileName] = useState("");
   const [formError, setFormError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  }); // Snackbar state
 
   const divisions = [
     "Barishal",
@@ -65,7 +72,11 @@ const PostPetSection = () => {
 
   const handlePredictBreed = async () => {
     if (!picture || type === "None") {
-      alert("Please upload a picture and select a pet type!");
+      setSnackbar({
+        open: true,
+        message: "Please upload a picture and select a pet type!",
+        severity: "warning",
+      });
       return;
     }
 
@@ -85,9 +96,18 @@ const PostPetSection = () => {
 
       const data = await response.json();
       setBreed(data.breed);
+      setSnackbar({
+        open: true,
+        message: `Breed predicted: ${data.breed}`,
+        severity: "success",
+      });
     } catch (error) {
       console.error("Error predicting breed:", error);
-      alert("Error predicting breed. Please try again.");
+      setSnackbar({
+        open: true,
+        message: "Error predicting breed. Please try again.",
+        severity: "error",
+      });
     }
   };
 
@@ -106,6 +126,11 @@ const PostPetSection = () => {
       type === "None"
     ) {
       setFormError(true);
+      setSnackbar({
+        open: true,
+        message: "Please fill out all fields correctly.",
+        severity: "error",
+      });
       return;
     }
 
@@ -137,8 +162,14 @@ const PostPetSection = () => {
       }
 
       console.log("Form submitted successfully");
-      alert("Application Submitted; we'll get in touch with you soon.");
+      setSnackbar({
+        open: true,
+        message:
+          "Application submitted successfully! We'll get in touch with you soon.",
+        severity: "success",
+      });
 
+      // Reset form fields
       setFormError(false);
       setName("");
       setAge("");
@@ -151,9 +182,21 @@ const PostPetSection = () => {
       setFileName("");
     } catch (error) {
       console.error("Error submitting form:", error);
+      setSnackbar({
+        open: true,
+        message: "Error submitting form. Please try again.",
+        severity: "error",
+      });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -229,6 +272,7 @@ const PostPetSection = () => {
               <Select
                 value={division}
                 onChange={(e) => setDivision(e.target.value)}
+                label="Division"
               >
                 <MenuItem value="None">Select Division</MenuItem>
                 {divisions.map((div, index) => (
@@ -241,7 +285,11 @@ const PostPetSection = () => {
 
             <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel>Type</InputLabel>
-              <Select value={type} onChange={(e) => setType(e.target.value)}>
+              <Select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                label="Type"
+              >
                 <MenuItem value="None">Select Type</MenuItem>
                 <MenuItem value="Dog">Dog</MenuItem>
                 <MenuItem value="Cat">Cat</MenuItem>
@@ -290,6 +338,7 @@ const PostPetSection = () => {
                 fullWidth
                 onClick={handlePredictBreed}
                 disabled={!picture || type === "None"}
+                sx={{ mt: 1 }}
               >
                 Predict Breed
               </Button>
@@ -312,6 +361,7 @@ const PostPetSection = () => {
                 borderRadius: "5px",
                 borderColor: "#ccc",
                 marginBottom: "1rem",
+                resize: "vertical",
               }}
             />
 
@@ -368,6 +418,22 @@ const PostPetSection = () => {
           </Grid>
         </Grid>
       </form>
+
+      {/* Snackbar Notification */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
