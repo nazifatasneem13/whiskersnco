@@ -326,7 +326,7 @@ const Profile = () => {
       <Tabs value={activeTab} onChange={handleTabChange} centered>
         <Tab label="User Details" />
         <Tab label="Wishlist" />
-        <Tab label="Blocked" />
+        <Tab label="Block List" />
         <Tab label="My Pets" />
         <Tab label="My Reviews" />
       </Tabs>
@@ -636,6 +636,7 @@ const Profile = () => {
                   <Card>
                     <CardContent>
                       <Typography variant="h6">
+                        <b>Pet Name: </b>
                         {review.petId?.name || "Unknown Pet"}
                       </Typography>
                       <Typography variant="body2">
