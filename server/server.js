@@ -15,6 +15,7 @@ const profilerouter = require("./Routes/profileroute.js");
 const msgRouter = require("./Routes/MessageRoutes");
 const trainRoute = require("./Routes/TrainRoute");
 const notifyroutes = require("./Routes/notifyroutes");
+const newsRoutes = require("./Routes/newsRoute.js");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const path = require("path");
@@ -56,6 +57,7 @@ app.use("/wishlist", wishlistRouter);
 app.use("/profile", profilerouter);
 app.use("/chats", communicationRouter);
 app.use("/messages", msgRouter);
+app.use("/api", newsRoutes);
 app.use("/notifications", notifyroutes);
 // Database connection
 mongoose
