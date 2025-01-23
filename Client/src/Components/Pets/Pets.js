@@ -183,32 +183,49 @@ const Pets = () => {
       <Typography
         variant="h4"
         textAlign="center"
-        marginBottom={3}
-        sx={{ fontWeight: "bold" }}
+        marginBottom={4}
+        sx={{
+          fontWeight: "bold",
+          color: "#19275c",
+          textShadow: "1px 1px 2px rgba(0, 0, 0, 0.3)",
+        }}
       >
         Available Pets
       </Typography>
+
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          marginBottom: 4,
+          marginBottom: 5,
           flexWrap: "wrap",
-          gap: 2,
+          gap: 3,
+          padding: 3,
+          backgroundColor: "#f9f9f9",
+          borderRadius: 4,
         }}
       >
         {/* General Filter */}
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>Pet Type</InputLabel>
+        <FormControl sx={{ minWidth: 220 }}>
+          <InputLabel sx={{ color: "#19275c" }}>Pet Type</InputLabel>
           <Select
             value={generalFilter}
             onChange={(event) => {
               setGeneralFilter(event.target.value);
-              // Optionally, reset search term when general filter changes
-              setSearchTerm("");
+              setSearchTerm(""); // Reset search term when general filter changes
             }}
             label="Pet Type"
+            sx={{
+              borderColor: "#19275c",
+              ".MuiOutlinedInput-notchedOutline": { borderColor: "#19275c" },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#1b3a79",
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#1b3a79",
+              },
+            }}
           >
             <MenuItem value="all">All Pets</MenuItem>
             <MenuItem value="Dog">Dog</MenuItem>
@@ -226,9 +243,9 @@ const Pets = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end",
-            gap: 2,
+            gap: 3,
             flexGrow: 1,
-            minWidth: 300,
+            minWidth: 320,
           }}
         >
           <TextField
@@ -242,7 +259,15 @@ const Pets = () => {
             }}
             variant="outlined"
             fullWidth
-            sx={{ maxWidth: 600 }}
+            sx={{
+              maxWidth: 600,
+              borderColor: "#19275c",
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#19275c" },
+                "&:hover fieldset": { borderColor: "#1b3a79" },
+                "&.Mui-focused fieldset": { borderColor: "#1b3a79" },
+              },
+            }}
           />
 
           <Box
@@ -254,16 +279,27 @@ const Pets = () => {
             }}
           >
             {/* Predict-specific Filter */}
-            <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel>Predict Pet Type</InputLabel>
+            <FormControl sx={{ minWidth: 220 }}>
+              <InputLabel sx={{ color: "#19275c" }}>
+                Predict Pet Type
+              </InputLabel>
               <Select
                 value={predictFilter}
                 onChange={(event) => {
                   setPredictFilter(event.target.value);
-                  // Optionally, reset search term when predict filter changes
-                  // setSearchTerm("");
                 }}
                 label="Predict Pet Type"
+                sx={{
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#19275c",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#1b3a79",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#1b3a79",
+                  },
+                }}
               >
                 <MenuItem value="all">All Pets</MenuItem>
                 <MenuItem value="Dog">Dog</MenuItem>
@@ -277,7 +313,15 @@ const Pets = () => {
               color="primary"
               component="label"
               startIcon={<PhotoCamera />}
-              onClick={clearSearchOnInteraction}
+              sx={{
+                borderColor: "#19275c",
+                color: "#19275c",
+                fontWeight: "bold",
+                "&:hover": {
+                  backgroundColor: "#f0f4ff",
+                  borderColor: "#1b3a79",
+                },
+              }}
             >
               Upload
               <input
@@ -292,9 +336,14 @@ const Pets = () => {
             <Button
               variant="contained"
               color="secondary"
-              onClick={() => {
-                handlePredictBreed();
-                clearSearchOnInteraction();
+              onClick={handlePredictBreed}
+              sx={{
+                background: "linear-gradient(90deg, #19275c, #1b3a79)",
+                color: "white",
+                fontWeight: "bold",
+                "&:hover": {
+                  background: "linear-gradient(90deg, #1b3a79, #19275c)",
+                },
               }}
             >
               Find
@@ -304,9 +353,15 @@ const Pets = () => {
             <Button
               variant="outlined"
               color="error"
-              onClick={() => {
-                handleReset();
-                clearSearchOnInteraction();
+              onClick={handleReset}
+              sx={{
+                borderColor: "#e53935",
+                color: "#e53935",
+                fontWeight: "bold",
+                "&:hover": {
+                  backgroundColor: "#fdecea",
+                  borderColor: "#c62828",
+                },
               }}
             >
               Reset
@@ -320,17 +375,18 @@ const Pets = () => {
         <Paper
           elevation={3}
           sx={{
-            position: "fixed", // Changed from absolute to fixed
-            top: 100, // Adjusted top position to avoid overlapping with buttons
+            position: "fixed",
+            top: 100,
             right: 20,
-            width: 300,
-            padding: 2,
-            borderRadius: 2,
+            width: 320,
+            padding: 3,
+            borderRadius: 3,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             zIndex: 10,
-            backgroundColor: "#fff",
+            backgroundColor: "#ffffff",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
           }}
         >
           <Box sx={{ position: "relative", width: "100%" }}>
@@ -338,9 +394,14 @@ const Pets = () => {
               onClick={handleReset}
               sx={{
                 position: "absolute",
-                top: 0,
-                right: 0,
-                color: "red",
+                top: -10,
+                right: -10,
+                backgroundColor: "#ffffff",
+                boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.1)",
+                color: "#e53935",
+                "&:hover": {
+                  backgroundColor: "#fdecea",
+                },
               }}
             >
               <Close />
@@ -351,7 +412,10 @@ const Pets = () => {
             alt="Preview"
             style={{ maxWidth: "100%", borderRadius: 8 }}
           />
-          <Typography variant="body2" sx={{ marginTop: 1 }}>
+          <Typography
+            variant="body2"
+            sx={{ marginTop: 1, fontFamily: "'Poppins', sans-serif" }}
+          >
             {fileName}
           </Typography>
         </Paper>
@@ -369,7 +433,7 @@ const Pets = () => {
           </Typography>
         ) : filteredPets.length > 0 ? (
           filteredPets.map((petDetail, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid item xs={12} sm={6} md={4} key={index}>
               <PetsViewer pet={petDetail} />
             </Grid>
           ))
