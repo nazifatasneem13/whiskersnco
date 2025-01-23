@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import { Heart, HelpCircle, Home } from "lucide-react";
-import adoptPet from "./images/adoptPet.jpeg";
+import adoptPet from "./images/adoptPet.jpg";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -253,11 +253,19 @@ const AdoptSection = () => {
             size="large"
             onClick={scrollToTop}
             sx={{
-              padding: "10px 20px",
+              padding: "12px 30px", // increased padding for a bigger button
               fontWeight: "bold",
-              fontSize: "1rem",
-              backgroundColor: "#121858",
-              "&:hover": { backgroundColor: "#474f97" },
+              fontSize: "1.1rem", // slightly larger text
+              background: "linear-gradient(45deg, #121858 30%, #474f97 90%)", // gradient background
+              borderRadius: "50px", // fully rounded corners
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)", // subtle shadow
+              textTransform: "none", // keeps the text uncapitalized
+              transition: "all 0.3s ease", // smooth transition for hover effects
+              "&:hover": {
+                background: "linear-gradient(45deg, #474f97 30%, #121858 90%)", // hover gradient change
+                boxShadow: "0 6px 18px rgba(0, 0, 0, 0.2)", // stronger shadow on hover
+                transform: "scale(1.05)", // slight scale effect on hover
+              },
             }}
           >
             Find Your Perfect Pet
