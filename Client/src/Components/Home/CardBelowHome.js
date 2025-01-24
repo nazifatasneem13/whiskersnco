@@ -8,7 +8,7 @@ const CardBelowHome = () => {
     <Box
       sx={{
         backgroundColor: "rgb(20, 20, 81)",
-        width: "flex",
+        width: "80%",
         minheight: "50vh",
         margin: "auto",
         padding: "10px",

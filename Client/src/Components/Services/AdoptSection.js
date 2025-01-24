@@ -29,6 +29,7 @@ const AdoptSection = () => {
   return (
     <Box
       sx={{
+        marginLeft: "3%",
         maxWidth: "auto",
         margin: "2rem auto",
         padding: "2rem",

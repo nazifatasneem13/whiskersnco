@@ -12,6 +12,7 @@ const Contact = () => {
     <Container
       maxWidth="auto"
       sx={{
+        marginLeft: "2%",
         display: "flex",
         justifyContent: "space-between",
       }}

@@ -178,7 +178,8 @@ const Pets = () => {
         padding: 4,
         backgroundColor: "#f9f9f9",
         borderRadius: 2,
-        position: "relative", // Ensure preview is positioned correctly
+        maxWidth: "flex",
+        marginLeft: "2%",
       }}
     >
       <Typography

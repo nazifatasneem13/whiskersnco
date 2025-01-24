@@ -203,12 +203,14 @@ const PostPetSection = () => {
   return (
     <Box
       sx={{
+        ml: 2,
         backgroundColor: "#f9f9f9",
         padding: "2rem",
         borderRadius: "8px",
         boxShadow: 3,
-        maxWidth: "auto",
-        margin: "2rem auto",
+        maxWidth: "flex",
+        margin: "2rem",
+        maxHeight: "flex",
       }}
     >
       <Typography

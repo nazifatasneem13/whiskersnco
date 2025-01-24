@@ -276,7 +276,7 @@ const Profile = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5, mb: 20 }}>
+    <Container maxWidth="md" sx={{ mt: 5, mb: 5 }}>
       {/* Profile Header */}
       <Box
         sx={{
@@ -325,9 +325,9 @@ const Profile = () => {
       {/* Tabs */}
       <Tabs value={activeTab} onChange={handleTabChange} centered>
         <Tab label="User Details" />
-        <Tab label="Wishlist" />
+
         <Tab label="Block List" />
-        <Tab label="My Pets" />
+
         <Tab label="My Reviews" />
       </Tabs>
 
@@ -492,60 +492,6 @@ const Profile = () => {
       )}
 
       {activeTab === 1 && (
-        <Box>
-          {/* Wishlist Section */}
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            Wishlist
-          </Typography>
-          <Grid container spacing={3}>
-            {wishlist.length > 0 ? (
-              wishlist.map((pet) => (
-                <Grid item xs={12} sm={6} md={4} key={pet._id}>
-                  <Card>
-                    <CardMedia
-                      component="img"
-                      height="200"
-                      image={pet.filename}
-                      alt={pet.name}
-                    />
-                    <CardContent>
-                      <Typography variant="h6">{pet.name}</Typography>
-                      <Typography variant="body2">
-                        <b>Type:</b> {pet.type}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>Breed:</b> {pet.breed}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>Location:</b> {pet.area}
-                      </Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button
-                        startIcon={<Delete />}
-                        color="error"
-                        onClick={() => handleRemoveFromWishlist(pet._id)}
-                      >
-                        Remove
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))
-            ) : (
-              <Typography
-                variant="body1"
-                color="textSecondary"
-                sx={{ width: "100%", textAlign: "center", mt: 3 }}
-              >
-                No pets in your wishlist.
-              </Typography>
-            )}
-          </Grid>
-        </Box>
-      )}
-
-      {activeTab === 2 && (
         <Box sx={{ mt: 4 }}>
           <Typography variant="h5">Blocked Users</Typography>
           {error && <Typography color="error">{error}</Typography>}
@@ -575,50 +521,8 @@ const Profile = () => {
           />
         </Box>
       )}
-      {activeTab === 3 && (
-        <Box>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            My Pets
-          </Typography>
-          <Grid container spacing={3}>
-            {userPets.length > 0 ? (
-              userPets.map((pet) => (
-                <Grid item xs={12} sm={6} md={4} key={pet._id}>
-                  <Card>
-                    <CardMedia
-                      component="img"
-                      height="200"
-                      image={pet.filename}
-                      alt={pet.name}
-                    />
-                    <CardContent>
-                      <Typography variant="h6">{pet.name}</Typography>
-                      <Typography variant="body2">
-                        <b>Type:</b> {pet.type}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>Breed:</b> {pet.breed}
-                      </Typography>
-                      <Typography variant="body2">
-                        <b>Location:</b> {pet.area}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))
-            ) : (
-              <Typography
-                variant="body1"
-                color="textSecondary"
-                sx={{ width: "100%", textAlign: "center", mt: 3 }}
-              >
-                No pets found.
-              </Typography>
-            )}
-          </Grid>
-        </Box>
-      )}
-      {activeTab === 4 && (
+
+      {activeTab === 2 && (
         <Box sx={{ padding: 3 }}>
           <Typography
             variant="h5"
@@ -626,7 +530,6 @@ const Profile = () => {
             gutterBottom
             sx={{ mb: 2 }}
           >
-            {" "}
             My Reviews
           </Typography>
           <Grid container spacing={3}>

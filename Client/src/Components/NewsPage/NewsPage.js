@@ -74,7 +74,14 @@ const NewsPage = () => {
   }
 
   return (
-    <Box padding={5} sx={{ backgroundColor: "#f9f9f9", minHeight: "100vh" }}>
+    <Box
+      padding={5}
+      sx={{
+        display: "lg",
+        marginLeft: "2%",
+        backgroundColor: "#f9f9f9",
+      }}
+    >
       <Typography
         variant="h4"
         gutterBottom
@@ -87,8 +94,8 @@ const NewsPage = () => {
           <Grid item xs={12} sm={6} md={4} key={index}>
             <Card
               sx={{
-                height: "100%",
-                display: "flex",
+                height: "auto",
+                display: "lg",
                 borderRadius: 5,
                 flexDirection: "column",
                 boxShadow: 3,

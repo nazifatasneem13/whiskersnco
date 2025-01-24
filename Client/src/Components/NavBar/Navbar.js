@@ -165,7 +165,6 @@ const Navbar = ({ title, children }) => {
               { label: "Home", path: "/" },
               { label: "Services", path: "/services" },
 
-              { label: "Chats", path: "/communication" },
               { label: "News", path: "/news" },
               { label: "Contact", path: "/contact" },
             ].map((link) => (

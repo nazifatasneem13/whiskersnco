@@ -14,7 +14,27 @@ import upload from "../../utils/upload";
 import newRequest from "../../utils/newRequest";
 import { useNavigate } from "react-router-dom";
 import { auth, provider, signInWithPopup } from "../../firebase";
-
+import { styled } from "@mui/material";
+import cat from "./pets.jpeg";
+const CatMaskBox = styled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "100%",
+  backgroundColor: "#ffffff",
+  // The imported local image
+  WebkitMaskImage: `url(${cat})`,
+  WebkitMaskSize: "contain",
+  WebkitMaskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
+  maskImage: `url(${cat})`,
+  maskSize: "contain",
+  maskRepeat: "no-repeat",
+  maskPosition: "center",
+  // If the silhouette is black on white, we use luminance mode:
+  WebkitMaskMode: "luminance",
+  maskMode: "luminance",
+  // Blur the shape
+  filter: "blur(200px)",
+}));
 const theme = createTheme({
   palette: {
     primary: {
@@ -128,7 +148,7 @@ const Register = () => {
           >
             <TextField
               fullWidth
-              label="Full Name"
+              label="UserName"
               name="username"
               margin="normal"
               variant="outlined"
@@ -212,7 +232,7 @@ const Register = () => {
           item
           xs={12}
           md={6}
-          style={{
+          sx={{
             backgroundColor: "#121858",
             display: "flex",
             justifyContent: "center",
@@ -220,15 +240,8 @@ const Register = () => {
             position: "relative",
           }}
         >
-          <Box
-            style={{
-              width: 300,
-              height: 300,
-              backgroundColor: "#ffffff",
-              borderRadius: "50%",
-              filter: "blur(50px)",
-            }}
-          />
+          {/* Render the styled Box (cat mask) */}
+          <CatMaskBox />
         </Grid>
       </Grid>
     </ThemeProvider>

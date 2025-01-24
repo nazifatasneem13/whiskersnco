@@ -146,7 +146,25 @@ const Sidebar = ({ title }) => {
       </IconButton>
 
       {/* Top Section */}
-      <Box sx={{ paddingTop: "20px" }}>
+      <Box
+        sx={{
+          paddingTop: "20px",
+          overflowY: "auto", // Vertical scroll only when expanded
+          overflowX: "hidden", // No horizontal scroll
+          "&::-webkit-scrollbar": {
+            width: "8px", // Width of the scrollbar
+            backgroundColor: "#004d6d", // Midnight blue background of the scrollbar
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#fff", // White scrollbar thumb (the draggable part)
+            borderRadius: "4px", // Rounded edges for the thumb
+            border: "2px solid #004d6d", // Padding effect for thumb
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+            backgroundColor: "#e0e0e0", // Slightly lighter on hover
+          },
+        }}
+      >
         {currentUser && (
           <Box
             sx={{
