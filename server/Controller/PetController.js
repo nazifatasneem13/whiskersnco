@@ -8,6 +8,75 @@ const User = require("../Model/user.model");
 const sharp = require("sharp"); // For image preprocessing
 const tf = require("@tensorflow/tfjs-node");
 console.log(tf.version.tfjs);
+const { Groq } = require("groq-sdk");
+
+const multer = require("multer");
+
+const groqClient = new Groq({
+  apiKey: process.env.GROQ_API_PetType,
+  dangerouslyAllowBrowser: false, // Use server-side only
+});
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+const predictPetType = async (req, res) => {
+  try {
+    // Ensure the file (image) is uploaded
+    if (!req.file) {
+      return res.status(400).json({ error: "No image file provided" });
+    }
+
+    // Upload the image to Cloudinary (or another service)
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "pets",
+    });
+
+    const imageUrl = result.secure_url; // Get the URL of the uploaded image
+
+    // Call Groq for pet type classification
+    const groqResponse = await groqClient.chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "Choose an option(one word answer): What type of animal is it? Options:  Dog, Cat, Fish, Rabbit, Birds, Others",
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: imageUrl, // Provide the Cloudinary image URL here
+              },
+            },
+          ],
+        },
+      ],
+      model: "llama-3.2-90b-vision-preview",
+      temperature: 1,
+      max_completion_tokens: 1024,
+      top_p: 1,
+      stream: false,
+      stop: null,
+    });
+
+    // Extract the predicted pet type from the response
+    const predictedType = groqResponse.choices[0]?.message?.content?.trim();
+
+    if (!predictedType) {
+      return res.status(500).json({ error: "Error predicting pet type" });
+    }
+
+    // Send the predicted pet type back to the frontend
+    res.status(200).json({ type: predictedType });
+  } catch (error) {
+    console.error("Error predicting pet type:", error);
+    res
+      .status(500)
+      .json({ error: "Error predicting pet type. Please try again." });
+  }
+};
 
 // Define paths for model JSON files (TensorFlow.js format)
 const dogModelPath = path.join(__dirname, "../Model/Dog/model.json");
@@ -452,4 +521,5 @@ module.exports = {
   getPreferredPets,
   approveadoptRequest,
   allPetsDisplay,
+  predictPetType,
 };

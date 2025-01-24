@@ -11,8 +11,8 @@ import {
   TextareaAutosize,
   CircularProgress,
   Grid,
-  Snackbar, // Imported Snackbar
-  Alert, // Imported Alert
+  Snackbar,
+  Alert,
   Tooltip,
 } from "@mui/material";
 import {
@@ -23,7 +23,7 @@ import {
   Phone,
 } from "@mui/icons-material";
 import postPet from "./images/postpet.jpeg";
-
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 const PostPetSection = () => {
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const [name, setName] = useState("");
@@ -71,6 +71,69 @@ const PostPetSection = () => {
     }
   };
 
+  // Function to predict pet type using Groq
+  const handlePredictPetType = async () => {
+    if (!picture) {
+      setSnackbar({
+        open: true,
+        message: "Please upload an image first!",
+        severity: "warning",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", picture);
+
+    try {
+      const response = await fetch("http://localhost:4000/predict-pet-type", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to predict pet type");
+      }
+
+      const data = await response.json();
+      console.log("API response:", data);
+
+      const dropdownOptions = [
+        "Dog",
+        "Cat",
+        "Fish",
+        "Rabbit",
+        "Birds",
+        "Others",
+      ];
+      const matchedType = dropdownOptions.find((option) =>
+        data.type.toLowerCase().includes(option.toLowerCase())
+      );
+
+      if (matchedType) {
+        setType(matchedType); // Update the dropdown selection
+        setSnackbar({
+          open: true,
+          message: `Pet type predicted: ${matchedType}`,
+          severity: "success",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: `Prediction (${data.type}) does not match any dropdown option.`,
+          severity: "warning",
+        });
+      }
+    } catch (error) {
+      console.error("Error predicting pet type:", error);
+      setSnackbar({
+        open: true,
+        message: "Error predicting pet type. Please try again.",
+        severity: "error",
+      });
+    }
+  };
+
   const handlePredictBreed = async () => {
     if (!picture || (type !== "Dog" && type !== "Cat")) {
       setSnackbar({
@@ -111,6 +174,9 @@ const PostPetSection = () => {
       });
     }
   };
+  useEffect(() => {
+    console.log("Updated type:", type); // Log whenever `type` changes
+  }, [type]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -234,7 +300,6 @@ const PostPetSection = () => {
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <Grid container spacing={3}>
-          {/* Left Section */}
           <Grid item xs={12} md={6}>
             <TextField
               label="Pet Name"
@@ -285,32 +350,28 @@ const PostPetSection = () => {
                 ))}
               </Select>
             </FormControl>
-
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Type</InputLabel>
-              <Select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                label="Type"
-              >
-                <MenuItem value="None">Select Type</MenuItem>
-                <MenuItem value="Dog">Dog</MenuItem>
-                <MenuItem value="Cat">Cat</MenuItem>
-                <MenuItem value="Rabbit">Rabbit</MenuItem>
-                <MenuItem value="Bird">Bird</MenuItem>
-                <MenuItem value="Fish">Fish</MenuItem>
-                <MenuItem value="Other">Other</MenuItem>
-              </Select>
-            </FormControl>
             <Box sx={{ display: "flex", gap: 2 }}>
-              <TextField
-                label="Breed"
+              <FormControl
                 fullWidth
-                variant="outlined"
-                value={breed}
-                onChange={(e) => setBreed(e.target.value)}
-                sx={{ mb: 2 }}
-              />
+                sx={{
+                  mb: 2,
+                }}
+              >
+                <InputLabel>Type</InputLabel>
+                <Select
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  label="Type"
+                >
+                  <MenuItem value="None">Select Type</MenuItem>
+                  <MenuItem value="Dog">Dog</MenuItem>
+                  <MenuItem value="Cat">Cat</MenuItem>
+                  <MenuItem value="Fish">Fish</MenuItem>
+                  <MenuItem value="Rabbit">Rabbit</MenuItem>
+                  <MenuItem value="Birds">Birds</MenuItem>
+                  <MenuItem value="Others">Others</MenuItem>
+                </Select>
+              </FormControl>
               <Tooltip title="Upload image" arrow>
                 <Button
                   variant="contained"
@@ -320,6 +381,7 @@ const PostPetSection = () => {
                     mb: 2,
                     backgroundColor: "#121858",
                     maxWidth: "12%",
+                    height: "5vh",
                   }}
                 >
                   <input
@@ -331,6 +393,30 @@ const PostPetSection = () => {
                   <PhotoCamera />
                 </Button>
               </Tooltip>
+              <Tooltip title="Predict Pet Type" arrow>
+                <Box fullWidth sx={{ mb: 2, maxWidth: "10%", height: "5vh" }}>
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth
+                    onClick={handlePredictPetType}
+                    disabled={!picture}
+                  >
+                    <SearchRoundedIcon />
+                  </Button>
+                </Box>
+              </Tooltip>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <TextField
+                label="Breed"
+                fullWidth
+                variant="outlined"
+                value={breed}
+                onChange={(e) => setBreed(e.target.value)}
+                sx={{ mb: 2 }}
+              />
 
               {(type === "Dog" || type === "Cat") && (
                 <Tooltip
@@ -350,7 +436,11 @@ const PostPetSection = () => {
                       fullWidth
                       onClick={handlePredictBreed}
                       disabled={!picture}
-                      sx={{ maxWidth: "10%", height: "100%" }}
+                      sx={{
+                        mb: 2,
+                        height: "100%",
+                        maxWidth: "12%",
+                      }}
                     >
                       <Pets />
                     </Button>
@@ -371,7 +461,6 @@ const PostPetSection = () => {
                         verticalAlign: "middle",
                       }}
                     >
-                      {/* Create a small preview image box */}
                       {picture && (
                         <img
                           src={URL.createObjectURL(picture)}
@@ -388,19 +477,22 @@ const PostPetSection = () => {
                   </>
                 )}
               </Typography>
-
-              {(type === "Dog" || type === "Cat") && (
+              {(type === "Dog" ||
+                type === "Cats" ||
+                type === "Rabbit" ||
+                type === "Birds" ||
+                type === "Fish" ||
+                type === "Others") && (
                 <Typography variant="body2" color="textSecondary">
-                  Caution: Prediction maybe not always give correct result,
-                  specially in cases of mixed breed pets, if you feel like the
-                  prediction is not correct, you can always type out the correct
-                  breed!
+                  Caution: Prediction maybe not always give correct result as it
+                  is still in developement stage, specially in cases of mixed
+                  breed pets, if you feel like the prediction is not correct,
+                  you can always type out the correct breed!
                 </Typography>
               )}
             </Box>
           </Grid>
 
-          {/* Right Section */}
           <Grid item xs={12} md={6}>
             <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
               Justification for Giving a Pet
