@@ -241,7 +241,7 @@ const Communication = () => {
     adopteeChats.some((chat) => chat.chatId === selectedChat.chatId);
 
   return (
-    <Box sx={{ display: "flex", maxHeight: "auto" }}>
+    <Box sx={{ display: "flex", maxHeight: "auto", marginLeft: "3%" }}>
       <Box
         sx={{
           width: "25%",
