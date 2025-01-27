@@ -10,8 +10,6 @@ const Home = (props) => {
   return (
     <Box
       sx={{
-        position: "center",
-        maxWidth: "flex",
         backgroundColor: "background.default",
         color: "text.primary",
         minHeight: "100vh",
@@ -31,6 +29,7 @@ const Home = (props) => {
       <PetTraining />
 
       <Divider sx={{ my: 3 }} />
+
       <PlanningToAdoptAPet />
     </Box>
   );

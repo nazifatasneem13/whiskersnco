@@ -130,6 +130,7 @@ const Navbar = ({ title, children }) => {
       <AppBar
         position="static"
         sx={{
+          display: "flex",
           backgroundColor: "#fff",
           color: "#000",
           padding: "10px 20px",

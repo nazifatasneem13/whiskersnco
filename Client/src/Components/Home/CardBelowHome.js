@@ -7,6 +7,8 @@ const CardBelowHome = () => {
   return (
     <Box
       sx={{
+        justifyContent: "center",
+        maxWidth: "100%",
         backgroundColor: "rgb(20, 20, 81)",
         width: "80%",
         minheight: "50vh",
@@ -15,7 +17,7 @@ const CardBelowHome = () => {
         marginTop: "30px",
         borderRadius: "40px 50px 20px 20px",
         display: "flex",
-        justifyContent: "space-between",
+
         alignItems: "center",
         color: "aliceblue",
       }}

@@ -92,6 +92,7 @@ const Sidebar = ({ title }) => {
         backgroundColor: "#004d6d",
         color: "#fff",
         display: "flex",
+        minHeight: "display",
         flexDirection: "column",
         justifyContent: "space-between",
         zIndex: 10,

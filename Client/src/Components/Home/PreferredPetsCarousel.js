@@ -71,8 +71,17 @@ const PreferredPetsCarousel = () => {
   };
 
   return (
-    <Box sx={{ textAlign: "center", padding: "2rem" }}>
-      <Typography variant="h2" sx={{ mb: 2 }}>
+    <Box sx={{ alignItems: "center", textAlign: "center", padding: "2rem" }}>
+      <Typography
+        variant="h2"
+        sx={{
+          fontWeight: "bold",
+          marginBottom: "1rem",
+          display: "flex",
+          justifyContent: "center",
+          color: "#121858",
+        }}
+      >
         You Might Be Interested...
       </Typography>
       {loading && <CircularProgress />}

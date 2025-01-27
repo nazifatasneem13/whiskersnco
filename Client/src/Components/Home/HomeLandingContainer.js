@@ -47,6 +47,8 @@ const HomeLandingContainer = (props) => {
   return (
     <Box
       sx={{
+        ml: "2%",
+        display: "flex",
         padding: "2rem",
         backgroundColor: "#f9f9f9",
         borderRadius: "8px",
@@ -55,7 +57,7 @@ const HomeLandingContainer = (props) => {
     >
       <Grid container spacing={4} alignItems="center">
         {/* Left Section */}
-        <Grid item xs={12} md={6}>
+        <Grid item md={6}>
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -144,7 +146,7 @@ const HomeLandingContainer = (props) => {
         </Grid>
 
         {/* Right Section */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} display={"flex"}>
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}

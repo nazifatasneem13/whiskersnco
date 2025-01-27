@@ -4,6 +4,7 @@ import {
   Typography,
   Accordion,
   AccordionSummary,
+  Container,
   AccordionDetails,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -32,59 +33,67 @@ const PlanningToAdoptAPet = () => {
   ];
 
   return (
-    <Box
-      sx={{
-        padding: "2rem",
-        maxWidth: "auto",
-        margin: "0 auto",
-        textAlign: "center",
-        backgroundColor: "#f9f9f9",
-        borderRadius: "8px",
-        boxShadow: 3,
-      }}
-    >
-      <Typography
-        variant="h4"
+    <Container sx={{ width: "90%", justifyContent: "center" }}>
+      <Box
         sx={{
-          fontWeight: "bold",
-          marginBottom: "1.5rem",
-          color: "#333",
+          padding: "2rem",
+          maxWidth: "100%",
+          margin: "0 auto",
+          textAlign: "center",
+          backgroundColor: "#f9f9f9",
+          borderRadius: "8px",
+          boxShadow: 3,
         }}
       >
-        Frequently Asked Questions
-      </Typography>
-      {faqData.map((faq, index) => (
-        <Accordion
-          key={index}
+        <Typography
+          variant="h3"
           sx={{
+            fontWeight: "bold",
             marginBottom: "1rem",
-            "&:before": {
-              display: "none", // Remove the default MUI accordion line
-            },
+            display: "flex",
+            justifyContent: "center",
+            color: "#121858",
           }}
         >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls={`panel${index + 1}-content`}
-            id={`panel${index + 1}-header`}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              fontWeight: "bold",
-              color: "#333",
-            }}
-          >
-            {faq.icon}
-            {faq.title}
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography variant="body1" sx={{ color: "#666" }}>
-              {faq.description}
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-      ))}
-    </Box>
+          Frequently Asked Questions
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          {faqData.map((faq, index) => (
+            <Accordion
+              key={index}
+              sx={{
+                marginBottom: "1rem",
+                "&:before": {
+                  display: "none", // Remove the default MUI accordion line
+                },
+              }}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls={`panel${index + 1}-content`}
+                id={`panel${index + 1}-header`}
+                maxWidth="flex"
+                justifyContent="center"
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  fontWeight: "bold",
+                  color: "#333",
+                }}
+              >
+                {faq.icon}
+                {faq.title}
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography variant="body1" sx={{ color: "#666" }}>
+                  {faq.description}
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Box>
+      </Box>
+    </Container>
   );
 };
 
