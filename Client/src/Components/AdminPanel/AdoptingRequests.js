@@ -138,21 +138,28 @@ const AdoptingRequests = () => {
               >
                 {pet.name}
               </Typography>
-              {petForms.map((form) => (
-                <FormCard
-                  key={form._id}
-                  form={form}
-                  pet={pet}
-                  updateCards={fetchForms}
-                  deleteBtnText="Reject"
-                  approveBtn={true}
-                />
-              ))}
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2, // Space between FormCards
+                  flexWrap: "wrap", // Wrap FormCards to the next row if needed
+                }}
+              >
+                {petForms.map((form) => (
+                  <FormCard
+                    key={form._id}
+                    form={form}
+                    pet={pet}
+                    updateCards={fetchForms}
+                    deleteBtnText="Reject"
+                    approveBtn={true}
+                  />
+                ))}
+              </Box>
             </Box>
           );
         })
       ) : (
-        /* Even if empty, the Box still has a height of 70vh */
         <Typography variant="body1" mt={4} textAlign="center">
           No adoption requests available for any pet.
         </Typography>

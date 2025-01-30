@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Grid,
+  Container,
   Box,
   TextField,
   Typography,
@@ -15,30 +16,13 @@ import newRequest from "../../utils/newRequest";
 import { useNavigate } from "react-router-dom";
 import { auth, provider, signInWithPopup } from "../../firebase";
 import { styled } from "@mui/material";
-import cat from "./pets.jpeg";
-const CatMaskBox = styled(Box)(({ theme }) => ({
-  width: "100%",
-  height: "100%",
-  backgroundColor: "#ffffff",
-  // The imported local image
-  WebkitMaskImage: `url(${cat})`,
-  WebkitMaskSize: "contain",
-  WebkitMaskRepeat: "no-repeat",
-  WebkitMaskPosition: "center",
-  maskImage: `url(${cat})`,
-  maskSize: "contain",
-  maskRepeat: "no-repeat",
-  maskPosition: "center",
-  // If the silhouette is black on white, we use luminance mode:
-  WebkitMaskMode: "luminance",
-  maskMode: "luminance",
-  // Blur the shape
-  filter: "blur(200px)",
-}));
+import image from "./signup.jpeg";
+import { Height } from "@mui/icons-material";
+
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#6a5acd", // Soft purple
+      main: "#6a5acd",
     },
     background: {
       default: "#f4f4f4",
@@ -122,7 +106,14 @@ const Register = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container style={{ minHeight: "70vh" }}>
+      <Grid
+        style={{
+          maxWidth: "100%",
+          display: "flex",
+          marginLeft: "5%",
+          justifyContent: "space-between",
+        }}
+      >
         {/* Left Panel */}
         <Grid
           item
@@ -130,7 +121,7 @@ const Register = () => {
           md={6}
           style={{
             backgroundColor: theme.palette.background.paper,
-            padding: "2rem",
+            padding: "5rem",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
@@ -180,10 +171,7 @@ const Register = () => {
               InputLabelProps={{ shrink: true }}
               onChange={(e) => setFile(e.target.files[0])}
             />
-            <FormControlLabel
-              control={<Checkbox />}
-              label="I accept the Terms of Use & Privacy Policy"
-            />
+
             {signupSuccess && (
               <Typography variant="body1" align="center" color="success.main">
                 Signup successful!
@@ -233,15 +221,23 @@ const Register = () => {
           xs={12}
           md={6}
           sx={{
-            backgroundColor: "#121858",
+            padding: "-5rem",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            position: "relative",
           }}
         >
-          {/* Render the styled Box (cat mask) */}
-          <CatMaskBox />
+          <img
+            src={image}
+            alt="Logo"
+            style={{
+              display: "flex",
+              width: "500px",
+              Height: "500px",
+              position: "center",
+              cursor: "pointer",
+            }}
+          />
         </Grid>
       </Grid>
     </ThemeProvider>

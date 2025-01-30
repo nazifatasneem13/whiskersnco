@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import { Heart, HelpCircle, Home } from "lucide-react";
-import adoptPet from "./images/adoptPet.jpg";
+import adoptPet from "./images/logo3.png";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -29,10 +29,10 @@ const AdoptSection = () => {
   return (
     <Box
       sx={{
-        marginLeft: "3%",
+        marginLeft: "7%",
         maxWidth: "auto",
-        margin: "2rem auto",
-        padding: "2rem",
+        margin: "4rem",
+        padding: "4rem",
         backgroundColor: "#f9f9f9",
         borderRadius: "8px",
         boxShadow: 3,
@@ -57,21 +57,22 @@ const AdoptSection = () => {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        style={{ textAlign: "center", marginBottom: "2rem" }}
+        style={{ textAlign: "center", marginBottom: "1rem" }}
       >
         <img
           src={adoptPet}
-          alt="Happy Pet"
-          style={{
-            width: "auto",
-            maxHeight: "auto",
+          sx={{
+            width: "5px",
+            borderRadius: "5%",
+            cursor: "pointer",
             objectFit: "cover",
-            borderRadius: "8px",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
           }}
+          alt="Happy Pet"
         />
       </motion.div>
 

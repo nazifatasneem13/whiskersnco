@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import image from "./login.jpeg";
 import {
   Box,
   Typography,
@@ -116,12 +117,12 @@ const Login = () => {
           justifyContent: "center",
         }}
       >
-        <CssBaseline />
         <Card
           sx={{
             display: "flex",
             width: "80%",
-            maxWidth: 900,
+            maxHeight: 500,
+            maxWidth: 700,
             borderRadius: 2,
             boxShadow: 3,
             overflow: "hidden",
@@ -132,7 +133,7 @@ const Login = () => {
             sx={{
               backgroundColor: "primary.main",
               color: "white",
-              padding: 4,
+              padding: 0.5,
               width: "40%",
               display: "flex",
               flexDirection: "column",
@@ -140,12 +141,17 @@ const Login = () => {
               alignItems: "center",
             }}
           >
-            <Typography variant="h4" sx={{ mb: 2 }}>
-              Welcome
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 3, textAlign: "center" }}>
-              Become a member of whiskers-n-co to enjoy our full facilities
-            </Typography>
+            <img
+              src={image}
+              alt="Logo"
+              style={{
+                display: "left",
+
+                width: "100%",
+                position: "left",
+                cursor: "pointer",
+              }}
+            />
           </Box>
 
           {/* Right Side - Sign In Section */}
@@ -159,8 +165,14 @@ const Login = () => {
               padding: 4,
             }}
           >
-            <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+            <Typography component="h1" variant="h5" sx={{ mb: 1 }}>
               Sign In
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{ fontSize: 10, mb: 1, textAlign: "center" }}
+            >
+              Become a member of whiskers-n-co to enjoy our full facilities
             </Typography>
             <Box
               component="form"
@@ -189,17 +201,14 @@ const Login = () => {
                 autoComplete="current-password"
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
+
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{
                   mt: 3,
-                  mb: 2,
+                  mb: 1,
                   backgroundColor: "#121858", // Midnight Blue
                   color: "white", // Ensure text color contrasts well
                   "&:hover": {
@@ -222,7 +231,6 @@ const Login = () => {
                 fullWidth
                 variant="outlined"
                 sx={{
-                  mt: 1,
                   mb: 1,
                 }}
                 onClick={handleGoogleLogin}

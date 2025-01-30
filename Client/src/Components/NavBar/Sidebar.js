@@ -20,7 +20,7 @@ import {
   ArrowForwardIos as ArrowForwardIosIcon,
   ArrowBackIos as ArrowBackIosIcon,
 } from "@mui/icons-material";
-import logo from "./images/logo.jpeg";
+import logo from "./images/logo2.png";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import MessageModal from "../MessageModal/MessageModal";
