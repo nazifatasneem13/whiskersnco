@@ -21,13 +21,18 @@ const PetCards = (props) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
 
-  const truncateText = (text, maxLength) =>
-    text.length <= maxLength ? text : `${text.substring(0, maxLength)}...`;
-
   const maxLength = 40;
 
   const formatTimeAgo = (updatedAt) =>
     formatDistanceToNow(new Date(updatedAt), { addSuffix: true });
+
+  // Helper to check if the justification string looks like a video URL
+  const isVideoUrl = (url) => {
+    return url && url.match(/\.(mp4|webm|ogg)$/i);
+  };
+
+  const truncateText = (text, maxLength) =>
+    text.length <= maxLength ? text : `${text.substring(0, maxLength)}...`;
 
   const handleApprove = async () => {
     setIsApproving(true);
@@ -64,6 +69,7 @@ const PetCards = (props) => {
         throw new Error("Failed to delete forms");
       }
     } catch {
+      // Optionally handle errors
     } finally {
       handleReject();
     }
@@ -137,18 +143,28 @@ const PetCards = (props) => {
         </Typography>
         <Typography variant="body2" color="text.secondary">
           <b>Justification:</b>{" "}
-          <span>
-            {truncateText(props.pet.justification, maxLength)}
-            {props.pet.justification.length > maxLength && (
-              <Button
-                variant="text"
-                size="small"
-                onClick={() => setShowJustificationPopup(true)}
-              >
-                Read More
-              </Button>
-            )}
-          </span>
+          {isVideoUrl(props.pet.justification) ? (
+            <Box sx={{ mt: 1 }}>
+              <video
+                src={props.pet.justification}
+                controls
+                style={{ maxWidth: "100%", maxHeight: "200px" }}
+              />
+            </Box>
+          ) : (
+            <span>
+              {truncateText(props.pet.justification, maxLength)}
+              {props.pet.justification.length > maxLength && (
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={() => setShowJustificationPopup(true)}
+                >
+                  Read More
+                </Button>
+              )}
+            </span>
+          )}
         </Typography>
         <Typography variant="caption" display="block" gutterBottom>
           {formatTimeAgo(props.pet.updatedAt)}
@@ -177,14 +193,22 @@ const PetCards = (props) => {
         </Box>
       </CardContent>
 
-      {/* Popups */}
+      {/* Justification Popup Dialog */}
       <Dialog
         open={showJustificationPopup}
         onClose={() => setShowJustificationPopup(false)}
       >
         <DialogTitle>Justification</DialogTitle>
         <DialogContent>
-          <Typography>{props.pet.justification}</Typography>
+          {isVideoUrl(props.pet.justification) ? (
+            <video
+              src={props.pet.justification}
+              controls
+              style={{ width: "100%", maxHeight: "300px" }}
+            />
+          ) : (
+            <Typography>{props.pet.justification}</Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowJustificationPopup(false)}>
@@ -192,6 +216,7 @@ const PetCards = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
+
       <Dialog open={showErrorPopup} onClose={() => setShowErrorPopup(false)}>
         <DialogTitle>Error</DialogTitle>
         <DialogContent>

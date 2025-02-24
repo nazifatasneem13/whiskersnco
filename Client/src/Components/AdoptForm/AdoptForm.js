@@ -33,12 +33,9 @@ function AdoptForm({ pet, closeForm }) {
     severity: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // To store the timeout ID so that it can be cleared if needed
   const [timeoutId, setTimeoutId] = useState(null);
 
   useEffect(() => {
-    // Cleanup the timeout when the component unmounts
     return () => {
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -94,10 +91,9 @@ function AdoptForm({ pet, closeForm }) {
       setPreviousExperience("");
       setFamilyComposition("");
 
-      // Set a timeout to close the form after the Snackbar is visible
       const id = setTimeout(() => {
         closeForm();
-      }, 3000); // 3 seconds delay
+      }, 3000);
       setTimeoutId(id);
     } catch (error) {
       setSnackbar({ open: true, message: error.message, severity: "error" });
@@ -106,21 +102,25 @@ function AdoptForm({ pet, closeForm }) {
     }
   };
 
+  // Helper: check if the justification is a video URL
+  const isVideoUrl = (url) => {
+    return url && url.match(/\.(mp4|webm|ogg)$/i);
+  };
+
   return (
     <Paper
       elevation={6}
       sx={{
-        maxWidth: "1100px", // Increased width to 1100px
+        maxWidth: "1100px",
         width: "100%",
         margin: "0.7rem auto",
         borderRadius: "12px",
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         overflow: "hidden",
-        position: "relative", // Added for proper positioning of the close button
-        fontFamily: "'Roboto', sans-serif", // Changed font
+        position: "relative",
+        fontFamily: "'Roboto', sans-serif",
       }}
     >
-      {/* Close Button */}
       <IconButton
         aria-label="close"
         onClick={closeForm}
@@ -134,13 +134,7 @@ function AdoptForm({ pet, closeForm }) {
         <Close />
       </IconButton>
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-        }}
-      >
-        {/* Left Side: Pet Image */}
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" } }}>
         <Box
           sx={{
             flex: 1,
@@ -149,71 +143,65 @@ function AdoptForm({ pet, closeForm }) {
             justifyContent: "center",
             backgroundColor: "#f9f9f9",
             padding: "1rem",
-            minWidth: "auto",
-            maxWidth: "auto", // Ensures minimum width for the image
           }}
         >
+          {/* Display pet image */}
           <Avatar
             src={pet.cloudinaryUrl || pet.filename}
             alt={pet.name}
             sx={{
-              width: "490px", // Larger square image
+              width: "490px",
               height: "400px",
-              borderRadius: "8px", // Makes the image square with slightly rounded corners
+              borderRadius: "8px",
             }}
           />
         </Box>
 
-        {/* Right Side: Pet Info and Form */}
-        <Box
-          sx={{
-            flex: 1,
-            padding: "2rem",
-            minWidth: "auto",
-            maxWidth: "auto",
-          }}
-        >
-          {/* Header */}
+        <Box sx={{ flex: 1, padding: "2rem" }}>
           <Typography
             variant="h5"
             sx={{
               fontWeight: "bold",
-              color: "#1a237e", // Updated color
+              color: "#1a237e",
               marginBottom: "1rem",
             }}
           >
             Adopt {pet.name}
           </Typography>
 
-          {/* Pet Info */}
           <Box sx={{ marginBottom: "1.5rem" }}>
-            <Typography
-              variant="body1"
-              sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
-            >
+            <Typography variant="body1" sx={{ color: "#424242" }}>
               <b>Type:</b> {pet.type}
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
-            >
+            <Typography variant="body1" sx={{ color: "#424242" }}>
               <b>Age:</b> {pet.age} months
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
-            >
+            <Typography variant="body1" sx={{ color: "#424242" }}>
               <b>Location:</b> {pet.area}
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{ color: "#424242", fontFamily: "'Roboto', sans-serif" }}
-            >
+            <Typography variant="body1" sx={{ color: "#424242" }}>
               <b>Division:</b> {pet.division}
             </Typography>
           </Box>
 
-          {/* Form */}
+          {/* If pet.justification is a video URL, display video preview */}
+          {isVideoUrl(pet.justification) && (
+            <Box sx={{ marginBottom: "1.5rem" }}>
+              <Typography variant="body1" sx={{ color: "#424242", mb: 1 }}>
+                Justification Video:
+              </Typography>
+              <video
+                src={pet.justification}
+                controls
+                style={{
+                  width: "100%",
+                  maxHeight: "300px",
+                  borderRadius: "8px",
+                }}
+              />
+            </Box>
+          )}
+
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -317,10 +305,10 @@ function AdoptForm({ pet, closeForm }) {
                 padding: "10px 0",
                 fontSize: "20px",
                 borderRadius: "8px",
-                backgroundColor: "#1a237e", // Updated color
-                color: "#ffffff", // Ensure button text color contrasts well
+                backgroundColor: "#1a237e",
+                color: "#ffffff",
                 "&:hover": {
-                  backgroundColor: "#3949ab", // Slightly lighter shade for hover effect
+                  backgroundColor: "#3949ab",
                 },
               }}
               disabled={isSubmitting}
@@ -331,7 +319,6 @@ function AdoptForm({ pet, closeForm }) {
         </Box>
       </Box>
 
-      {/* Snackbar Notification */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}

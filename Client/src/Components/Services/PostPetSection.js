@@ -8,7 +8,6 @@ import {
   Select,
   FormControl,
   InputLabel,
-  TextareaAutosize,
   CircularProgress,
   Grid,
   Snackbar,
@@ -24,26 +23,30 @@ import {
 } from "@mui/icons-material";
 import postPet from "./images/postpet.jpeg";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+
 const PostPetSection = () => {
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [area, setArea] = useState("");
   const [division, setDivision] = useState("None");
-  const [justification, setJustification] = useState("");
   const [email, setEmail] = useState(currentUser ? currentUser.email : "");
   const [phone, setPhone] = useState("");
   const [breed, setBreed] = useState("");
   const [type, setType] = useState("None");
   const [picture, setPicture] = useState(null);
   const [fileName, setFileName] = useState("");
+  // States for justification video (no written justification)
+  const [justificationVideo, setJustificationVideo] = useState(null);
+  const [videoFileName, setVideoFileName] = useState("");
+
   const [formError, setFormError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
-  }); // Snackbar state
+  });
 
   const divisions = [
     "Barishal",
@@ -68,6 +71,15 @@ const PostPetSection = () => {
     if (selectedFile) {
       setPicture(selectedFile);
       setFileName(selectedFile.name);
+    }
+  };
+
+  // Handler for justification video upload
+  const handleJustificationVideoChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setJustificationVideo(selectedFile);
+      setVideoFileName(selectedFile.name);
     }
   };
 
@@ -111,7 +123,7 @@ const PostPetSection = () => {
       );
 
       if (matchedType) {
-        setType(matchedType); // Update the dropdown selection
+        setType(matchedType);
         setSnackbar({
           open: true,
           message: `Pet type predicted: ${matchedType}`,
@@ -174,19 +186,20 @@ const PostPetSection = () => {
       });
     }
   };
+
   useEffect(() => {
-    console.log("Updated type:", type); // Log whenever `type` changes
+    console.log("Updated type:", type);
   }, [type]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Removed check for written justification
     if (
       !name ||
       !age ||
       !area ||
       division === "None" ||
-      !justification ||
       !email ||
       !phone ||
       !fileName ||
@@ -208,7 +221,6 @@ const PostPetSection = () => {
     formData.append("age", age);
     formData.append("area", area);
     formData.append("division", division);
-    formData.append("justification", justification);
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("type", type);
@@ -216,6 +228,10 @@ const PostPetSection = () => {
 
     if (picture) {
       formData.append("picture", picture);
+    }
+    // Append justification video if provided
+    if (justificationVideo) {
+      formData.append("justificationVideo", justificationVideo);
     }
 
     try {
@@ -242,11 +258,12 @@ const PostPetSection = () => {
       setAge("");
       setArea("");
       setDivision("None");
-      setJustification("");
       setPhone("");
       setBreed("");
       setPicture(null);
       setFileName("");
+      setJustificationVideo(null);
+      setVideoFileName("");
     } catch (error) {
       console.error("Error submitting form:", error);
       setSnackbar({
@@ -350,13 +367,9 @@ const PostPetSection = () => {
                 ))}
               </Select>
             </FormControl>
+
             <Box sx={{ display: "flex", gap: 2 }}>
-              <FormControl
-                fullWidth
-                sx={{
-                  mb: 2,
-                }}
-              >
+              <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel>Type</InputLabel>
                 <Select
                   value={type}
@@ -372,6 +385,7 @@ const PostPetSection = () => {
                   <MenuItem value="Others">Others</MenuItem>
                 </Select>
               </FormControl>
+
               <Tooltip title="Upload image" arrow>
                 <Button
                   variant="contained"
@@ -393,8 +407,9 @@ const PostPetSection = () => {
                   <PhotoCamera />
                 </Button>
               </Tooltip>
+
               <Tooltip title="Predict Pet Type" arrow>
-                <Box fullWidth sx={{ mb: 2, maxWidth: "10%", height: "5vh" }}>
+                <Box sx={{ mb: 2, maxWidth: "10%", height: "5vh" }}>
                   <Button
                     type="button"
                     variant="outlined"
@@ -408,6 +423,7 @@ const PostPetSection = () => {
                 </Box>
               </Tooltip>
             </Box>
+
             <Box sx={{ display: "flex", gap: 2 }}>
               <TextField
                 label="Breed"
@@ -425,10 +441,7 @@ const PostPetSection = () => {
                   }
                   arrow
                 >
-                  <Box
-                    fullWidth
-                    sx={{ mb: 2, maxWidth: "10%", maxHeight: "flex" }}
-                  >
+                  <Box sx={{ mb: 2, maxWidth: "10%" }}>
                     <Button
                       type="button"
                       variant="outlined"
@@ -478,39 +491,65 @@ const PostPetSection = () => {
                 )}
               </Typography>
               {(type === "Dog" ||
-                type === "Cats" ||
+                type === "Cat" ||
                 type === "Rabbit" ||
                 type === "Birds" ||
                 type === "Fish" ||
                 type === "Others") && (
                 <Typography variant="body2" color="textSecondary">
-                  Caution: Prediction maybe not always give correct result as it
-                  is still in developement stage, specially in cases of mixed
-                  breed pets, if you feel like the prediction is not correct,
-                  you can always type out the correct breed!
+                  Caution: Prediction may not always give a correct result as it
+                  is still in development stage. If you feel like the prediction
+                  is not correct, you can always type out the correct breed!
                 </Typography>
               )}
             </Box>
           </Grid>
 
           <Grid item xs={12} md={6}>
+            {/* Removed written justification field */}
             <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
-              Justification for Giving a Pet
+              Justification Video
             </Typography>
-            <TextareaAutosize
-              minRows={6}
-              placeholder="Write your justification here..."
-              value={justification}
-              onChange={(e) => setJustification(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "5px",
-                borderColor: "#ccc",
-                marginBottom: "1rem",
-                resize: "vertical",
-              }}
-            />
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+              <Button
+                variant="contained"
+                component="label"
+                sx={{ backgroundColor: "#121858", color: "white" }}
+              >
+                Upload Video
+                <input
+                  type="file"
+                  hidden
+                  accept="video/*"
+                  onChange={handleJustificationVideoChange}
+                />
+              </Button>
+              {videoFileName && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Typography variant="body2">
+                    Selected video: {videoFileName}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "inline-block",
+                      marginLeft: 1,
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    <video
+                      src={URL.createObjectURL(justificationVideo)}
+                      controls
+                      style={{
+                        maxWidth: "100px",
+                        maxHeight: "100px",
+                        borderRadius: "4px",
+                        border: "1px solid #ccc",
+                      }}
+                    />
+                  </Box>
+                </Box>
+              )}
+            </Box>
 
             <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
               Contact Information
@@ -566,7 +605,6 @@ const PostPetSection = () => {
         </Grid>
       </form>
 
-      {/* Snackbar Notification */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}

@@ -208,34 +208,53 @@ const postPetRequest = async (req, res) => {
       age,
       area,
       division,
-      justification,
+      // Provide a default fallback in case no justification is sent
+      justification: justificationText = "",
       email,
       phone,
       type,
       breed,
     } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ error: "No image file provided" });
+    // Ensure the pet picture file is provided
+    if (!req.files || !req.files.picture || req.files.picture.length === 0) {
+      return res.status(400).json({ error: "No pet image file provided" });
     }
 
-    // Upload image to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
+    // Upload the pet picture to Cloudinary
+    const pictureFile = req.files.picture[0];
+    const pictureResult = await cloudinary.uploader.upload(pictureFile.path, {
       folder: "pets",
     });
 
-    // Create a new Pet document in the database
+    let justificationUrl = justificationText; // fallback text (could be empty)
+
+    // Check if a justification video file was provided
+    if (
+      req.files.justificationVideo &&
+      req.files.justificationVideo.length > 0
+    ) {
+      const videoFile = req.files.justificationVideo[0];
+      // Upload the video file with the video resource type
+      const videoResult = await cloudinary.uploader.upload(videoFile.path, {
+        folder: "pets",
+        resource_type: "video",
+      });
+      justificationUrl = videoResult.secure_url;
+    }
+
+    // Create a new Pet document with the uploaded files and other details
     const pet = await Pet.create({
       name,
       age,
       division,
       area,
-      justification,
+      justification: justificationUrl,
       email,
       phone,
       type,
       breed,
-      filename: result.secure_url, // Store Cloudinary URL
+      filename: pictureResult.secure_url,
       status: "Pending",
     });
 

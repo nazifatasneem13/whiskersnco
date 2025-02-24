@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // Limit file size to 5MB
+    fileSize: 20 * 1024 * 1024, // Limit file size to 5MB
   },
 });
 
@@ -43,7 +43,14 @@ router.get("/requests", (req, res) => allPets("Pending", req, res));
 router.get("/approvedPets", (req, res) => allPets("Approved", req, res));
 router.post("/approvedPetsDisplay", allPetsDisplay("Approved"));
 router.get("/adoptedPets", (req, res) => allPets("Delivered", req, res));
-router.post("/services", upload.single("picture"), postPetRequest);
+router.post(
+  "/services",
+  upload.fields([
+    { name: "picture", maxCount: 1 },
+    { name: "justificationVideo", maxCount: 1 },
+  ]),
+  postPetRequest
+);
 router.put("/approving/:id", approveRequest);
 router.delete("/delete/:id", deletePost);
 router.post("/preferredPets", getPreferredPets("Approved"));
