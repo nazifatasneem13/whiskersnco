@@ -177,9 +177,12 @@ const PetsViewer = (props) => {
             style={{
               width: "90%",
               maxWidth: "1100px",
+              maxHeight: "90vh",
+              overflowY: "auto",
               backgroundColor: "white",
               borderRadius: "12px",
               padding: "2rem",
+              position: "relative",
             }}
           >
             <AdoptForm closeForm={togglePopup} pet={props.pet} />

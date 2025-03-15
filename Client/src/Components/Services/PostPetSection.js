@@ -59,6 +59,43 @@ const PostPetSection = () => {
     "Sylhet",
     "Others",
   ];
+  // Auto-detect current location using the Geolocation API and reverse geocoding
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              if (data && data.address) {
+                const city =
+                  data.address.city ||
+                  data.address.town ||
+                  data.address.village ||
+                  "";
+                const state = data.address.state || "";
+                const country = data.address.country || "";
+                const detectedLocation = `${city}${
+                  city && state ? ", " : ""
+                }${state}${state && country ? ", " : ""}${country}`;
+                setArea(detectedLocation);
+              }
+            })
+            .catch((error) => {
+              console.error("Error in reverse geocoding:", error);
+            });
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+  }, []);
 
   useEffect(() => {
     if (!isSubmitting) {
@@ -395,7 +432,7 @@ const PostPetSection = () => {
                     mb: 2,
                     backgroundColor: "#121858",
                     maxWidth: "12%",
-                    height: "5vh",
+                    height: "9vh",
                   }}
                 >
                   <input
@@ -409,7 +446,7 @@ const PostPetSection = () => {
               </Tooltip>
 
               <Tooltip title="Predict Pet Type" arrow>
-                <Box sx={{ mb: 2, maxWidth: "10%", height: "5vh" }}>
+                <Box sx={{ mb: 2, maxWidth: "10%", height: "9vh" }}>
                   <Button
                     type="button"
                     variant="outlined"
@@ -417,6 +454,7 @@ const PostPetSection = () => {
                     fullWidth
                     onClick={handlePredictPetType}
                     disabled={!picture}
+                    sx={{ mb: 2, maxWidth: "10%", height: "9vh" }}
                   >
                     <SearchRoundedIcon />
                   </Button>

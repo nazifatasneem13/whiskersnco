@@ -35,6 +35,11 @@ function AdoptForm({ pet, closeForm }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timeoutId, setTimeoutId] = useState(null);
 
+  // Helper: check if the justification is a video URL
+  const isVideoUrl = (url) => {
+    return url && url.match(/\.(mp4|webm|ogg)$/i);
+  };
+
   useEffect(() => {
     return () => {
       if (timeoutId) {
@@ -102,11 +107,6 @@ function AdoptForm({ pet, closeForm }) {
     }
   };
 
-  // Helper: check if the justification is a video URL
-  const isVideoUrl = (url) => {
-    return url && url.match(/\.(mp4|webm|ogg)$/i);
-  };
-
   return (
     <Paper
       elevation={6}
@@ -135,12 +135,14 @@ function AdoptForm({ pet, closeForm }) {
       </IconButton>
 
       <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" } }}>
+        {/* Left Side - Pet Image & Video Preview */}
         <Box
           sx={{
             flex: 1,
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             backgroundColor: "#f9f9f9",
             padding: "1rem",
           }}
@@ -150,13 +152,30 @@ function AdoptForm({ pet, closeForm }) {
             src={pet.cloudinaryUrl || pet.filename}
             alt={pet.name}
             sx={{
-              width: "490px",
-              height: "400px",
+              width: "290px",
+              height: "200px",
               borderRadius: "8px",
             }}
           />
+          {isVideoUrl(pet.justification) && (
+            <Box sx={{ marginTop: "1rem", width: "100%" }}>
+              <Typography variant="body1" sx={{ color: "#424242", mb: 1 }}>
+                Justification Video:
+              </Typography>
+              <video
+                src={pet.justification}
+                controls
+                style={{
+                  width: "100%",
+                  maxHeight: "200px",
+                  borderRadius: "8px",
+                }}
+              />
+            </Box>
+          )}
         </Box>
 
+        {/* Right Side - Details and Form */}
         <Box sx={{ flex: 1, padding: "2rem" }}>
           <Typography
             variant="h5"
@@ -183,24 +202,6 @@ function AdoptForm({ pet, closeForm }) {
               <b>Division:</b> {pet.division}
             </Typography>
           </Box>
-
-          {/* If pet.justification is a video URL, display video preview */}
-          {isVideoUrl(pet.justification) && (
-            <Box sx={{ marginBottom: "1.5rem" }}>
-              <Typography variant="body1" sx={{ color: "#424242", mb: 1 }}>
-                Justification Video:
-              </Typography>
-              <video
-                src={pet.justification}
-                controls
-                style={{
-                  width: "100%",
-                  maxHeight: "300px",
-                  borderRadius: "8px",
-                }}
-              />
-            </Box>
-          )}
 
           <Box
             component="form"
