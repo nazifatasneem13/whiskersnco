@@ -395,12 +395,14 @@ const getPreferredPets = (reqStatus) => async (req, res) => {
     console.log(`Number of pets found for userId ${userId}: ${pets.length}`);
 
     if (pets.length === 0) {
-      console.log(
-        `No pets found for userId: ${userId} with status: ${reqStatus}`
-      );
-      return res
-        .status(404)
-        .json({ message: "No pets found for the given preferences." });
+      pets = await Pet.find({
+        status: reqStatus, // Filter by status
+        staus: { $in: "Approved" },
+        $and: [
+          { email: { $nin: allBlockedEmails } },
+          { email: { $nin: user.email } },
+        ], // Exclude pets owned by blocked users
+      }).sort({ updatedAt: -1 });
     }
 
     res.status(200).json(pets);
@@ -522,6 +524,21 @@ const allPetsDisplay = (reqStatus) => async (req, res) => {
   }
 };
 
+const getnotPreferredPets = (reqStatus) => async (req, res) => {
+  try {
+    console.log(`Fetching all pets with status: ${reqStatus}`);
+
+    // Fetch all pets where status is "Approved"
+    const pets = await Pet.find({ status: reqStatus }).sort({ updatedAt: -1 });
+
+    console.log(`Total approved pets found: ${pets.length}`);
+    res.status(200).json(pets);
+  } catch (error) {
+    console.error("Error fetching non-preferred pets:", error);
+    res.status(500).json({ message: "Server error while fetching pets." });
+  }
+};
+
 // Export controllers
 module.exports = {
   postPetRequest,
@@ -533,4 +550,5 @@ module.exports = {
   approveadoptRequest,
   allPetsDisplay,
   predictPetType,
+  getnotPreferredPets,
 };

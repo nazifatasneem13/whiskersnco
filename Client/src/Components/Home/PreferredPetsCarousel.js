@@ -23,18 +23,30 @@ const PreferredPetsCarousel = () => {
   const fetchPets = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const { data } = await axios.get("http://localhost:4000/users/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const userId = data._id;
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-      const petsResponse = await axios.post(
-        "http://localhost:4000/preferredPets",
-        { userId }
-      );
-
-      setPets(petsResponse.data);
+      if (currentUser) {
+        // If the user is logged in, fetch the user's profile and preferred pets.
+        const token = localStorage.getItem("token");
+        const { data } = await axios.get(
+          "http://localhost:4000/users/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const userId = data._id;
+        const petsResponse = await axios.post(
+          "http://localhost:4000/preferredPets",
+          { userId }
+        );
+        setPets(petsResponse.data);
+      } else {
+        // If the user is not logged in, fetch all approved pets.
+        const petsResponse = await axios.post(
+          "http://localhost:4000/notpreferredPets"
+        );
+        setPets(petsResponse.data);
+      }
     } catch (error) {
       console.error("Error fetching preferred pets or user ID:", error);
       setError("Failed to fetch data");
