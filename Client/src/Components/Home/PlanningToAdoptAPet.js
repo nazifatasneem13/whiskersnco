@@ -6,93 +6,102 @@ import {
   AccordionSummary,
   Container,
   AccordionDetails,
+  Card,
+  CardContent,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Heart, Smile, Book } from "lucide-react"; // Import Lucide icons
+import { Heart, Smile, Book } from "lucide-react";
 
 const PlanningToAdoptAPet = () => {
   const faqData = [
     {
-      title: "The Joy of Welcoming a Pet",
+      title: "How does the pet adoption process work?",
       description:
-        "Introducing a pet into your life enriches it in unique ways, offering joy and unconditional love. Adopting a pet means giving them a forever home and experiencing the special bond that forms when you care for an animal.",
-      icon: <Heart style={{ marginRight: "8px", color: "#FF6F61" }} />, // Lucide icon
+        "Our adoption process is simple! Browse available pets, submit an adoption application, and schedule a meet-and-greet. If it's a good match, we finalize the adoption with a small fee and paperwork.",
+      icon: <Book size={20} style={{ marginRight: "8px", color: "#1976D2" }} />,
     },
     {
-      title: "Your Pet Adoption Journey",
+      title: "Are all pets vaccinated and spayed/neutered?",
       description:
-        "Ready to expand your family with a pet? Adopting is a heartwarming decision with significant considerations. This journey requires understanding, patience, and commitment, but it results in a rewarding relationship that lasts a lifetime.",
-      icon: <Book style={{ marginRight: "8px", color: "#3F51B5" }} />, // Lucide icon
+        "Yes! All our pets receive vaccinations, health checkups, and are spayed/neutered before adoption to ensure their well-being and prevent overpopulation.",
+      icon: (
+        <Smile size={20} style={{ marginRight: "8px", color: "#388E3C" }} />
+      ),
     },
     {
-      title: "Healing Benefits of Pets",
+      title: "Can I return a pet if it’s not a good fit?",
       description:
-        "Pets bring more than just joy; they provide remarkable health benefits. Their presence can lessen stress, improve heart health, and elevate our overall happiness. The connection with a pet is not only enjoyable but also healing.",
-      icon: <Smile style={{ marginRight: "8px", color: "#4CAF50" }} />, // Lucide icon
+        "We understand that sometimes adoptions don’t work out. We offer a return policy within a certain timeframe to ensure the best fit for both you and the pet.",
+      icon: (
+        <Heart size={20} style={{ marginRight: "8px", color: "#D81B60" }} />
+      ),
+    },
+    {
+      title: "What should I prepare before bringing my new pet home?",
+      description:
+        "Make sure you have essential supplies like food, water bowls, a bed, toys, and a safe space. Gradual introductions to your home help pets settle in comfortably.",
+      icon: <Book size={20} style={{ marginRight: "8px", color: "#1976D2" }} />,
     },
   ];
 
   return (
-    <Container sx={{ width: "90%", justifyContent: "center" }}>
-      <Box
+    <Container maxWidth="md">
+      <Card
         sx={{
           padding: "2rem",
-          maxWidth: "100%",
-          margin: "0 auto",
-          textAlign: "center",
-          backgroundColor: "#f9f9f9",
-          borderRadius: "8px",
-          boxShadow: 3,
+          backgroundColor: "#fff",
+          borderRadius: "12px",
+          boxShadow: 4,
         }}
       >
-        <Typography
-          variant="h3"
-          sx={{
-            fontWeight: "bold",
-            marginBottom: "1rem",
-            display: "flex",
-            justifyContent: "center",
-            color: "#121858",
-          }}
-        >
-          Frequently Asked Questions
-        </Typography>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          {faqData.map((faq, index) => (
-            <Accordion
-              key={index}
-              sx={{
-                marginBottom: "1rem",
-                "&:before": {
-                  display: "none", // Remove the default MUI accordion line
-                },
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls={`panel${index + 1}-content`}
-                id={`panel${index + 1}-header`}
-                maxWidth="flex"
-                justifyContent="center"
+        <CardContent>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              marginBottom: "1rem",
+              textAlign: "center",
+              color: "#121858",
+            }}
+          >
+            Frequently Asked Questions
+          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            {faqData.map((faq, index) => (
+              <Accordion
+                key={index}
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  fontWeight: "bold",
-                  color: "#333",
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "8px",
+                  boxShadow: "none",
+                  "&:before": { display: "none" },
+                  "&:hover": { backgroundColor: "#e8e8e8" },
                 }}
               >
-                {faq.icon}
-                {faq.title}
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body1" sx={{ color: "#666" }}>
-                  {faq.description}
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          ))}
-        </Box>
-      </Box>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon sx={{ color: "#555" }} />}
+                  aria-controls={`panel${index + 1}-content`}
+                  id={`panel${index + 1}-header`}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontWeight: "bold",
+                    color: "#333",
+                  }}
+                >
+                  {faq.icon}
+                  <Typography variant="h6">{faq.title}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography variant="body1" sx={{ color: "#666" }}>
+                    {faq.description}
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </Box>
+        </CardContent>
+      </Card>
     </Container>
   );
 };
