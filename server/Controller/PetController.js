@@ -311,23 +311,15 @@ const allPets = async (reqStatus, req, res) => {
 const deletePost = async (req, res) => {
   try {
     const id = req.params.id;
-    const pet = await Pet.findByIdAndDelete(id);
-    if (!pet) {
-      return res.status(404).json({ error: "Pet not found" });
-    }
 
-    // Delete the image from Cloudinary (if needed)
-    const filename = pet.filename.split("/").pop().split(".")[0]; // Extract public_id from Cloudinary URL
-    await cloudinary.uploader.destroy(filename);
-    const user = await User.findOne({ email: pet.email });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    const pet = await Pet.findByIdAndUpdate(
+      id,
+      {
+        status: "deleted",
+      },
+      { new: true }
+    );
 
-    await Notification.create({
-      userId: adopter._id,
-      message: `Your request for ${pet.name} has been deleted, try out again.`,
-    });
     res.status(200).json({ message: "Pet deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
