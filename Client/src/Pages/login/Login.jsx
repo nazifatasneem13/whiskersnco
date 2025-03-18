@@ -330,7 +330,7 @@ const Login = () => {
                 sx={{
                   width: 50,
                   height: 50,
-                  backgroundColor: "#e91e63",
+                  backgroundColor: "#0288d1",
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
@@ -353,7 +353,7 @@ const Login = () => {
               sx={{
                 width: 60,
                 height: 60,
-                border: "2px dashed #e91e63",
+                border: "2px dashed #0288d1",
                 borderRadius: "50%",
                 display: "flex",
                 alignItems: "center",
@@ -366,7 +366,7 @@ const Login = () => {
                   sx={{
                     width: 50,
                     height: 50,
-                    backgroundColor: "#e91e63",
+                    backgroundColor: "#0288d1",
                     borderRadius: "50%",
                     display: "flex",
                     alignItems: "center",
@@ -378,7 +378,7 @@ const Login = () => {
                   </Typography>
                 </Box>
               ) : (
-                <Typography variant="body2" sx={{ color: "#e91e63" }}>
+                <Typography variant="body2" sx={{ color: "#0288d1" }}>
                   Drop Here
                 </Typography>
               )}
@@ -394,9 +394,9 @@ const Login = () => {
             onClick={handleDialogConfirm}
             disabled={!isHumanVerified}
             sx={{
-              backgroundColor: "#121858",
+              backgroundColor: "#0288d1",
               color: "white",
-              "&:hover": { backgroundColor: "#0f144d" },
+              "&:hover": { backgroundColor: "#0288d1" },
             }}
           >
             Confirm and Login
