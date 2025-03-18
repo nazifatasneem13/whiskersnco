@@ -17,7 +17,7 @@ const PlanningToAdoptAPet = () => {
     {
       title: "How does the pet adoption process work?",
       description:
-        "Our adoption process is simple! Browse available pets, submit an adoption application, and schedule a meet-and-greet. If it's a good match, we finalize the adoption with a small fee and paperwork.",
+        "Our adoption process is simple! Browse available pets, submit an adoption application, and wait for admin to approve. After that you can communicate with the donator. Same process is also for giving away a pet.",
       icon: <Book size={20} style={{ marginRight: "8px", color: "#1976D2" }} />,
     },
     {
@@ -29,9 +29,9 @@ const PlanningToAdoptAPet = () => {
       ),
     },
     {
-      title: "Can I return a pet if it’s not a good fit?",
+      title: "Can I return a pet if it's not a good fit?",
       description:
-        "We understand that sometimes adoptions don’t work out. We offer a return policy within a certain timeframe to ensure the best fit for both you and the pet.",
+        "We understand that sometimes adoptions don't work out. You can communicate with the donator within a certain timeframe to ensure the best fit for both you and the pet.",
       icon: (
         <Heart size={20} style={{ marginRight: "8px", color: "#D81B60" }} />
       ),
