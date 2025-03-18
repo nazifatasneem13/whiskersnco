@@ -280,7 +280,9 @@ const TrainYourPet = () => {
         severity: "success",
       });
       setShowGenerateNewGuide(false);
+      handleToggleProgress(4);
       closeTracker();
+      window.location.reload();
     } catch (err) {
       console.error("Error generating new guide:", err);
       setSnackbar({
@@ -353,8 +355,7 @@ const TrainYourPet = () => {
         message: "Progress saved successfully!",
         severity: "success",
       });
-      closeTracker();
-      window.location.reload();
+
       // Check if all progress tasks are completed
       if (updatedGuide.progress.every((task) => task.completed)) {
         setSnackbar({
@@ -370,6 +371,8 @@ const TrainYourPet = () => {
           severity: "success",
         });
       }
+      closeTracker();
+      window.location.reload();
     } catch (err) {
       console.error("Error saving progress:", err);
       setSnackbar({

@@ -186,9 +186,10 @@ const getTrainingGuides = async (req, res, next) => {
     const userId = user._id;
 
     // Fetch all training guides for the user
-    const trainingGuides = await TrainingGuide.find({ userId }).sort({
-      createdAt: -1,
-    });
+    const trainingGuides = await TrainingGuide.find({
+      userId,
+      archived: { $ne: true }, // Exclude guides with archived === true
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({ trainingGuides });
   } catch (error) {
