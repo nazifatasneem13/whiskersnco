@@ -66,7 +66,7 @@ const FormCard = (props) => {
 
       if (!response.ok) {
         setShowErrorPopup(true);
-        throw new Error("Failed to delete form");
+        throw new Error("Failed to delete this form");
       } else {
         setShowDeletedSuccess(true);
       }
