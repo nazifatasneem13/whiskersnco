@@ -3,21 +3,7 @@
 
 ---
 
-## 📖 Table of Contents  
-1. [Project Description](#-project-description)  
-2. [Key Features](#-key-features)  
-3. [Technologies & Tools](#-technologies--tools)  
-4. [APIs Integrated](#-apis-integrated)  
-5. [Installation Guide](#-installation-guide)  
-6. [Deployment](#-deployment)  
-7. [Usage Guide](#-usage-guide)  
-8. [ER Diagram](#-er-diagram)  
-9. [Project Timeline](#-project-timeline)  
-10. [Team Members](#-team-members)  
-11. [License](#-license)  
-12. [Acknowledgments](#-acknowledgments)  
 
----
 
 ## 🚀 Project Description  
 **Whiskers & Co.** revolutionizes pet adoption by bridging adopters, shelters, and pet owners through a seamless digital platform. It eliminates fragmented workflows with features like AI-powered pet recognition, real-time communication, and automated adoption tracking. Designed to reduce abandoned pets and enhance transparency in adoptions.  
@@ -82,7 +68,7 @@
 ## ⚙️ Installation Guide  
 1. **Clone the repository**:  
    ```bash  
-   git clone https://github.com/[your-username]/whiskers-and-co.git  
+   git clone https://github.com/nazifatasneem13/whiskersnco.git  
 Install dependencies:
 
 bash
@@ -127,17 +113,6 @@ Communicate in real-time after approval.
 Admin Access:
 
 Manage requests and monitor adoption history.
-
-📊 ER Diagram
-ER Diagram
-Refer to the ER Diagram section in the project proposal for details.
-
-📅 Project Timeline
-Weeks 1-4: Project setup, authentication, user management.
-
-Weeks 5-8: Pet management, search integration, ML model training.
-
-Weeks 9-12: Final testing, deployment, and user engagement.
 
 👥 Team Members
 Nabila Islam (210042111)
