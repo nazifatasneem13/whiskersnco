@@ -82,9 +82,10 @@ npm install
 MONGODB_URI=your_mongodb_uri  
 CLOUDINARY_CLOUD_NAME=your_cloud_name  
 NEWSAPI_KEY=your_newsapi_key  
-GROQ_API_KEY=your_groq_key  
-Run the application:
+GROQ_API_KEY=your_groq_key
 ```
+Run the application:
+
 
  ```bash  
 npm run dev
