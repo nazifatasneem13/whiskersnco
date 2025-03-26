@@ -66,29 +66,29 @@
 ---
 
 ## ⚙️ Installation Guide  
-1. **Clone the repository**:  
+## **Clone the repository**:  
    ```bash  
-   git clone https://github.com/nazifatasneem13/whiskersnco.git  
-Install dependencies:
+   git clone https://github.com/nazifatasneem13/whiskersnco.git
+   ```
+## **Install dependencies**:
 
-bash
-Copy
+ ```bash  
 cd whiskers-and-co  
-npm install  
-Configure environment variables:
-Create a .env file with:
-
-env
-Copy
+npm install
+```  
+## **Configure environment variables**:
+ Create a .env file with:
+```bash  
 MONGODB_URI=your_mongodb_uri  
 CLOUDINARY_CLOUD_NAME=your_cloud_name  
 NEWSAPI_KEY=your_newsapi_key  
 GROQ_API_KEY=your_groq_key  
 Run the application:
+```
 
-bash
-Copy
-npm run dev  
+ ```bash  
+npm run dev
+```  
 ## 🚀 Deployment
 The project is deployed on Render:
 🔗 https://wnco.onrender.com/
@@ -114,11 +114,11 @@ Communicate in real-time after approval.
 
 Manage requests and monitor adoption history.
 ## 👥 Team Members
-Nabila Islam (210042111)
+- Nabila Islam (210042111)
 
-Nazifa Tasneem (210042114)
+- Nazifa Tasneem (210042114)
 
-Tasnia Anwer Medha (210042124)
+- Tasnia Anwer Medha (210042124)
 
 ## 📜 License
 This project is licensed under the MIT License. See LICENSE for details.
