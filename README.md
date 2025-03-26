@@ -89,44 +89,43 @@ Run the application:
 bash
 Copy
 npm run dev  
-🚀 Deployment
+## 🚀 Deployment
 The project is deployed on Render:
 🔗 https://wnco.onrender.com/
 
-🎮 Usage Guide
-Sign Up/Log In:
+## 🎮 Usage Guide
+-Sign Up/Log In:
 
 Register using email/password or Google OAuth.
 
-Browse Pets:
+- Browse Pets:
 
 Explore pets via the dynamic carousel or search filters.
 
-Submit Adoption Request:
+- Submit Adoption Request:
 
 Fill out the adoption form and upload required documents.
 
-Chat with Owners:
+- Chat with Owners:
 
 Communicate in real-time after approval.
 
-Admin Access:
+- Admin Access:
 
 Manage requests and monitor adoption history.
-
-👥 Team Members
+## 👥 Team Members
 Nabila Islam (210042111)
 
 Nazifa Tasneem (210042114)
 
 Tasnia Anwer Medha (210042124)
 
-📜 License
+## 📜 License
 This project is licensed under the MIT License. See LICENSE for details.
 
-🙏 Acknowledgments
-Academic Supervisor: Sabrina Islam, Lecturer, IUT.
+## 🙏 Acknowledgments
+- Academic Supervisor: Sabrina Islam, Lecturer, IUT.
 
-Industry Supervisor: Mohammad Galib Shams.
+- Industry Supervisor: Mohammad Galib Shams.
 
 Special thanks to IUT for guidance and resources.
