@@ -95,7 +95,7 @@ The project is deployed on Render:
 🔗 https://wnco.onrender.com/
 
 ## 🎮 Usage Guide
--Sign Up/Log In:
+- Sign Up/Log In:
 
 Register using email/password or Google OAuth.
 
